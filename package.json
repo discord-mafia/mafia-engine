@@ -1,0 +1,21 @@
+{
+	"scripts": {
+		"dev": "nodemon ./src/index.ts",
+		"build:prisma": "npx prisma format && npx prisma generate && npx prisma db push",
+		"build": "tsc",
+		"start:local": "pm2 start ./build/index.js --name betrayal-bot",
+		"start": "node ./build/index.js"
+	},
+	"dependencies": {
+		"@prisma/client": "^5.0.0",
+		"discord.js": "^14.11.0",
+		"dotenv": "^16.3.1",
+		"prisma": "^5.0.0",
+		"zod": "^3.21.4"
+	},
+	"devDependencies": {
+		"@types/node": "^20.4.2",
+		"ts-node": "^10.9.1",
+		"typecript": "^0.0.1-security"
+	}
+}
