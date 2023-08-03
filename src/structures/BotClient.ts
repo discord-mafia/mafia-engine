@@ -6,6 +6,7 @@ import {
 	Events,
 	GatewayIntentBits,
 	Guild,
+	Partials,
 	REST,
 	Routes,
 	SlashCommandBuilder,
@@ -27,7 +28,9 @@ export const DEFAULT_INTENTS = {
 		GatewayIntentBits.GuildMessages,
 		GatewayIntentBits.MessageContent,
 		GatewayIntentBits.GuildIntegrations,
+		GatewayIntentBits.GuildPresences,
 	],
+	partials: [Partials.User],
 };
 
 export const slashCommands: Collection<string, SlashCommand> = new Collection();

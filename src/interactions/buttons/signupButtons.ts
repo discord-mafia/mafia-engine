@@ -1,4 +1,4 @@
-import { ButtonBuilder, ButtonStyle } from 'discord.js';
+import { ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
 import { prisma } from '../..';
 import { Button } from '../../structures/interactions';
 import { getSignup } from '../../util/database';
@@ -56,20 +56,32 @@ export default new Button('button-category')
 				await removeFromCategory(category.id, i.user.id);
 			}
 		} else if (cache == 'settings') {
+			const embed = new EmbedBuilder();
+			embed.setColor('White');
+			embed.setTitle('Signup Data');
+			embed.addFields({
+				name: 'Signup Index',
+				value: '> ' + signup.id.toString(),
+			});
+
+			embed.addFields({
+				name: 'Category Index List',
+				value: signup.categories.length > 0 ? signup.categories.map((x) => `> ${x.name} - ${x.id}`).join('\n') : '> None',
+			});
+
+			return i.editReply({ embeds: [embed] });
 		} else {
 			const categoryId = parseInt(cache);
 			if (isNaN(categoryId)) return i.editReply({ content: 'This button is invalid' });
 
 			for (const category of signup.categories) {
 				if (category.id != categoryId) await removeFromCategory(category.id, i.user.id);
+				else {
+					const exists = category.users.find((x) => x.id == fetchedUser.id);
+					if (exists) return i.editReply({ content: 'You are already in this category' });
+					else await prisma.signupUserJunction.create({ data: { signupCategoryId: categoryId, userId: fetchedUser.id } });
+				}
 			}
-
-			await prisma.signupUserJunction.create({
-				data: {
-					userId: fetchedUser.id,
-					signupCategoryId: categoryId,
-				},
-			});
 		}
 
 		const reset = await getSignup({ messageId });
