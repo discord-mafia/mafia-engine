@@ -16,6 +16,7 @@ model User {
   username  String
 
   signupCategories SignupUserJunction[]
+  playerAccounts   Player[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -31,13 +32,15 @@ model Signup {
 }
 
 model SignupCategory {
-  id         Int                  @id @default(autoincrement())
-  signup     Signup               @relation(fields: [signupId], references: [id])
-  signupId   Int
-  name       String
-  limit      Int                  @default(-1)
-  isLocked   Boolean              @default(false)
-  emoji      String?
+  id        Int     @id @default(autoincrement())
+  signup    Signup  @relation(fields: [signupId], references: [id])
+  signupId  Int
+  name      String
+  isFocused Boolean @default(false)
+  limit     Int     @default(-1)
+  isLocked  Boolean @default(false)
+  emoji     String?
+
   users      SignupUserJunction[]
   buttonName String? // Uses the name if not set
 
@@ -51,4 +54,49 @@ model SignupUserJunction {
   signupCategoryId Int
   user             User           @relation(fields: [userId], references: [id])
   userId           Int
+}
+
+// Vote Counter
+
+model Player {
+  id            Int    @id @default(autoincrement())
+  voteCounterId Int
+  discordId     String
+
+  voteCounter   VoteCounter @relation(fields: [voteCounterId], references: [id])
+  user          User        @relation(fields: [discordId], references: [discordId])
+  votesIncoming Vote[]      @relation(name: "votedTarget")
+  votesOutgoing Vote[]      @relation(name: "voter")
+
+  @@unique([voteCounterId, discordId])
+}
+
+model VoteCounter {
+  id        Int      @id @default(autoincrement())
+  channelId String   @unique
+  votes     Vote[]
+  players   Player[]
+
+  currentRound     Int      @default(1)
+  currentIteration Int      @default(0)
+  lastCheckedVotes DateTime @default(now())
+
+  noLynch  Boolean @default(true)
+  majority Boolean @default(true)
+}
+
+model Vote {
+  id            Int  @id @default(autoincrement())
+  voteCounterId Int
+  votedTargetId Int?
+  voterId       Int
+
+  voteCounter VoteCounter @relation(fields: [voteCounterId], references: [id])
+  votedTarget Player?     @relation(fields: [votedTargetId], references: [id], name: "votedTarget")
+  voter       Player      @relation(fields: [voterId], references: [id], name: "voter")
+  reason      String?
+
+  isNoLynch Boolean @default(false)
+
+  createdAt DateTime @default(now())
 }

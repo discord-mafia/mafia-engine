@@ -5,7 +5,7 @@ export function formatSignupEmbed(signup: FullSignup) {
 	const embed = new EmbedBuilder();
 	embed.setTitle(signup.name ?? 'Game Signups');
 	embed.setDescription('Click the appropriate buttons to join a category');
-
+	embed.setColor('Blurple');
 	const row = new ActionRowBuilder<ButtonBuilder>();
 
 	for (const category of signup.categories) {
@@ -24,9 +24,8 @@ export function formatSignupEmbed(signup: FullSignup) {
 		const button = new ButtonBuilder();
 		button.setCustomId(`button-category_${category.id}`);
 		button.setLabel(category.buttonName ? category.buttonName : `Join ${name}`);
-		if (category.emoji) button.setEmoji(category.emoji);
 		if (isLocked || (limit && limit > 0 && userIds.length >= limit)) button.setDisabled(true);
-		button.setStyle(ButtonStyle.Secondary);
+		button.setStyle(category.isFocused ? ButtonStyle.Primary : ButtonStyle.Secondary);
 
 		row.addComponents(button);
 	}

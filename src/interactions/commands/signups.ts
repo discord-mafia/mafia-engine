@@ -32,6 +32,7 @@ export default newSlashCommand({
 								limit: limit,
 								emoji: '✅',
 								buttonName: 'Play',
+								isFocused: true,
 							},
 							{
 								name: 'Backups',
