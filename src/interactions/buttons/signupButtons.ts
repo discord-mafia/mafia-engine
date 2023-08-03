@@ -18,8 +18,7 @@ export default new Button('button-category')
 
 		await i.deferReply({ ephemeral: true });
 
-		await i.guild.members.fetch();
-		const member = i.guild.members.cache.get(i.user.id);
+		const member = await i.guild.members.fetch(i.user.id);
 		if (!member) return i.editReply({ content: 'Failed to fetch member.' });
 
 		const fetchedUser =
@@ -75,8 +74,8 @@ export default new Button('button-category')
 			if (isNaN(categoryId)) return i.editReply({ content: 'This button is invalid' });
 
 			for (const category of signup.categories) {
-				if (category.id != categoryId) await removeFromCategory(category.id, i.user.id);
-				else {
+				await removeFromCategory(category.id, i.user.id);
+				if (category.id == categoryId) {
 					const exists = category.users.find((x) => x.id == fetchedUser.id);
 					if (exists) return i.editReply({ content: 'You are already in this category' });
 					else await prisma.signupUserJunction.create({ data: { signupCategoryId: categoryId, userId: fetchedUser.id } });
