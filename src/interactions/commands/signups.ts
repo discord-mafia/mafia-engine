@@ -1,5 +1,5 @@
 import { ChannelType, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { newSlashCommand } from '../../structures/BotClient';
+import { ServerType, newSlashCommand } from '../../structures/BotClient';
 import { getSignup } from '../../util/database';
 import { formatSignupEmbed } from '../../util/embeds';
 import { prisma } from '../..';
@@ -10,6 +10,7 @@ data.addIntegerOption((limit) => limit.setName('limit').setDescription('Limit th
 
 export default newSlashCommand({
 	data,
+	serverType: ServerType.MAIN,
 	execute: async (i: ChatInputCommandInteraction) => {
 		const title = i.options.getString('title') ?? 'Game Signups';
 		const limit = i.options.getInteger('limit') ?? undefined;

@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { newSlashCommand } from '../../structures/BotClient';
+import { ServerType, newSlashCommand } from '../../structures/BotClient';
 import { getAllWithRole } from '../../util/discordRole';
+import config from '../../config';
 
 const StaffRoles: string[] = [
 	'648664560936550400', // Co-Owners
@@ -16,11 +17,14 @@ export default newSlashCommand({
 		if (!i.guild) return;
 		await i.deferReply();
 
+		const mainGuild = await i.client.guilds.fetch(config.MAIN_SERVER_ID);
+		if (!mainGuild) return i.editReply('An error has occurred');
+
 		try {
 			const allStaff: Record<string, string[]> = {};
 			for (let j = 0; j < StaffRoles.length; j++) {
 				const staffRoleID = StaffRoles[j];
-				const data = await getAllWithRole(i.guild, staffRoleID);
+				const data = await getAllWithRole(mainGuild, staffRoleID);
 				if (!data) continue;
 				const { role, members } = data;
 				const uniqueMembers: string[] = [];
