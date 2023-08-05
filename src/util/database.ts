@@ -125,3 +125,26 @@ export async function getVoteCounter(query: VoteCountQuery) {
 		},
 	});
 }
+
+export type FullArchive = NonNullable<Awaited<ReturnType<typeof getArchive>>>;
+export async function getArchive(gameTag: string) {
+	try {
+		return await prisma.archivedGame.findUnique({
+			where: {
+				gameHandle: gameTag,
+			},
+			include: {
+				actions: true,
+				urls: true,
+				users: {
+					include: {
+						user: true,
+					},
+				},
+			},
+		});
+	} catch (err) {
+		console.log(err);
+		return null;
+	}
+}
