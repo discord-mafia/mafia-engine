@@ -34,10 +34,37 @@ export default newSlashCommand({
 			.setThumbnail(user.displayAvatarURL())
 			.setColor(averageColour as ColorResolvable);
 
+		// embed.addFields({
+		// 	name: 'Biography',
+		// 	value: '> This is my epilogue\n> My Soliliquy\n> Take this broken melody, straight to the grave',
+		// });
+
 		embed.addFields({
 			name: 'Official Name',
 			value: citizenship.username,
+			inline: true,
 		});
+
+		embed.addFields({
+			name: 'Winrate (26 games)',
+			value: '75.52%',
+			inline: true,
+		});
+
+		embed.setAuthor({
+			name: 'Citizen �',
+			iconURL: 'https://media.discordapp.net/attachments/978980333968052254/1136743501447565464/Staff.png?width=438&height=460',
+		});
+
+		if (citizenship.mvpStatus != 'None') {
+			const crownURL =
+				'https://media.discordapp.net/attachments/1119025192946110464/1136734900351934464/pngtree-beutifull-gold-crown-clipart-vector-art-png-image_6566757.png?width=720&height=720';
+			const crownType = citizenship.mvpStatus;
+			embed.setFooter({
+				text: `${crownType} MVP`,
+				iconURL: crownURL,
+			});
+		}
 
 		return i.reply({ embeds: [embed], ephemeral: hidden });
 	},

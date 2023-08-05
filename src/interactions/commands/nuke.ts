@@ -1,5 +1,5 @@
 import { CategoryChannel, Channel, ChannelType, SlashCommandBuilder, TextChannel } from 'discord.js';
-import { newSlashCommand } from '../../structures/BotClient';
+import { ServerType, newSlashCommand } from '../../structures/BotClient';
 
 const data = new SlashCommandBuilder().setName('nuke').setDescription('Delete all channels underneath a category');
 data.addChannelOption((x) =>
@@ -8,6 +8,7 @@ data.addChannelOption((x) =>
 
 export default newSlashCommand({
 	data,
+	serverType: ServerType.PLAYERCHAT,
 	execute: async (i) => {
 		await i.deferReply();
 		const category = i.options.getChannel('category', true) as CategoryChannel;

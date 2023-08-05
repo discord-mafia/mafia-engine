@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder, ChatInputCommandInteraction, ChannelType } from 'discord.js';
-import { newSlashCommand } from '../../structures/BotClient';
+import { ServerType, newSlashCommand } from '../../structures/BotClient';
 import { getAllWithRole } from '../../util/discordRole';
 import { prisma } from '../..';
 import { getOrCreatePlayer, getOrCreateUser, getPlayer, getVoteCounter } from '../../util/database';
@@ -14,6 +14,7 @@ data.addBooleanOption((option) =>
 
 export default newSlashCommand({
 	data,
+	serverType: ServerType.MAIN,
 	execute: async (i) => {
 		if (!i.guild) return;
 		const votedPlayerUser = i.options.getUser('player', false);

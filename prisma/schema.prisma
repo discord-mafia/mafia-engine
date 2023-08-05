@@ -10,16 +10,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Status {
+  None
+  Bronze
+  Silver
+  Gold
+  Diamond
+  Platinum
+}
+
 model User {
   id        Int    @id @default(autoincrement())
   discordId String @unique
   username  String
+  mvpStatus Status @default(None)
 
   signupCategories SignupUserJunction[]
   playerAccounts   Player[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  gameHosts GameHost[]
+}
+
+model GameHost {
+  id       String @id @default(uuid())
+  signup   Signup @relation(fields: [signupId], references: [id])
+  user     User   @relation(fields: [userId], references: [id])
+  signupId Int
+  userId   Int
 }
 
 model Signup {
@@ -29,6 +48,13 @@ model Signup {
   channelId  String
   messageId  String           @unique
   categories SignupCategory[]
+
+  isActive        Boolean    @default(true)
+  requiredServers String[]   @default([])
+  isTurbo         Boolean    @default(false)
+  hosts           GameHost[]
+
+  createdAt DateTime @default(now())
 }
 
 model SignupCategory {
@@ -54,19 +80,24 @@ model SignupUserJunction {
   signupCategoryId Int
   user             User           @relation(fields: [userId], references: [id])
   userId           Int
+  isTurboHost      Boolean        @default(false)
 }
 
 // Vote Counter
 
 model Player {
-  id            Int    @id @default(autoincrement())
-  voteCounterId Int
-  discordId     String
+  id              Int     @id @default(autoincrement())
+  voteCounterId   Int?
+  discordId       String
+  automatedGameId String?
 
-  voteCounter   VoteCounter @relation(fields: [voteCounterId], references: [id])
-  user          User        @relation(fields: [discordId], references: [discordId])
-  votesIncoming Vote[]      @relation(name: "votedTarget")
-  votesOutgoing Vote[]      @relation(name: "voter")
+  voteCounter   VoteCounter? @relation(fields: [voteCounterId], references: [id])
+  user          User         @relation(fields: [discordId], references: [discordId])
+  votesIncoming Vote[]       @relation(name: "votedTarget")
+  votesOutgoing Vote[]       @relation(name: "voter")
+
+  automatedGame  AutomatedGame?  @relation(fields: [automatedGameId], references: [id])
+  automatedRoles AutomatedRole[]
 
   @@unique([voteCounterId, discordId])
 }
@@ -77,9 +108,10 @@ model VoteCounter {
   votes     Vote[]
   players   Player[]
 
-  currentRound     Int      @default(1)
-  currentIteration Int      @default(0)
-  lastCheckedVotes DateTime @default(now())
+  currentRound     Int            @default(1)
+  currentIteration Int            @default(0)
+  lastCheckedVotes DateTime       @default(now())
+  automatedGame    AutomatedGame?
 
   noLynch  Boolean @default(true)
   majority Boolean @default(true)
@@ -99,4 +131,44 @@ model Vote {
   isNoLynch Boolean @default(false)
 
   createdAt DateTime @default(now())
+}
+
+model AutomatedGame {
+  id            String @id @default(uuid())
+  voteCounterId Int?   @unique
+
+  currentPhase      Int             @default(0) // 0 = pregame
+  scheduledPhaseEnd DateTime?
+  voteCounter       VoteCounter?    @relation(fields: [voteCounterId], references: [id])
+  players           Player[]
+  roles             AutomatedRole[]
+
+  guildId        String
+  infoChannelId  String? @unique
+  chatChannelId  String? @unique
+  mafiaChannelId String? @unique
+}
+
+model AutomatedRole {
+  id              String @id @default(uuid())
+  automatedGameId String
+  playerId        Int
+
+  roleName      String
+  automatedGame AutomatedGame @relation(fields: [automatedGameId], references: [id])
+  player        Player        @relation(fields: [playerId], references: [id])
+}
+
+// Role Cards
+model Role {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  otherNames   String[]
+  alignment    String
+  abilities    String
+  winCondition String
+  iconUrl      String?
+  flavourText  String?
+  roleColour   String?
+  wikiUrl      String?
 }

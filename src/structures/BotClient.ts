@@ -20,6 +20,7 @@ import { ContextMenuCommandBuilder } from 'discord.js';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import { Extension } from '../util/types';
+import config from '../config';
 
 export const DEFAULT_INTENTS = {
 	intents: [
@@ -34,8 +35,16 @@ export const DEFAULT_INTENTS = {
 };
 
 export const slashCommands: Collection<string, SlashCommand> = new Collection();
+export enum ServerType {
+	MAIN = 'MAIN',
+	PLAYERCHAT = 'PLAYERCHAT',
+	TURBO = 'TURBO',
+	ALL = 'ALL',
+	NONE = 'NONE',
+}
 export interface SlashCommand {
 	data: SlashCommandBuilder;
+	serverType?: ServerType | ServerType[];
 	execute: (i: ChatInputCommandInteraction) => any | Promise<any>;
 }
 
@@ -57,7 +66,7 @@ export class BotClient extends Client {
 
 	public interactionsPath = path.join(__dirname, '..', 'interactions');
 
-	constructor(clientID: string, discordToken: string) {
+	constructor(clientID: string, discordToken: string, registerCallback: (client: BotClient) => void = (c) => {}) {
 		super(DEFAULT_INTENTS);
 		this.discordToken = discordToken;
 		this.clientID = clientID;
@@ -71,7 +80,7 @@ export class BotClient extends Client {
 		this.loadInteractions<ContextMenuCommandBuilder>('context');
 
 		this.assignEvents();
-		this.registerCommands();
+		this.registerCommands().then(() => registerCallback(this));
 	}
 
 	private async assignEvents() {
@@ -93,25 +102,58 @@ export class BotClient extends Client {
 					const filePath = path.join(commandPath, file);
 					require(filePath).default as T;
 				} catch (err) {
-					console.error(`Failed trying to load ${file}`);
+					console.log(`\x1B[31mFailed to load file: \x1B[34m${file}\x1B[0m`);
+
 					console.error(err);
 				}
 			}
 		} catch (err) {
-			console.log(`Failed to load ${newPath}`);
+			console.log(`\x1B[31mFailed to load directory: \x1B[34m${newPath}\x1B[0m`);
 		}
 	}
 
 	public async registerCommands() {
 		try {
-			const list: any[] = [];
+			const commandList: Record<ServerType, any[]> = {
+				MAIN: [],
+				PLAYERCHAT: [],
+				ALL: [],
+				NONE: [],
+				TURBO: [],
+			};
+
 			slashCommands.forEach((val) => {
-				list.push(val.data.toJSON());
+				if (!val.serverType) return commandList[ServerType.ALL].push(val.data);
+				else if (Array.isArray(val.serverType)) {
+					val.serverType.forEach((type) => {
+						commandList[type].push(val.data);
+					});
+				} else if (val.serverType) {
+					commandList[val.serverType].push(val.data);
+				} else {
+					commandList[ServerType.NONE].push(val.data);
+				}
 			});
 
-			const raw = await this.rest.put(Routes.applicationCommands(this.clientID), { body: list });
-			const data = raw as any;
-			console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+			const allServers = (await this.rest.put(Routes.applicationCommands(this.clientID), { body: commandList['ALL'] })) as any;
+			console.log(`[ALL] Successfully reloaded ${allServers.length} application (/) commands.`);
+
+			const mainServer = (await this.rest.put(Routes.applicationGuildCommands(this.clientID, config.MAIN_SERVER_ID), {
+				body: commandList['MAIN'],
+			})) as any;
+			console.log(`[MAIN] Successfully reloaded ${mainServer.length} application (/) commands.`);
+
+			const playerChatServer = (await this.rest.put(Routes.applicationGuildCommands(this.clientID, config.PLAYERCHAT_SERVER_ID), {
+				body: commandList['PLAYERCHAT'],
+			})) as any;
+			console.log(`[PLAYERCHAT] Successfully reloaded ${playerChatServer.length} application (/) commands.`);
+
+			const turboServer = (await this.rest.put(Routes.applicationGuildCommands(this.clientID, config.TURBO_SERVER_ID), {
+				body: commandList['TURBO'],
+			})) as any;
+			console.log(`[TURBO] Successfully reloaded ${turboServer.length} application (/) commands.`);
+
+			console.log(`[NONE] ${commandList['NONE'].length} commands force-skipped`);
 		} catch (err) {
 			console.error(err);
 		}

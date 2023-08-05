@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder, ChatInputCommandInteraction } from 'discord.js';
-import { newSlashCommand } from '../../structures/BotClient';
+import { ServerType, newSlashCommand } from '../../structures/BotClient';
 import { getAllWithRole } from '../../util/discordRole';
 import { prisma } from '../..';
 import { getOrCreateUser, getPlayer, getVoteCounter } from '../../util/database';
@@ -29,6 +29,7 @@ data.addSubcommand((sub) =>
 
 export default newSlashCommand({
 	data,
+	serverType: ServerType.MAIN,
 	execute: async (i) => {
 		if (!i.guild) return;
 
