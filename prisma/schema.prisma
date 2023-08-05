@@ -87,14 +87,14 @@ model SignupUserJunction {
 
 model Player {
   id              Int     @id @default(autoincrement())
-  voteCounterId   Int
+  voteCounterId   Int?
   discordId       String
   automatedGameId String?
 
-  voteCounter   VoteCounter @relation(fields: [voteCounterId], references: [id])
-  user          User        @relation(fields: [discordId], references: [discordId])
-  votesIncoming Vote[]      @relation(name: "votedTarget")
-  votesOutgoing Vote[]      @relation(name: "voter")
+  voteCounter   VoteCounter? @relation(fields: [voteCounterId], references: [id])
+  user          User         @relation(fields: [discordId], references: [discordId])
+  votesIncoming Vote[]       @relation(name: "votedTarget")
+  votesOutgoing Vote[]       @relation(name: "voter")
 
   automatedGame  AutomatedGame?  @relation(fields: [automatedGameId], references: [id])
   automatedRoles AutomatedRole[]
@@ -135,13 +135,18 @@ model Vote {
 
 model AutomatedGame {
   id            String @id @default(uuid())
-  voteCounterId Int    @unique
+  voteCounterId Int?   @unique
 
   currentPhase      Int             @default(0) // 0 = pregame
-  scheduledPhaseEnd DateTime
-  voteCounter       VoteCounter     @relation(fields: [voteCounterId], references: [id])
+  scheduledPhaseEnd DateTime?
+  voteCounter       VoteCounter?    @relation(fields: [voteCounterId], references: [id])
   players           Player[]
   roles             AutomatedRole[]
+
+  guildId        String
+  infoChannelId  String? @unique
+  chatChannelId  String? @unique
+  mafiaChannelId String? @unique
 }
 
 model AutomatedRole {
