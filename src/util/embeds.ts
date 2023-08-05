@@ -50,13 +50,15 @@ export function formatSignupEmbed(signup: FullSignup) {
 	row.addComponents(new ButtonBuilder().setCustomId('button-category_leave').setEmoji('❌').setStyle(ButtonStyle.Secondary));
 	row.addComponents(new ButtonBuilder().setCustomId('button-category_settings').setEmoji('⚙').setStyle(ButtonStyle.Secondary));
 
-	if (totalUsers.length <= 0 || (signup.isTurbo && !signup.isActive)) {
-		embed.setFields([]);
-		embed.setDescription('This turbo lobby has been closed.');
-		embed.setTimestamp(new Date());
-		embed.setColor('Red');
-		for (const button of row.components) {
-			button.setDisabled(true);
+	if (signup.isTurbo) {
+		if (totalUsers.length <= 0 || !signup.isActive) {
+			embed.setFields([]);
+			embed.setDescription('This turbo lobby has been closed.');
+			embed.setTimestamp(new Date());
+			embed.setColor('Red');
+			for (const button of row.components) {
+				button.setDisabled(true);
+			}
 		}
 	}
 
