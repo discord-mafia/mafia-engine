@@ -25,6 +25,8 @@ export async function checkExpiredTurbos(client: Client) {
 		const turboList = await getExpiredTurbos();
 		for (const turbo of turboList) {
 			const { channelId, messageId, serverId } = turbo;
+			if (!turbo.isTurbo) continue;
+
 			const guild = await client.guilds.fetch(serverId);
 			if (!guild) continue;
 
