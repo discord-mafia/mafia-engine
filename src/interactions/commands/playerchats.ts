@@ -68,10 +68,11 @@ export default newSlashCommand({
 		});
 		if (!hostPanel) return i.editReply({ content: 'Failed to create host panel' });
 
+		await i.guild.members.fetch();
 		for (const user of signupCategory.users) {
 			const { discordId, username } = user.user;
 
-			const member = await i.guild.members.fetch(discordId);
+			const member = i.guild.members.cache.get(discordId);
 
 			const channel = await i.guild.channels.create({
 				name: username,
@@ -86,7 +87,7 @@ export default newSlashCommand({
 				continue;
 			}
 
-			await channel.permissionOverwrites.create(member.id, {
+			await channel.permissionOverwrites.create(discordId, {
 				ViewChannel: true,
 				SendMessages: true,
 			});
