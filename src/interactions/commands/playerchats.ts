@@ -79,7 +79,10 @@ export default newSlashCommand({
 				name: username,
 				type: ChannelType.GuildText,
 				parent: category,
-				permissionOverwrites: member ? [{ id: discordId, allow: ['ViewChannel'] }] : undefined,
+			});
+
+			channel.permissionOverwrites.create(member.id, {
+				ViewChannel: true,
 			});
 
 			hostPanel.send({ content: `Created channel for ${username} <#${channel.id}>` });

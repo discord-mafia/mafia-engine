@@ -134,7 +134,15 @@ export async function getArchive(gameTag: string) {
 				gameHandle: gameTag,
 			},
 			include: {
-				actions: true,
+				actions: {
+					include: {
+						user: {
+							include: {
+								user: true,
+							},
+						},
+					},
+				},
 				urls: true,
 				users: {
 					include: {
