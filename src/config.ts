@@ -13,6 +13,7 @@ const envSchema = z.object({
 	PLAYERCHAT_SERVER_ID: z.string(),
 	TURBO_SERVER_ID: z.string(),
 	LOG_WEBHOOK_URL: z.string().url().nullish(),
+	IMAGE_CDN_WEBHOOK_URL: z.string().url().nullish(),
 });
 
 export const env = envSchema.parse(process.env);

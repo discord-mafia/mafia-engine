@@ -95,11 +95,12 @@ model ArchivedGame {
   messageId         String? @unique
   managingMessageId String? @unique
 
-  actions        ArchivedGameAction[]
-  urls           ArchivedURL[]
-  users          ArchivedGameUserJunction[]
-  spreadsheetURL String?
-  additionalURLs String[]                   @default([])
+  actions             ArchivedGameAction[]
+  urls                ArchivedURL[]
+  users               ArchivedGameUserJunction[]
+  spreadsheetURL      String?
+  spreadsheetImageURL String?
+  additionalURLs      String[]                   @default([])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -114,6 +115,7 @@ model ArchivedGameUserJunction {
   isWinner       Boolean              @default(false)
   isLoser        Boolean              @default(false)
   role           String?
+  alignment      String?
   user           User                 @relation(fields: [userId], references: [id])
   archivedGame   ArchivedGame         @relation(fields: [archivedGameId], references: [id])
   actions        ArchivedGameAction[]
@@ -126,6 +128,8 @@ model ArchivedGameAction {
   game           ArchivedGame              @relation(fields: [archivedGameId], references: [id])
   user           ArchivedGameUserJunction? @relation(fields: [userId], references: [id])
   actionDetails  String
+  phase          String
+  phaseNumber    Int
 }
 
 model ArchivedURL {
