@@ -72,20 +72,26 @@ export default newSlashCommand({
 			const { discordId, username } = user.user;
 
 			const member = await i.guild.members.fetch(discordId);
-			if (!member) {
-				hostPanel.send({ content: `Failed to find ${username} in the server` });
-			}
+
 			const channel = await i.guild.channels.create({
 				name: username,
 				type: ChannelType.GuildText,
 				parent: category,
 			});
 
-			channel.permissionOverwrites.create(member.id, {
+			if (!member) {
+				hostPanel.send({
+					content: `\`\`\`Failed to find ${username} in the server. Manually fix their permissions in <#${channel.id}>\`\`\``,
+				});
+				continue;
+			}
+
+			await channel.permissionOverwrites.create(member.id, {
 				ViewChannel: true,
+				SendMessages: true,
 			});
 
-			hostPanel.send({ content: `Created channel for ${username} <#${channel.id}>` });
+			await hostPanel.send({ content: `Created channel for ${username} <#${channel.id}>` });
 		}
 
 		await i.editReply({ content: 'Done' });
