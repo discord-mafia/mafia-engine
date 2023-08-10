@@ -1,8 +1,6 @@
-import { Attachment, AttachmentBuilder, Colors, WebhookClient } from 'discord.js';
+import { AttachmentBuilder, Colors, WebhookClient } from 'discord.js';
 import config from '../config';
 import { EmbedBuilder } from '@discordjs/builders';
-import { client } from '..';
-import { type } from 'os';
 
 export enum LogType {
 	Error = 'Error',
