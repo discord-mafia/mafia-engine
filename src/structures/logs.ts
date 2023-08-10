@@ -1,4 +1,4 @@
-import { AttachmentBuilder, Colors, WebhookClient } from 'discord.js';
+import { AttachmentBuilder, ColorResolvable, Colors, RGBTuple, WebhookClient } from 'discord.js';
 import config from '../config';
 import { EmbedBuilder } from '@discordjs/builders';
 
@@ -12,6 +12,7 @@ interface BaseLog {
 	message: string;
 	file?: Buffer;
 	timestamp: Date;
+	color: number | RGBTuple | null;
 }
 
 export async function sendLog(log: BaseLog) {
@@ -24,6 +25,7 @@ export async function sendLog(log: BaseLog) {
 		const embed = new EmbedBuilder();
 		embed.setTitle(`Log: ${log.type}`);
 		embed.setColor(log.type == LogType.Error ? Colors.Red : Colors.White);
+		if (log.color) embed.setColor(log.color);
 		embed.setDescription(log.message);
 		embed.setTimestamp(log.timestamp);
 
@@ -36,11 +38,12 @@ export async function sendLog(log: BaseLog) {
 	}
 }
 
-export async function sendInfoLog(message: string) {
+export async function sendInfoLog(message: string, customColor: number | RGBTuple | null = Colors.White) {
 	return sendLog({
 		type: LogType.Info,
 		message,
 		timestamp: new Date(),
+		color: customColor,
 	});
 }
 
@@ -53,6 +56,7 @@ export async function sendErrorLog(message: string, error?: unknown) {
 		message,
 		file: buffer,
 		timestamp: new Date(),
+		color: Colors.Red,
 	});
 }
 

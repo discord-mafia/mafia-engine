@@ -1,4 +1,4 @@
-import { ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
+import { ButtonBuilder, ButtonStyle, Colors, EmbedBuilder } from 'discord.js';
 import { prisma } from '../..';
 import { Button } from '../../structures/interactions';
 import { getSignup } from '../../util/database';
@@ -85,7 +85,8 @@ export default new Button('button-category')
 		if (cache == 'leave') {
 			for (const category of signup.categories) {
 				const count = await removeFromCategory(category.id, i.user.id);
-				if (count > 0) sendInfoLog(`User ${i.user.username} has left ${category.name} in signup ${signup.id} (<#${signup.channelId}>)`);
+				if (count > 0)
+					sendInfoLog(`User ${i.user.username} has left ${category.name} in signup ${signup.id} (<#${signup.channelId}>)`, Colors.Red);
 			}
 		} else if (cache == 'settings') {
 			const embed = new EmbedBuilder();
@@ -113,7 +114,10 @@ export default new Button('button-category')
 					if (exists) return i.editReply({ content: 'You are already in this category' });
 					else {
 						await prisma.signupUserJunction.create({ data: { signupCategoryId: categoryId, userId: fetchedUser.id } });
-						sendInfoLog(`User ${i.user.username} has joined ${category.name} in signup ${signup.id} (<#${signup.channelId}>)`);
+						sendInfoLog(
+							`User ${i.user.username} has joined ${category.name} in signup ${signup.id} (<#${signup.channelId}>)`,
+							category.isFocused ? Colors.Green : Colors.Yellow
+						);
 					}
 				}
 			}
