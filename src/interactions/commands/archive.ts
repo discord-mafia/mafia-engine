@@ -22,10 +22,10 @@ import { first } from 'cheerio/lib/api/traversing';
 
 const data = new SlashCommandBuilder().setName('archive').setDescription('Manage an archive');
 
-const queues: string[] = ['main', 'special', 'newcomer', 'turbo', 'community'];
+export const queues: string[] = ['main', 'special', 'newcomer', 'turbo', 'community', 'extra'];
 const phases: string[] = ['day', 'night', 'pregame', 'postgame'];
 
-function addQueueOptions(opt: SlashCommandStringOption) {
+export function addQueueOptions(opt: SlashCommandStringOption) {
 	return opt
 		.setName('queue')
 		.setDescription('The queue to start an archive for')
@@ -191,7 +191,7 @@ export default newSlashCommand({
 	},
 });
 
-function getGameTag(queue: string, number: number) {
+export function getGameTag(queue: string, number: number) {
 	return queue.slice(0, 2).toUpperCase() + number;
 }
 
@@ -485,13 +485,11 @@ async function addEvent(i: ChatInputCommandInteraction) {
 
 	const gameTag = getGameTag(queue, number);
 
-	const isUsingDiscordID = !member && hostNumber;
 	const discordID = member?.id || hostNumber?.toString();
-	if (!discordID) return i.reply({ content: 'No member or discord id provided.', ephemeral: true });
+	const hasUser = !!discordID;
 
 	const archivedGame = await getArchive(gameTag);
 	if (!archivedGame) return i.reply({ content: `No archive found for ${gameTag}.`, ephemeral: true });
-
 	const fetchedUser = await prisma.archivedGameUserJunction.findFirst({
 		where: {
 			archivedGameId: archivedGame.id,
@@ -501,12 +499,10 @@ async function addEvent(i: ChatInputCommandInteraction) {
 		},
 	});
 
-	if (!fetchedUser) return i.reply({ content: `No user found for ${discordID}.`, ephemeral: true });
-
 	const archivedGameEvent = await prisma.archivedGameAction.create({
 		data: {
 			archivedGameId: archivedGame.id,
-			userId: fetchedUser.id,
+			userId: hasUser ? fetchedUser?.id : undefined,
 			actionDetails: event,
 			phase: phase,
 			phaseNumber: eventNumber,
@@ -568,17 +564,8 @@ export function formatArchive(archive: FullArchive) {
 		});
 	}
 
-	if (archive.spreadsheetURL) format += `## Spreadsheet\n${archive.spreadsheetURL}\n`;
-
-	if (archive.urls.length > 0) {
-		format += `## URLs\n`;
-		archive.urls.forEach((url) => {
-			format += `- ${url.name}: ${url.url}\n`;
-		});
-	}
-
 	if (archive.actions.length > 0) {
-		format += `## Actions\n`;
+		format += `## Game History\n`;
 
 		const preGame = archive.actions.filter((action) => action.phase === 'pregame');
 		const postGame = archive.actions.filter((action) => action.phase === 'postgame');
@@ -597,8 +584,6 @@ export function formatArchive(archive: FullArchive) {
 				if (action.user) dayActions.get(action.phaseNumber)?.push(` - **${action.user.user.username}** ${action.actionDetails}`);
 				else dayActions.get(action.phaseNumber)?.push(` - ${action.actionDetails}`);
 			});
-
-		console.log(dayActions);
 
 		archive.actions
 			.filter((action) => action.phase === 'night')
@@ -625,9 +610,6 @@ export function formatArchive(archive: FullArchive) {
 		for (let i = 0; i <= largestPhaseNumber; i++) {
 			const day = dayActions.get(i);
 			const night = nightActions.get(i);
-
-			console.log(day, night);
-
 			if (!day && !night) continue;
 
 			if (day) {
@@ -651,8 +633,156 @@ export function formatArchive(archive: FullArchive) {
 			);
 		}
 
-		if (list.length > 0) format += list.join('\n');
+		if (list.length > 0) format += list.join('\n') + '\n';
+	}
+
+	if (archive.spreadsheetURL) format += `## Spreadsheet\n${archive.spreadsheetURL}\n`;
+
+	if (archive.urls.length > 0) {
+		format += `## URLs\n`;
+		archive.urls.forEach((url) => {
+			format += `- ${url.name}: ${url.url}\n`;
+		});
 	}
 
 	return { content: format, image: archive.spreadsheetImageURL };
+}
+
+export function formatArchiveEmbed(archive: FullArchive) {
+	const embed = new EmbedBuilder();
+	embed.setColor('White');
+	embed.setTitle(`${archive.gameHandle.toUpperCase()}: ${archive.gameTitle}`);
+	const hostList = archive.users
+		.filter((user) => user.isHost)
+		.map((user) => '- ' + user.user.username)
+		.join('\n');
+	if (hostList.length > 0) embed.addFields({ name: 'Hosts', value: hostList });
+
+	const coHostList = archive.users
+		.filter((user) => user.isCoHost)
+		.map((user) => '- ' + user.user.username)
+		.join('\n');
+	if (coHostList.length > 0) embed.addFields({ name: 'Co-Hosts', value: coHostList });
+
+	const winnerListFormat = new Map<string, string[]>();
+	archive.users
+		.filter((user) => user.isWinner)
+		.forEach((v) => {
+			if (v.role && v.alignment) {
+				if (!winnerListFormat.get(v.alignment)) winnerListFormat.set(v.alignment, []);
+				winnerListFormat.get(v.alignment)?.push(` - **${v.user.username}** as ${v.role}`);
+			}
+		});
+	if (winnerListFormat.size > 0) {
+		embed.addFields({
+			name: 'Winners',
+			value: Array.from(winnerListFormat.entries())
+				.map(([k, v]) => {
+					return `- **${k}**\n${v.join('\n')}`;
+				})
+				.join('\n'),
+		});
+	}
+
+	const loserListFormat = new Map<string, string[]>();
+	archive.users
+		.filter((user) => user.isLoser)
+		.forEach((v) => {
+			if (v.role && v.alignment) {
+				if (!loserListFormat.get(v.alignment)) loserListFormat.set(v.alignment, []);
+				loserListFormat.get(v.alignment)?.push(` - **${v.user.username}** as ${v.role}`);
+			}
+		});
+	if (loserListFormat.size > 0) {
+		embed.addFields({
+			name: 'Losers',
+			value: Array.from(loserListFormat.entries())
+				.map(([k, v]) => {
+					return `- **${k}**\n${v.join('\n')}`;
+				})
+				.join('\n'),
+		});
+	}
+
+	if (archive.actions.length > 0) {
+		const preGame = archive.actions.filter((action) => action.phase === 'pregame');
+		const postGame = archive.actions.filter((action) => action.phase === 'postgame');
+
+		const dayActions = new Map<number, string[]>();
+		const nightActions = new Map<number, string[]>();
+
+		let largestPhaseNumber = 0;
+
+		archive.actions
+			.filter((action) => action.phase === 'day')
+			.forEach((action) => {
+				largestPhaseNumber = Math.max(largestPhaseNumber, action.phaseNumber);
+
+				if (!dayActions.get(action.phaseNumber)) dayActions.set(action.phaseNumber, []);
+				if (action.user) dayActions.get(action.phaseNumber)?.push(` - **${action.user.user.username}** ${action.actionDetails}`);
+				else dayActions.get(action.phaseNumber)?.push(` - ${action.actionDetails}`);
+			});
+
+		archive.actions
+			.filter((action) => action.phase === 'night')
+			.forEach((action) => {
+				largestPhaseNumber = Math.max(largestPhaseNumber, action.phaseNumber);
+
+				if (!nightActions.get(action.phaseNumber)) nightActions.set(action.phaseNumber, []);
+				if (action.user) nightActions.get(action.phaseNumber)?.push(` - **${action.user.user.username}** ${action.actionDetails}`);
+				else nightActions.get(action.phaseNumber)?.push(` - ${action.actionDetails}`);
+			});
+
+		const list: string[] = [];
+
+		if (preGame.length > 0) {
+			list.push(`- Pre-Game`);
+			list.push(
+				...preGame.map((action) => {
+					if (action.user) return ` - **${action.user.user.username}** ${action.actionDetails}`;
+					else return ` - ${action.actionDetails}`;
+				})
+			);
+		}
+
+		for (let i = 0; i <= largestPhaseNumber; i++) {
+			const day = dayActions.get(i);
+			const night = nightActions.get(i);
+			if (!day && !night) continue;
+
+			if (day) {
+				list.push(`- Day ${i}`);
+				list.push(...day);
+			}
+
+			if (night) {
+				list.push(`- Night ${i}`);
+				list.push(...night);
+			}
+		}
+
+		if (postGame.length > 0) {
+			list.push(`- Post-Game`);
+			list.push(
+				...postGame.map((action) => {
+					if (action.user) return ` - **${action.user.user.username}** ${action.actionDetails}`;
+					else return ` - ${action.actionDetails}`;
+				})
+			);
+		}
+
+		if (list.length > 0) embed.addFields({ name: 'Game History', value: list.join('\n') });
+	}
+
+	if (archive.spreadsheetURL) embed.addFields({ name: 'Spreadsheet', value: archive.spreadsheetURL });
+	if (archive.urls.length > 0) {
+		embed.addFields({
+			name: 'URLs',
+			value: archive.urls.map((url) => `- ${url.name ? url.name + ': ' : ''}${url.url}`).join('\n'),
+		});
+	}
+
+	if (archive.spreadsheetImageURL) embed.setThumbnail(archive.spreadsheetImageURL);
+
+	return embed;
 }

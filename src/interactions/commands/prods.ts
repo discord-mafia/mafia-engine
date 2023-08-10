@@ -27,27 +27,53 @@ export default newSlashCommand({
 
 		try {
 			await i.guild.roles.fetch();
-			await i.guild.members.fetch();
-
-			const prodChecks: Record<string, Message<boolean>[]> = {};
 			const role = i.guild.roles.cache.get(aliveLine.id);
 			if (!role) throw Error('Invalid role');
-			const users = role.members.map((m) => m.user.id);
-			users.forEach((user) => {
-				prodChecks[user] = [];
+
+			const prods = new Map<string, Message<boolean>[]>();
+			role.members.forEach((m) => {
+				prods.set(m.user.id, []);
 			});
 
-			await i.editReply({
-				content: `Checking prods for:\n${users.map((u) => `<@${u}>`).join('\n')}`,
-			});
+			const formatContent = (complete: boolean = false) => {
+				const embed = new EmbedBuilder();
+				embed.setColor(complete ? Colors.Green : Colors.Red);
+				embed.setTitle('Checking Prods...');
+
+				const passed: [string, number][] = [];
+				const failed: [string, number][] = [];
+
+				prods.forEach((value, key) => {
+					if (value.length >= req) passed.push([key, value.length]);
+					else failed.push([key, value.length]);
+				});
+
+				const passText = passed.length > 0 ? passed.map((v) => `<@${v[0]}>: ${v[1]}/${req}`).join('\n') : '> None';
+				const failText = failed.length > 0 ? failed.map((v) => `<@${v[0]}>: ${v[1]}/${req}`).join('\n') : '> None';
+
+				embed.addFields(
+					{
+						name: 'Passed',
+						value: passText,
+					},
+					{
+						name: 'Failed',
+						value: failText,
+					}
+				);
+
+				return embed;
+			};
+
+			await i.editReply({ embeds: [formatContent()] });
 
 			let message = await channel.messages.fetch({ limit: 1 }).then((messagePage) => (messagePage.size === 1 ? messagePage.at(0) : null));
 			let messageCount = 1;
 
 			const checkMessage = (msg: Message) => {
 				const createdAt = Math.ceil(msg.createdAt.getTime() / 1000);
-				if (users.includes(msg.author.id) && createdAt > seconds) {
-					prodChecks[msg.author.id].push(msg);
+				if (prods.has(msg.author.id) && createdAt > seconds) {
+					prods.get(msg.author.id)?.push(msg);
 				}
 			};
 
@@ -63,27 +89,11 @@ export default newSlashCommand({
 					message = 0 < messagePage.size ? messagePage.at(messagePage.size - 1) : null;
 					if (hitProdThreshold) message = null;
 				});
+
+				await i.editReply({ embeds: [formatContent()] });
 			}
 
-			const embed = new EmbedBuilder();
-			embed.setTitle('Prod Check');
-			embed.setColor(Colors.White);
-
-			embed.setDescription(`Checked ${messageCount} messages in <#${channel.id}>.\nChecking since <t:${seconds}:R>, (${hoursToCheck} hours)`);
-
-			const prodded: string[] = [];
-			const cleared: string[] = [];
-			for (const userID in prodChecks) {
-				const list = prodChecks[userID];
-
-				if (list.length >= req) cleared.push(`<@${userID}> has ${list.length}/${req} messages.`);
-				else prodded.push(`<@${userID}> has ${list.length}/${req} messages.`);
-			}
-
-			if (cleared.length > 0) embed.addFields({ name: 'Cleared', value: cleared.join('\n') });
-			if (prodded.length > 0) embed.addFields({ name: 'Prodded', value: prodded.join('\n') });
-
-			await i.editReply({ content: '', embeds: [embed] });
+			await i.editReply({ embeds: [formatContent(true)] });
 		} catch (err) {
 			console.log(err);
 			await i.editReply('An error has occurred');

@@ -87,7 +87,7 @@ export default newSlashCommand({
 				continue;
 			}
 
-			await channel.permissionOverwrites.create(discordId, {
+			const stuff = await channel.permissionOverwrites.create(discordId, {
 				ViewChannel: true,
 				SendMessages: true,
 			});
