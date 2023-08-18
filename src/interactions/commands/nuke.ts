@@ -8,7 +8,7 @@ data.addChannelOption((x) =>
 
 export default newSlashCommand({
 	data,
-	serverType: ServerType.PLAYERCHAT,
+	serverType: [ServerType.PLAYERCHAT, ServerType.TURBO],
 	execute: async (i) => {
 		await i.deferReply();
 		const category = i.options.getChannel('category', true) as CategoryChannel;

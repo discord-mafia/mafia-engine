@@ -1,4 +1,4 @@
-import { ChannelType, ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ChannelType, ChatInputCommandInteraction, SlashCommandBuilder, Snowflake } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../structures/BotClient';
 import { getOrCreateUser, getSignup } from '../../util/database';
 import { formatSignupEmbed } from '../../util/embeds';
@@ -60,13 +60,31 @@ export default newSlashCommand({
 			},
 		});
 
-		await prisma.signupUserJunction.create({
-			data: {
-				signupCategoryId: category.id,
-				userId: user.id,
-				isTurboHost: true,
-			},
-		});
+		// await prisma.signupUserJunction.create({
+		// 	data: {
+		// 		signupCategoryId: category.id,
+		// 		userId: user.id,
+		// 		isTurboHost: false,
+		// 	},
+		// });
+
+		let isHost = true;
+		const addUser = async (id: Snowflake) => {
+			const member = await i.guild?.members.fetch(id);
+			if (!member) return;
+			const user = await getOrCreateUser(member);
+			if (!user) return;
+			await prisma.signupUserJunction.create({
+				data: {
+					signupCategoryId: category.id,
+					userId: user.id,
+					isTurboHost: isHost,
+				},
+			});
+			isHost = false;
+		};
+
+		for (const id of ['1137077628713586699', '1137079220720381962', '1039977162427613184', '661828979442974730']) await addUser(id);
 
 		const fetchedSignup = await getSignup({ signupId: signup.id });
 		if (!fetchedSignup) return i.editReply({ content: 'Failed to create signup post.' });

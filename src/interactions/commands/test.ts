@@ -7,6 +7,7 @@ import {
 	ColorResolvable,
 	EmbedBuilder,
 	ForumChannel,
+	GuildForumTag,
 	GuildMember,
 	InviteTargetType,
 	SlashCommandBuilder,
@@ -31,6 +32,8 @@ export default newSlashCommand({
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			new ButtonBuilder().setCustomId('test').setLabel('See Player Mentions').setStyle(ButtonStyle.Secondary)
 		);
+
+		const tags: GuildForumTag[] = forumChannel.availableTags;
 
 		forumChannel.threads.create({
 			name: 'Test Archive',

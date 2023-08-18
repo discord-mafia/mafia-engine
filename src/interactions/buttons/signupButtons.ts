@@ -1,4 +1,4 @@
-import { ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, Role } from 'discord.js';
 import { prisma } from '../..';
 import { Button } from '../../structures/interactions';
 import { getSignup } from '../../util/database';
@@ -6,6 +6,7 @@ import { sign } from 'crypto';
 import { formatSignupEmbed } from '../../util/embeds';
 import { LogType, sendInfoLog, sendLog } from '../../structures/logs';
 import { isTurboFull, turboSignupFull } from '../../clock/turbos';
+import { setupTurbo } from '../../structures/turbos/turboSignups';
 
 export default new Button('button-category')
 	.setButton(new ButtonBuilder().setLabel('Delete').setStyle(ButtonStyle.Danger))
@@ -48,6 +49,17 @@ export default new Button('button-category')
 					},
 				});
 
+				const signupCategoryRoles: (string | null)[] = signup.categories.map((x) => x.attachedRoleId);
+				for (const role of signupCategoryRoles) {
+					if (!role || !i.guild) continue;
+					try {
+						const hasRole = member.roles.cache.has(role);
+						if (hasRole) member.roles.remove(role);
+					} catch (err) {
+						await sendInfoLog('Failed to remove role', `Failed to remove role <@&${role}> from user ${member.user.username}`, Colors.Red);
+					}
+				}
+
 				if (signup.isTurbo) {
 					const hasHost = await prisma.signupUserJunction.findFirst({
 						where: {
@@ -85,26 +97,49 @@ export default new Button('button-category')
 		if (cache == 'leave') {
 			for (const category of signup.categories) {
 				const count = await removeFromCategory(category.id, i.user.id);
-				if (count > 0) sendInfoLog(`User ${i.user.username} has left ${category.name} in signup ${signup.id} (<#${signup.channelId}>)`);
+				if (count > 0)
+					sendInfoLog(
+						`Leaving Signup: ${category.name} in <#${signup.channelId}>`,
+						`User ${i.user.username} has left ${category.name} in signup ${signup.id} (<#${signup.channelId}>)`,
+						Colors.Red
+					);
 			}
 		} else if (cache == 'settings') {
+			const isAdmin = member.permissions.has('Administrator');
+			const isHost = signup.hostRoleId ? member.roles.cache.has(signup.hostRoleId) : false;
+			if (!isAdmin && !isHost) return i.editReply({ content: 'You do not have permission to edit this signup' });
+
 			const embed = new EmbedBuilder();
 			embed.setColor('White');
-			embed.setTitle('Signup Data');
-			embed.addFields({
-				name: 'Signup Index',
-				value: '> ' + signup.id.toString(),
-			});
+			embed.setTitle('Signup Management');
+			embed.setDescription('This is your hub to manage the signup. Only designated hosts and admins can access this.');
 
-			embed.addFields({
-				name: 'Category Index List',
-				value: signup.categories.length > 0 ? signup.categories.map((x) => `> ${x.name} - ${x.id}`).join('\n') : '> None',
-			});
+			embed.addFields(
+				{
+					name: 'Signup Index',
+					value: '> ' + signup.id.toString(),
+					inline: true,
+				},
+				{
+					name: 'Category Index List',
+					value: signup.categories.length > 0 ? signup.categories.map((x) => `> ${x.name} - ${x.id}`).join('\n') : '> None',
+					inline: true,
+				}
+			);
 
-			return i.editReply({ embeds: [embed] });
+			const row = new ActionRowBuilder<ButtonBuilder>();
+			row.addComponents(new ButtonBuilder().setCustomId('signup-manage-role').setLabel('Add Roles').setStyle(ButtonStyle.Secondary));
+			row.addComponents(
+				new ButtonBuilder().setCustomId('signup-manage-category').setLabel('Manage Categories').setStyle(ButtonStyle.Secondary)
+			);
+			row.addComponents(new ButtonBuilder().setCustomId('signup-manage-chats').setLabel('Create Player Chats').setStyle(ButtonStyle.Secondary));
+
+			return i.editReply({ embeds: [embed], components: [row] });
 		} else {
 			const categoryId = parseInt(cache);
 			if (isNaN(categoryId)) return i.editReply({ content: 'This button is invalid' });
+
+			const addRoles: Role[] = [];
 
 			for (const category of signup.categories) {
 				await removeFromCategory(category.id, i.user.id);
@@ -113,8 +148,37 @@ export default new Button('button-category')
 					if (exists) return i.editReply({ content: 'You are already in this category' });
 					else {
 						await prisma.signupUserJunction.create({ data: { signupCategoryId: categoryId, userId: fetchedUser.id } });
-						sendInfoLog(`User ${i.user.username} has joined ${category.name} in signup ${signup.id} (<#${signup.channelId}>)`);
+
+						if (category.attachedRoleId) {
+							try {
+								const role = await i.guild.roles.fetch(category.attachedRoleId);
+								if (!role) throw Error('Role not found');
+
+								addRoles.push(role);
+							} catch (err) {
+								console.log(err);
+								await sendInfoLog(
+									'Failed to add role',
+									`Failed to add role <@&${category.attachedRoleId}> to user ${member.user.username}`,
+									Colors.Red
+								);
+							}
+						}
+
+						sendInfoLog(
+							`Joining Signup: ${category.name} in <#${signup.channelId}>`,
+							`User ${i.user.username} has joined ${category.name} in signup ${signup.id} (<#${signup.channelId}>)`,
+							category.isFocused ? Colors.Green : Colors.Yellow
+						);
 					}
+				}
+			}
+
+			for (const role of addRoles) {
+				const hasRole = member.roles.cache.has(role.id);
+				if (!hasRole) {
+					const usr = await member.roles.add(role.id);
+					console.log(usr.roles.cache.filter((x) => x.id == role.id).map((x) => x.name) ?? 'Not there');
 				}
 			}
 		}
@@ -123,7 +187,7 @@ export default new Button('button-category')
 		if (!reset) return i.editReply({ content: 'This button failed' });
 
 		const isTurboAndFull = isTurboFull(reset);
-		if (isTurboAndFull) turboSignupFull(reset);
+		if (isTurboAndFull) setupTurbo(reset);
 
 		const { embed, row } = formatSignupEmbed(reset);
 

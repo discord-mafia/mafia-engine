@@ -114,7 +114,7 @@ export class BotClient extends Client {
 
 	public async registerCommands() {
 		try {
-			const commandList: Record<ServerType, any[]> = {
+			const commandList: Record<ServerType, SlashCommand[]> = {
 				MAIN: [],
 				PLAYERCHAT: [],
 				ALL: [],
@@ -123,37 +123,39 @@ export class BotClient extends Client {
 			};
 
 			slashCommands.forEach((val) => {
-				if (!val.serverType) return commandList[ServerType.ALL].push(val.data);
+				if (!val.serverType) return commandList[ServerType.ALL].push(val);
 				else if (Array.isArray(val.serverType)) {
 					val.serverType.forEach((type) => {
-						commandList[type].push(val.data);
+						commandList[type].push(val);
 					});
 				} else if (val.serverType) {
-					commandList[val.serverType].push(val.data);
+					commandList[val.serverType].push(val);
 				} else {
-					commandList[ServerType.NONE].push(val.data);
+					commandList[ServerType.NONE].push(val);
 				}
 			});
 
-			const allServers = (await this.rest.put(Routes.applicationCommands(this.clientID), { body: commandList['ALL'] })) as any;
-			console.log(`[ALL] Successfully reloaded ${allServers.length} application (/) commands.`);
+			// Go through each and register them
 
-			const mainServer = (await this.rest.put(Routes.applicationGuildCommands(this.clientID, config.MAIN_SERVER_ID), {
-				body: commandList['MAIN'],
-			})) as any;
-			console.log(`[MAIN] Successfully reloaded ${mainServer.length} application (/) commands.`);
+			console.log(`\x1b[33mRegistering all application (/) commands...\x1b[0m`);
 
-			const playerChatServer = (await this.rest.put(Routes.applicationGuildCommands(this.clientID, config.PLAYERCHAT_SERVER_ID), {
-				body: commandList['PLAYERCHAT'],
-			})) as any;
-			console.log(`[PLAYERCHAT] Successfully reloaded ${playerChatServer.length} application (/) commands.`);
+			const register = async (serverType: ServerType, commands: SlashCommand[], serverId?: string) => {
+				console.log(`\x1b[33mRegistering ${commands.length} application (/) commands for ${serverType}...\x1b[0m`);
+				const list: any[] = commands.map((cmd) => {
+					console.log(`- ${cmd.data.name}`);
+					return cmd.data;
+				});
+				const registeredCommands = (await this.rest.put(Routes.applicationCommands(this.clientID), { body: list })) as any;
 
-			const turboServer = (await this.rest.put(Routes.applicationGuildCommands(this.clientID, config.TURBO_SERVER_ID), {
-				body: commandList['TURBO'],
-			})) as any;
-			console.log(`[TURBO] Successfully reloaded ${turboServer.length} application (/) commands.`);
+				if (registeredCommands.length != commands.length) {
+					console.log(`\x1B[31mFailed to load ${commands.length - registeredCommands.length} commands`);
+				}
+			};
 
-			console.log(`[NONE] ${commandList['NONE'].length} commands force-skipped`);
+			await register(ServerType.ALL, commandList['ALL']);
+			await register(ServerType.MAIN, commandList['MAIN'], config.PLAYERCHAT_SERVER_ID);
+			await register(ServerType.PLAYERCHAT, commandList['PLAYERCHAT'], config.PLAYERCHAT_SERVER_ID);
+			await register(ServerType.TURBO, commandList['TURBO'], config.TURBO_SERVER_ID);
 		} catch (err) {
 			console.error(err);
 		}
