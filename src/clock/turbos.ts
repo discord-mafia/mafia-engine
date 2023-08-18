@@ -1,7 +1,7 @@
 import { ChannelType, Client, Guild, GuildMember } from 'discord.js';
 import { sendErrorLog, sendLog } from '../structures/logs';
 import { client, prisma } from '..';
-import { FullSignup, getOrCreateUser, getSignup } from '../util/database';
+import { FullSignup, createAutomatedGame, getOrCreateUser, getSignup } from '../util/database';
 import { formatSignupEmbed } from '../util/embeds';
 import config from '../config';
 import { sign } from 'crypto';
@@ -94,16 +94,9 @@ export async function turboSignupFull(signup: FullSignup) {
 	const focusedCategory = signup.categories.find((c) => c.isFocused);
 	if (!focusedCategory) return;
 
-	console.log('Here');
-
 	try {
-		const game = await prisma.automatedGame.create({
-			data: {
-				guildId: guild.id,
-			},
-		});
-
-		if (!game) return;
+		const game = await createAutomatedGame(guild.id);
+		if (!game) return message.channel.send({ content: `Failed to create automated game.`, allowedMentions: { users: [] } });
 
 		for (const user of focusedCategory.users) {
 			const member = await guild.members.fetch(user.user.discordId);

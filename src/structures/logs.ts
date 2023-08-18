@@ -13,6 +13,7 @@ interface BaseLog {
 	file?: Buffer;
 	timestamp: Date;
 	color: number | RGBTuple | null;
+	title?: string;
 }
 
 export async function sendLog(log: BaseLog) {
@@ -23,7 +24,7 @@ export async function sendLog(log: BaseLog) {
 		const webhook = new WebhookClient({ url: webhookURL });
 
 		const embed = new EmbedBuilder();
-		embed.setTitle(`Log: ${log.type}`);
+		embed.setTitle(log.title ? log.title : `Log: ${log.type}`);
 		embed.setColor(log.type == LogType.Error ? Colors.Red : Colors.White);
 		if (log.color) embed.setColor(log.color);
 		embed.setDescription(log.message);
@@ -38,12 +39,13 @@ export async function sendLog(log: BaseLog) {
 	}
 }
 
-export async function sendInfoLog(message: string, customColor: number | RGBTuple | null = Colors.White) {
+export async function sendInfoLog(title: string, message: string, customColor: number | RGBTuple | null = Colors.White) {
 	return sendLog({
 		type: LogType.Info,
 		message,
 		timestamp: new Date(),
 		color: customColor,
+		title,
 	});
 }
 

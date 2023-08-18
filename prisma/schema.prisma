@@ -22,7 +22,7 @@ enum Status {
 model User {
   id        Int    @id @default(autoincrement())
   discordId String @unique
-  username  String
+  username  String @unique
   mvpStatus Status @default(None)
 
   signupCategories SignupUserJunction[]
@@ -51,6 +51,7 @@ model Signup {
   channelId  String
   messageId  String           @unique
   categories SignupCategory[]
+  hostRoleId String?
 
   isActive        Boolean    @default(true)
   requiredServers String[]   @default([])
@@ -61,14 +62,15 @@ model Signup {
 }
 
 model SignupCategory {
-  id        Int     @id @default(autoincrement())
-  signup    Signup  @relation(fields: [signupId], references: [id])
-  signupId  Int
-  name      String
-  isFocused Boolean @default(false)
-  limit     Int     @default(-1)
-  isLocked  Boolean @default(false)
-  emoji     String?
+  id             Int     @id @default(autoincrement())
+  signup         Signup  @relation(fields: [signupId], references: [id])
+  signupId       Int
+  name           String
+  isFocused      Boolean @default(false)
+  limit          Int     @default(-1)
+  isLocked       Boolean @default(false)
+  emoji          String?
+  attachedRoleId String?
 
   users      SignupUserJunction[]
   buttonName String? // Uses the name if not set
@@ -155,6 +157,7 @@ model Player {
 
   automatedGame  AutomatedGame?  @relation(fields: [automatedGameId], references: [id])
   automatedRoles AutomatedRole[]
+  confessionalId String?
 
   @@unique([voteCounterId, discordId])
 }
@@ -190,20 +193,40 @@ model Vote {
   createdAt DateTime @default(now())
 }
 
+enum Phase {
+  Pregame
+  Day
+  Night
+  Postgame
+}
+
 model AutomatedGame {
   id            String @id @default(uuid())
   voteCounterId Int?   @unique
 
-  currentPhase      Int             @default(0) // 0 = pregame
+  currentPhase      Phase           @default(Pregame)
+  currentCycle      Int             @default(0)
   scheduledPhaseEnd DateTime?
   voteCounter       VoteCounter?    @relation(fields: [voteCounterId], references: [id])
   players           Player[]
   roles             AutomatedRole[]
 
   guildId        String
-  infoChannelId  String? @unique
-  chatChannelId  String? @unique
-  mafiaChannelId String? @unique
+  infoChannelId  String?            @unique
+  chatChannelId  String?            @unique
+  mafiaChannelId String?            @unique
+  confessionals  AutoConfessional[]
+}
+
+model AutoConfessional {
+  id     String @id @default(uuid())
+  gameId String
+  roleId String @unique
+
+  game AutomatedGame @relation(fields: [gameId], references: [id])
+  role AutomatedRole @relation(fields: [roleId], references: [id])
+
+  channelId String @unique
 }
 
 model AutomatedRole {
@@ -212,8 +235,12 @@ model AutomatedRole {
   playerId        Int
 
   roleName      String
-  automatedGame AutomatedGame @relation(fields: [automatedGameId], references: [id])
-  player        Player        @relation(fields: [playerId], references: [id])
+  data          String[]          @default([])
+  automatedGame AutomatedGame     @relation(fields: [automatedGameId], references: [id])
+  player        Player            @relation(fields: [playerId], references: [id])
+  confessional  AutoConfessional?
+
+  isConfirmed Boolean?
 }
 
 // Role Cards

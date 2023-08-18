@@ -1,6 +1,6 @@
 import { sign } from 'crypto';
 import { prisma } from '..';
-import { GuildMember } from 'discord.js';
+import { GuildMember, Snowflake } from 'discord.js';
 
 export type FullSignup = NonNullable<Awaited<ReturnType<typeof getSignup>>>;
 
@@ -62,6 +62,36 @@ export async function getUser(discordId: string) {
 		});
 	} catch (err) {
 		console.log(err);
+		return null;
+	}
+}
+
+type CitizenshipQuery =
+	| {
+			name: string;
+	  }
+	| {
+			discordId: Snowflake;
+	  };
+export async function getCitizenship(query: CitizenshipQuery) {
+	try {
+		if ('name' in query) {
+			const citizen = await prisma.user.findUnique({
+				where: {
+					username: query.name,
+				},
+			});
+			return citizen;
+		} else if ('discordId' in query) {
+			const citizen = await prisma.user.findUnique({
+				where: {
+					discordId: query.discordId,
+				},
+			});
+			return citizen;
+		}
+		return null;
+	} catch (err) {
 		return null;
 	}
 }
@@ -155,4 +185,52 @@ export async function getArchive(gameTag: string) {
 		console.log(err);
 		return null;
 	}
+}
+
+export async function createAutomatedGame(guildId: string) {
+	try {
+		return await prisma.automatedGame.create({
+			data: {
+				guildId,
+			},
+		});
+	} catch (err) {
+		console.log(err);
+		return null;
+	}
+}
+
+export type GameQuery =
+	| {
+			id: string;
+	  }
+	| {
+			infoChannelId: string;
+	  }
+	| {
+			voteCounterId: number;
+	  };
+export type FullAutomatedGame = NonNullable<Awaited<ReturnType<typeof getAutomatedGame>>>;
+
+export async function getAutomatedGame(query: GameQuery) {
+	try {
+		const game = await prisma.automatedGame.findUnique({
+			where: query,
+			include: {
+				confessionals: true,
+				players: true,
+				roles: true,
+				voteCounter: true,
+			},
+		});
+		return game;
+	} catch (err) {
+		return null;
+	}
+}
+
+export async function getAutomatedGameOrThrow(query: GameQuery) {
+	const game = await getAutomatedGame(query);
+	if (!game) throw new Error('Game not found');
+	return game;
 }

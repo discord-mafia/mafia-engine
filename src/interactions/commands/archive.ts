@@ -1,24 +1,21 @@
 import {
-	APIApplicationCommandOptionChoice,
 	ActionRowBuilder,
-	AttachmentBuilder,
 	ButtonBuilder,
+	ButtonStyle,
+	ChannelType,
 	ChatInputCommandInteraction,
 	EmbedBuilder,
 	SlashCommandBuilder,
 	SlashCommandStringOption,
-	WebhookClient,
+	StringSelectMenuBuilder,
 } from 'discord.js';
 import { newSlashCommand } from '../../structures/BotClient';
 import { prisma } from '../..';
 import { FullArchive, getArchive, getUser } from '../../util/database';
-import { formatSignupEmbed } from '../../util/embeds';
-import { arch } from 'os';
-import { Button } from '../../structures/interactions';
 import { createViewArchiveButton } from '../buttons/archiveManageMembers';
-import config from '../../config';
-import axios from 'axios';
-import { first } from 'cheerio/lib/api/traversing';
+import viewArchiveMentions from '../buttons/viewArchiveMentions';
+import { arch } from 'os';
+import refreshArchive from '../buttons/refreshArchive';
 
 const data = new SlashCommandBuilder().setName('archive').setDescription('Manage an archive');
 
@@ -55,7 +52,6 @@ data.addSubcommand((sub) =>
 		.addIntegerOption((opt) => opt.setName('number').setDescription('The number of the game').setRequired(true))
 		.addStringOption((opt) => opt.setName('title').setDescription('The title of the game').setRequired(true))
 );
-
 data.addSubcommand((sub) =>
 	sub
 		.setName('view')
@@ -73,7 +69,6 @@ data.addSubcommand((sub) =>
 		)
 		.addIntegerOption((opt) => opt.setName('number').setDescription('The number of the game').setRequired(true))
 );
-
 data.addSubcommand((sub) =>
 	sub
 		.setName('host')
@@ -94,7 +89,6 @@ data.addSubcommand((sub) =>
 		.addStringOption((opt) => opt.setName('discordid').setDescription('The host discord ID').setRequired(false))
 		.addStringOption((opt) => opt.setName('username').setDescription('The username of the host').setRequired(false))
 );
-
 data.addSubcommand((sub) =>
 	sub
 		.setName('cohost')
@@ -105,7 +99,6 @@ data.addSubcommand((sub) =>
 		.addStringOption((opt) => opt.setName('discordid').setDescription('The host discord ID').setRequired(false))
 		.addStringOption((opt) => opt.setName('username').setDescription('The username of the host').setRequired(false))
 );
-
 data.addSubcommand((sub) =>
 	sub
 		.setName('player')
@@ -119,7 +112,6 @@ data.addSubcommand((sub) =>
 		.addStringOption((opt) => opt.setName('discordid').setDescription('The host discord ID').setRequired(false))
 		.addStringOption((opt) => opt.setName('username').setDescription('The username of the host').setRequired(false))
 );
-
 data.addSubcommand((sub) =>
 	sub
 		.setName('spreadsheet')
@@ -138,7 +130,6 @@ data.addSubcommand((sub) =>
 		.addStringOption((opt) => opt.setName('url').setDescription('The URL to add').setRequired(true))
 		.addStringOption((opt) => opt.setName('description').setDescription('The description of the URL').setRequired(false))
 );
-
 data.addSubcommand((sub) =>
 	sub
 		.setName('event')
@@ -158,8 +149,16 @@ data.addSubcommand((sub) =>
 		.addStringOption((opt) => opt.setName('discordid').setDescription('The host discord ID').setRequired(false))
 		.addStringOption((opt) => opt.setName('username').setDescription('The username of the host').setRequired(false))
 );
-
-data.addSubcommand((sub) => sub.setName('submit').setDescription('Submit the archive'));
+data.addSubcommand((sub) =>
+	sub
+		.setName('submit')
+		.setDescription('Submit the archive')
+		.addStringOption(addQueueOptions)
+		.addIntegerOption((opt) => opt.setName('number').setDescription('The number of the game').setRequired(true))
+		.addChannelOption((opt) =>
+			opt.setName('channel').setDescription('The channel to submit the archive to').setRequired(true).addChannelTypes(ChannelType.GuildForum)
+		)
+);
 
 export default newSlashCommand({
 	data,
@@ -185,11 +184,58 @@ export default newSlashCommand({
 				return addUrl(i);
 			case 'event':
 				return addEvent(i);
+			case 'submit':
+				return runSubmit(i);
 			default:
 				return i.reply({ content: 'Not implemented yet.' });
 		}
 	},
 });
+
+async function runSubmit(i: ChatInputCommandInteraction) {
+	if (!i.guild) return i.reply({ content: 'This command can only be used in a server.', ephemeral: true });
+	const channel = i.options.getChannel('channel', true);
+	const queue = i.options.getString('queue', true);
+	const number = i.options.getInteger('number', true);
+	const tag = getGameTag(queue, number);
+
+	await i.deferReply();
+	try {
+		const forumChannel = await i.guild.channels.fetch(channel.id);
+		if (!forumChannel || forumChannel.type != ChannelType.GuildForum) return i.editReply({ content: 'Invalid channel.' });
+
+		const archive = await getArchive(tag);
+		if (!archive) return i.editReply({ content: `No archive found for ${tag}.` });
+
+		const formattedArchive = formatArchive(archive);
+		const { content, image } = formattedArchive;
+		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+			new ButtonBuilder().setCustomId(viewArchiveMentions.createCustomID(tag)).setLabel('View Mentions').setStyle(ButtonStyle.Secondary),
+			new ButtonBuilder().setCustomId(refreshArchive.createCustomID(tag)).setLabel('Refresh').setStyle(ButtonStyle.Secondary)
+		);
+
+		const message = await forumChannel.threads.create({
+			name: `${tag} - ${archive.gameTitle}`,
+			message: {
+				content,
+				files: image
+					? [
+							{
+								attachment: image,
+								name: 'archive.png',
+							},
+					  ]
+					: undefined,
+				components: [row],
+			},
+		});
+
+		await i.editReply({ content: `Submitted archive to ${message.url}\n**Make sure to manually add the appropriate tags**` });
+	} catch (err) {
+		console.error(err);
+		await i.editReply({ content: 'An error occured.' });
+	}
+}
 
 export function getGameTag(queue: string, number: number) {
 	return queue.slice(0, 2).toUpperCase() + number;
@@ -251,34 +297,6 @@ async function addHost(i: ChatInputCommandInteraction) {
 
 	const archivedGame = await getArchive(gameTag);
 	if (!archivedGame) return i.reply({ content: `No archive found for ${gameTag}.`, ephemeral: true });
-
-	const fetchedUser = await getUser(discordID);
-	if (!fetchedUser) {
-		if (isUsingDiscordID) {
-			if (!username)
-				return i.reply({
-					content: 'User not found, and creating a new user requires a `username` prop that was not supplied.',
-					ephemeral: true,
-				});
-
-			await prisma.user.create({
-				data: {
-					discordId: discordID,
-					username: username,
-				},
-			});
-		} else {
-			const member = await i.guild?.members.fetch(discordID);
-			if (!member) return i.reply({ content: 'User not found. Try again using the Discord ID and username instead', ephemeral: true });
-
-			await prisma.user.create({
-				data: {
-					discordId: discordID,
-					username: member.user.username,
-				},
-			});
-		}
-	}
 
 	const user = await getUser(discordID);
 	if (!user) return i.reply({ content: 'User not found and could not be created with the supplied props', ephemeral: true });
