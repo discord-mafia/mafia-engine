@@ -35,8 +35,8 @@ app.use(
 );
 
 export function runExpressServer(callback: () => any = () => {}) {
-	app.listen(4000, () => {
-		console.log('Listening on port 4000');
+	app.listen(process.env.PORT ?? 4000, () => {
+		console.log('Listening on port ' + process.env.PORT ?? '4000');
 		callback();
 	});
 }
