@@ -18,7 +18,6 @@ export function Home() {
 				<button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
 				<p>{data.isLoading ? 'Data is loading from server...' : data.data}</p>
 			</div>
-			<p className="read-the-docs">Click on the Vite and React logos to learn more</p>
 		</>
 	);
 }
