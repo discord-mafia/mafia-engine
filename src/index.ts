@@ -2,7 +2,7 @@ import { BotClient } from './structures/BotClient';
 import { PrismaClient } from '@prisma/client';
 import config from './config';
 import { checkExpiredTurbos } from './clock/turbos';
-import { Guild } from 'discord.js';
+import { type Guild } from 'discord.js';
 import { runCycles } from './structures/turbos/games';
 
 export const prisma = new PrismaClient();

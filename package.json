@@ -4,7 +4,9 @@
 		"build:prisma": "npx prisma format && npx prisma generate && npx prisma db push",
 		"build": "tsc",
 		"start:local": "pm2 start ./build/index.js --name betrayal-bot",
-		"start": "node ./build/index.js"
+		"start": "node ./build/index.js",
+		"lint": "eslint . --ext .ts",
+		"lint:fix": "eslint . --ext .ts --fix"
 	},
 	"dependencies": {
 		"@prisma/client": "^5.0.0",
@@ -26,6 +28,9 @@
 		"@types/cors": "^2.8.13",
 		"@types/express": "^4.17.17",
 		"@types/node": "^20.4.2",
+		"@typescript-eslint/eslint-plugin": "^6.4.1",
+		"@typescript-eslint/parser": "^6.4.1",
+		"eslint": "^8.48.0",
 		"ts-node": "^10.9.1",
 		"typecript": "^0.0.1-security"
 	}

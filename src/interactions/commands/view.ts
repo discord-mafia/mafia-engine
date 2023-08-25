@@ -1,23 +1,8 @@
-import {
-	APIApplicationCommandOptionChoice,
-	ActionRowBuilder,
-	ButtonBuilder,
-	ButtonStyle,
-	ChannelType,
-	ChatInputCommandInteraction,
-	ColorResolvable,
-	EmbedBuilder,
-	ForumChannel,
-	GuildMember,
-	InviteTargetType,
-	SlashCommandBuilder,
-	TextChannel,
-} from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { newSlashCommand } from '../../structures/BotClient';
 import { addQueueOptions, formatArchiveEmbed, getGameTag } from './archive';
 import { getArchive } from '../../util/database';
 import { formatArchive } from './archive';
-import { Button } from '../../structures/interactions';
 import viewArchiveMentions from '../buttons/viewArchiveMentions';
 const data = new SlashCommandBuilder().setName('view').setDescription('View something');
 

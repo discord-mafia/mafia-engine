@@ -1,7 +1,8 @@
-import { ChatInputCommandInteraction, Interaction } from 'discord.js';
+import type { ChatInputCommandInteraction, Interaction } from 'discord.js';
 import { slashCommands } from '../../structures/BotClient';
 import { Button, Modal, SelectMenu } from '../../structures/interactions';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function onInteraction(i: Interaction<any>) {
 	if (i.isChatInputCommand()) {
 		const command = slashCommands.get(i.commandName);

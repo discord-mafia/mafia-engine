@@ -1,26 +1,21 @@
 import {
-	CacheType,
-	ChatInputCommandInteraction,
+	type ChatInputCommandInteraction,
 	Client,
 	Collection,
 	Events,
 	GatewayIntentBits,
-	Guild,
 	Partials,
 	REST,
 	Routes,
-	SlashCommandBuilder,
+	type SlashCommandBuilder,
 } from 'discord.js';
 import * as path from 'path';
 import * as fs from 'fs';
-import { Button, Event, Modal, SelectMenu } from './interactions';
+import { type Button, type Modal, type SelectMenu } from './interactions';
 import OnClientReady from '../interactions/events/clientReady';
 import OnInteraction from '../interactions/events/onInteraction';
-import { ContextMenuCommandBuilder } from 'discord.js';
-import { Prisma, PrismaClient } from '@prisma/client';
-import { DefaultArgs } from '@prisma/client/runtime/library';
-import { Extension } from '../util/types';
-import config from '../config';
+import { type ContextMenuCommandBuilder } from 'discord.js';
+import type { UnknownResponse } from '~/util/types';
 
 export const DEFAULT_INTENTS = {
 	intents: [
@@ -45,7 +40,7 @@ export enum ServerType {
 export interface SlashCommand {
 	data: SlashCommandBuilder;
 	serverType?: ServerType | ServerType[];
-	execute: (i: ChatInputCommandInteraction) => any | Promise<any>;
+	execute: (i: ChatInputCommandInteraction) => UnknownResponse;
 }
 
 export async function newSlashCommand(cmd: SlashCommand) {
@@ -66,7 +61,7 @@ export class BotClient extends Client {
 
 	public interactionsPath = path.join(__dirname, '..', 'interactions');
 
-	constructor(clientID: string, discordToken: string, registerCallback: (client: BotClient) => void = (c) => {}) {
+	constructor(clientID: string, discordToken: string, registerCallback: (client: BotClient) => void = () => {}) {
 		super(DEFAULT_INTENTS);
 		this.discordToken = discordToken;
 		this.clientID = clientID;
@@ -100,6 +95,7 @@ export class BotClient extends Client {
 			for (const file of files) {
 				try {
 					const filePath = path.join(commandPath, file);
+					// eslint-disable-next-line @typescript-eslint/no-var-requires
 					require(filePath).default as T;
 				} catch (err) {
 					console.log(`\x1B[31mFailed to load file: \x1B[34m${file}\x1B[0m`);
@@ -138,16 +134,20 @@ export class BotClient extends Client {
 			// Go through each and register them
 
 			console.log(`\x1b[33mRegistering all application (/) commands...\x1b[0m`);
-			const list: any[] = commandList.ALL.map((cmd) => {
+			const list: unknown[] = commandList.ALL.map((cmd) => {
 				return cmd.data;
 			});
 
 			const registeredCommands = (await this.rest.put(Routes.applicationGuildCommands(this.clientID, '648663810772697089'), {
 				body: list,
-			})) as any;
-			if (registeredCommands.length != list.length) {
-				console.log(`\x1B[31mFailed to load ${list.length - registeredCommands.length} commands`);
+			})) as unknown;
+
+			if (Array.isArray(registeredCommands)) {
+				if (registeredCommands.length != list.length) {
+					console.log(`\x1B[31mFailed to load ${list.length - registeredCommands.length} commands`);
+				}
 			}
+			console.log(`\x1b[32mSuccessfully registered [unknown] commands\x1b[0m`);
 		} catch (err) {
 			console.error(err);
 		}

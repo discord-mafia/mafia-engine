@@ -1,4 +1,4 @@
-import { ChannelType, Colors, EmbedBuilder, Message, SlashCommandBuilder, TextChannel } from 'discord.js';
+import { ChannelType, Colors, EmbedBuilder, type Message, SlashCommandBuilder, type TextChannel } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../structures/BotClient';
 const data = new SlashCommandBuilder().setName('prods').setDescription('Generate prods');
 data.addRoleOption((role) => role.setName('aliveline').setDescription('Role which all living players have').setRequired(true));
@@ -68,7 +68,6 @@ export default newSlashCommand({
 			await i.editReply({ embeds: [formatContent()] });
 
 			let message = await channel.messages.fetch({ limit: 1 }).then((messagePage) => (messagePage.size === 1 ? messagePage.at(0) : null));
-			let messageCount = 1;
 
 			const checkMessage = (msg: Message) => {
 				const createdAt = Math.ceil(msg.createdAt.getTime() / 1000);
@@ -80,10 +79,9 @@ export default newSlashCommand({
 			if (message) checkMessage(message);
 
 			while (message) {
-				let hitProdThreshold = false;
+				const hitProdThreshold = false;
 				await channel.messages.fetch({ limit: 100, before: message.id }).then((messagePage) => {
 					messagePage.forEach((msg) => {
-						messageCount++;
 						checkMessage(msg);
 					});
 					message = 0 < messagePage.size ? messagePage.at(messagePage.size - 1) : null;

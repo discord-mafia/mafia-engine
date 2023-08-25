@@ -1,43 +1,17 @@
 import {
 	ActionRowBuilder,
-	AnySelectMenuInteraction,
-	ButtonBuilder,
-	ButtonInteraction,
+	type AnySelectMenuInteraction,
+	type ButtonBuilder,
+	type ButtonInteraction,
 	Collection,
 	ModalBuilder,
-	ModalSubmitInteraction,
-	TextInputBuilder,
-	Interaction as CoreInteraction,
-	MessagePayload,
+	type ModalSubmitInteraction,
+	type TextInputBuilder,
+	type Interaction as CoreInteraction,
+	type MessagePayload,
 } from 'discord.js';
+import type { UnknownResponse } from '~/util/types';
 type CustomID = string;
-type AnyOutcome = any | Promise<any>;
-
-type EventFunc = (...val: any) => AnyOutcome;
-export class Event {
-	static events: Collection<CustomID, Event> = new Collection();
-	private event: CustomID;
-	private func: EventFunc | undefined;
-	constructor(event: CustomID) {
-		this.event = event;
-		Event.events.set(this.event, this);
-
-		console.log(`Loaded [${this.event}]`);
-	}
-
-	public getCustomID() {
-		return this.event;
-	}
-
-	public onExecute(func: EventFunc) {
-		this.func = func;
-		return this;
-	}
-
-	public execute(...val: any) {
-		if (this.func) this.func(...val);
-	}
-}
 
 export class Interaction {
 	private customId: CustomID;
@@ -56,15 +30,20 @@ export class Interaction {
 		return `${this.customId}_${data}`;
 	}
 
-	static getDataFromCustomID(customIdString: string): [CustomID, string] {
+	static getDataFromCustomID(customIdString: string): [CustomID, string | undefined] {
 		const split = customIdString.split('_');
-		return [split[0], split[1]];
+
+		const customId = split[0];
+		const data = split[1];
+		if (!customId) return [customIdString, undefined];
+		if (!data) return [customId, ''];
+		return [customId, data];
 	}
 }
 
 export class Button extends Interaction {
 	static buttons: Collection<CustomID, Button> = new Collection();
-	private func: undefined | ((i: ButtonInteraction, cache?: string) => any | Promise<any>);
+	private func: undefined | ((i: ButtonInteraction, cache?: string) => UnknownResponse);
 	private buttonBuilder: ButtonBuilder | undefined;
 	private customID: CustomID;
 	constructor(customId: CustomID) {
@@ -86,12 +65,12 @@ export class Button extends Interaction {
 		return newButton;
 	}
 
-	public onExecute(func: (i: ButtonInteraction, cache?: string) => any | Promise<any>) {
+	public onExecute(func: (i: ButtonInteraction, cache?: string) => UnknownResponse) {
 		this.func = func;
 		return this;
 	}
 
-	public execute(i: ButtonInteraction, cacheHandle: string) {
+	public execute(i: ButtonInteraction, cacheHandle: string | undefined) {
 		if (!i.isButton()) return;
 		if (this.func) this.func(i, cacheHandle);
 	}
@@ -99,24 +78,24 @@ export class Button extends Interaction {
 
 export class SelectMenu extends Interaction {
 	static selectMenus: Collection<CustomID, SelectMenu> = new Collection();
-	private func: undefined | ((i: AnySelectMenuInteraction, cache: string) => any | Promise<any>);
+	private func: undefined | ((i: AnySelectMenuInteraction, cache: string | undefined) => UnknownResponse);
 	constructor(customId: CustomID) {
 		super(customId);
 		SelectMenu.selectMenus.set(customId, this);
 	}
 
-	public onExecute(func: (i: AnySelectMenuInteraction, cache: string) => any | Promise<any>) {
+	public onExecute(func: (i: AnySelectMenuInteraction, cache: string | undefined) => UnknownResponse) {
 		this.func = func;
 		return this;
 	}
 
-	public execute(i: AnySelectMenuInteraction, cacheHandle: string) {
+	public execute(i: AnySelectMenuInteraction, cacheHandle: string | undefined) {
 		if (!i.isAnySelectMenu()) return;
 		if (this.func) this.func(i, cacheHandle);
 	}
 }
 
-export type ModalFunc = (i: ModalSubmitInteraction, cache?: string) => AnyOutcome;
+export type ModalFunc = (i: ModalSubmitInteraction, cache?: string) => unknown;
 export type ModalFill = (modal: ModalBuilder, cache?: string) => ActionRowBuilder<TextInputBuilder>[] | Promise<ActionRowBuilder<TextInputBuilder>[]>;
 export class Modal extends Interaction {
 	static modals: Collection<CustomID, Modal> = new Collection();
@@ -139,7 +118,7 @@ export class Modal extends Interaction {
 	}
 
 	public async getModal(cache?: string) {
-		let newModal = this.modalBuilder;
+		const newModal = this.modalBuilder;
 		if (this.hydrateFunc) newModal.setComponents(await this.hydrateFunc(newModal, cache));
 
 		if (cache) newModal.setCustomId(`${this.customID}_${cache}`);
@@ -160,7 +139,7 @@ export class Modal extends Interaction {
 		return this;
 	}
 
-	public execute(i: ModalSubmitInteraction, cacheHandle: string) {
+	public execute(i: ModalSubmitInteraction, cacheHandle: string | undefined) {
 		if (!i.isModalSubmit()) return;
 		if (this.func) this.func(i, cacheHandle);
 	}

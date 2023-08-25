@@ -1,5 +1,4 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
-import { prisma } from '../..';
 import { Button } from '../../structures/interactions';
 import { getArchive } from '../../util/database';
 import { formatArchive } from '../commands/archive';

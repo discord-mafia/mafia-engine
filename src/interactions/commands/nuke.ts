@@ -1,4 +1,4 @@
-import { CategoryChannel, Channel, ChannelType, SlashCommandBuilder, TextChannel } from 'discord.js';
+import { type CategoryChannel, type Channel, ChannelType, SlashCommandBuilder } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../structures/BotClient';
 
 const data = new SlashCommandBuilder().setName('nuke').setDescription('Delete all channels underneath a category');
@@ -15,7 +15,8 @@ export default newSlashCommand({
 		const channels: Channel[] = [];
 		category.children.cache.forEach((v) => channels.push(v));
 		for (let i = 0; i < channels.length; i++) {
-			await channels[i].delete();
+			const channel = channels[i];
+			if (channel) await channel.delete();
 		}
 		await category.delete();
 		await i.editReply('Done');

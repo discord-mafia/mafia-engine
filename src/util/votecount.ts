@@ -1,5 +1,5 @@
-import { Snowflake } from 'discord.js';
-import { FullVoteCount } from './database';
+import { type Snowflake } from 'discord.js';
+import { type FullVoteCount } from './database';
 
 export type CalculatedVoteCount = ReturnType<typeof calculateVoteCount>;
 export function calculateVoteCount(vc: FullVoteCount) {

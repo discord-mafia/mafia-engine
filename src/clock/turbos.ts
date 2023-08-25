@@ -1,7 +1,7 @@
-import { ChannelType, Client, Guild, GuildMember } from 'discord.js';
-import { sendErrorLog, sendLog } from '../structures/logs';
+import { ChannelType, type Client, type Guild } from 'discord.js';
+import { sendErrorLog } from '../structures/logs';
 import { client, prisma } from '..';
-import { FullSignup, createAutomatedGame, getOrCreateUser, getSignup } from '../util/database';
+import { type FullSignup, createAutomatedGame, getOrCreateUser, getSignup } from '../util/database';
 import { formatSignupEmbed } from '../util/embeds';
 
 export const turboExpirySeconds = 60 * 60 * 3;
@@ -87,7 +87,6 @@ export async function turboSignupFull(signup: FullSignup) {
 
 	message.channel.send({ content: `Turbo signup is full. Imagine there's confirmation functionality here`, allowedMentions: { users: [] } });
 
-	const players: GuildMember[] = [];
 	const focusedCategory = signup.categories.find((c) => c.isFocused);
 	if (!focusedCategory) return;
 
@@ -163,7 +162,7 @@ export async function turboSignupFull(signup: FullSignup) {
 			parent: category,
 		});
 
-		const updatedGame = await prisma.automatedGame.update({
+		await prisma.automatedGame.update({
 			where: {
 				id: game.id,
 			},

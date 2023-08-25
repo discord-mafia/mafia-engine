@@ -1,4 +1,4 @@
-import { APIApplicationCommandOptionChoice, ColorResolvable, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
+import { type ColorResolvable, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { newSlashCommand } from '../../structures/BotClient';
 import { getAverageColor } from 'fast-average-color-node';
 import { prisma } from '../..';

@@ -1,4 +1,4 @@
-import { Guild, GuildMember, Role } from 'discord.js';
+import { type Guild, type GuildMember, type Role } from 'discord.js';
 
 type AllWithRole = {
 	role: Role;

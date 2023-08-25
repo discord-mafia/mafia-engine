@@ -1,5 +1,5 @@
 import { prisma } from '../..';
-import { FullAutomatedGame, getAutomatedGameOrThrow } from '../../util/database';
+import { type FullAutomatedGame, getAutomatedGameOrThrow } from '../../util/database';
 
 /**
  * Cycles through every stored automated game and starts the process to handle actions and events
@@ -69,14 +69,14 @@ export function runCycle(game: FullAutomatedGame) {
 	}
 }
 
-export function processDayEnd(game: FullAutomatedGame) {
+export function processDayEnd(_game: FullAutomatedGame) {
 	// Check votes
 	// If a player has been eliminated
 	// 	 1. Kill and flip the player
 	// 	 2. Check win conditions. If win conditions are met, end the game unless it's a non-game ending win con.
 	//   3. If win conditions are not met, move to the next phase.
 }
-export function processNightEnd(game: FullAutomatedGame) {
+export function processNightEnd(_game: FullAutomatedGame) {
 	// Check actions
 	// After all actions are handled, check win conditions. If win conditions are met, end the game unless it's a non-game ending win con.
 }

@@ -1,22 +1,5 @@
-import {
-	APIApplicationCommandOptionChoice,
-	ActionRowBuilder,
-	ButtonBuilder,
-	ButtonStyle,
-	ChannelType,
-	ColorResolvable,
-	EmbedBuilder,
-	ForumChannel,
-	GuildForumTag,
-	GuildMember,
-	InviteTargetType,
-	SlashCommandBuilder,
-	TextChannel,
-} from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelType, type ForumChannel, SlashCommandBuilder } from 'discord.js';
 import { newSlashCommand } from '../../structures/BotClient';
-import axios from 'axios';
-import { load } from 'cheerio';
-import { format } from 'path';
 
 const data = new SlashCommandBuilder().setName('test').setDescription('TEST');
 data.addChannelOption((option) =>
@@ -32,8 +15,6 @@ export default newSlashCommand({
 		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
 			new ButtonBuilder().setCustomId('test').setLabel('See Player Mentions').setStyle(ButtonStyle.Secondary)
 		);
-
-		const tags: GuildForumTag[] = forumChannel.availableTags;
 
 		forumChannel.threads.create({
 			name: 'Test Archive',

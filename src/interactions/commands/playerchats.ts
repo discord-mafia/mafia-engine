@@ -1,7 +1,6 @@
-import { ChannelType, EmbedBuilder, OverwriteResolvable, SlashCommandBuilder, User } from 'discord.js';
+import { ChannelType, type OverwriteResolvable, SlashCommandBuilder, type User } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../structures/BotClient';
 import { getSignup } from '../../util/database';
-import { sign } from 'crypto';
 
 const data = new SlashCommandBuilder().setName('playerchats').setDescription('Create a category as associated channels for a signup');
 data.addStringOption((x) => x.setName('name').setDescription('The name of the game').setRequired(true));
@@ -87,10 +86,10 @@ export default newSlashCommand({
 				continue;
 			}
 
-			const stuff = await channel.permissionOverwrites.create(discordId, {
-				ViewChannel: true,
-				SendMessages: true,
-			});
+			// const stuff = await channel.permissionOverwrites.create(discordId, {
+			// 	ViewChannel: true,
+			// 	SendMessages: true,
+			// });
 
 			await hostPanel.send({ content: `Created channel for ${username} <#${channel.id}>` });
 		}

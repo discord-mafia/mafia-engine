@@ -1,4 +1,4 @@
-import { AttachmentBuilder, ColorResolvable, Colors, RGBTuple, WebhookClient } from 'discord.js';
+import { AttachmentBuilder, Colors, type RGBTuple, WebhookClient } from 'discord.js';
 import config from '../config';
 import { EmbedBuilder } from '@discordjs/builders';
 

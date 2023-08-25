@@ -1,6 +1,5 @@
-import { sign } from 'crypto';
 import { prisma } from '..';
-import { GuildMember, Snowflake } from 'discord.js';
+import { type GuildMember, type Snowflake } from 'discord.js';
 
 export type FullSignup = NonNullable<Awaited<ReturnType<typeof getSignup>>>;
 

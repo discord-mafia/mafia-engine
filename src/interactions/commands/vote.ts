@@ -1,8 +1,7 @@
-import { SlashCommandBuilder, EmbedBuilder, ChatInputCommandInteraction, ChannelType } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../structures/BotClient';
-import { getAllWithRole } from '../../util/discordRole';
 import { prisma } from '../..';
-import { getOrCreatePlayer, getOrCreateUser, getPlayer, getVoteCounter } from '../../util/database';
+import { getOrCreatePlayer, getPlayer, getVoteCounter } from '../../util/database';
 import { calculateVoteCount, formatVoteCount } from '../../util/votecount';
 
 const data = new SlashCommandBuilder().setName('vote').setDescription('Vote for a player');
@@ -108,21 +107,3 @@ export default newSlashCommand({
 		}
 	},
 });
-
-async function createVoteCount(i: ChatInputCommandInteraction) {
-	if (!i.guild) return;
-
-	await i.deferReply({ ephemeral: true });
-	try {
-		await prisma.voteCounter.create({
-			data: {
-				channelId: i.channelId,
-			},
-		});
-
-		return await i.editReply({ content: `Vote Counter has been created, use other commands to add/remove players` });
-	} catch (err) {
-		console.log(err);
-		return i.editReply({ content: `An error occured while creating the vote counter` });
-	}
-}

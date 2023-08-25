@@ -1,6 +1,5 @@
-import { SlashCommandBuilder, EmbedBuilder, ChatInputCommandInteraction } from 'discord.js';
+import { SlashCommandBuilder, type ChatInputCommandInteraction } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../structures/BotClient';
-import { getAllWithRole } from '../../util/discordRole';
 import { prisma } from '../..';
 import { getOrCreateUser, getPlayer, getVoteCounter } from '../../util/database';
 
@@ -134,7 +133,7 @@ async function resetVoteCount(i: ChatInputCommandInteraction) {
 		const voteCounter = await getVoteCounter({ channelId: i.channelId });
 		if (!voteCounter) return i.editReply({ content: `This is not a vote channel` });
 
-		const deletion = await prisma.vote.deleteMany({
+		await prisma.vote.deleteMany({
 			where: {
 				voteCounterId: voteCounter.id,
 			},

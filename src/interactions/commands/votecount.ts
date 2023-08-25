@@ -1,8 +1,6 @@
-import { SlashCommandBuilder, EmbedBuilder, ChatInputCommandInteraction, Snowflake } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../structures/BotClient';
-import { getAllWithRole } from '../../util/discordRole';
-import { prisma } from '../..';
-import { getOrCreatePlayer, getOrCreateUser, getVoteCounter } from '../../util/database';
+import { getVoteCounter } from '../../util/database';
 import { calculateVoteCount, formatVoteCount } from '../../util/votecount';
 
 const data = new SlashCommandBuilder().setName('votecount').setDescription('View the vote count');

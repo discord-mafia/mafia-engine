@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { Button } from '../../structures/interactions';
 import { getArchive } from '../../util/database';
 import { formatArchive } from '../commands/archive';

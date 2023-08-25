@@ -1,4 +1,5 @@
-import { ButtonInteraction, Collection, Interaction } from 'discord.js';
+import { Collection, type Interaction } from 'discord.js';
+import type { UnknownResponse } from '~/util/types';
 
 export type CustomID = string;
 export interface FilledCustomID {
@@ -9,7 +10,7 @@ export interface FilledCustomID {
 export const interactions: Collection<string, BaseInteraction> = new Collection();
 interface BaseInteraction {
 	customID: CustomID;
-	execute: (i: Interaction, cache?: any) => any | Promise<any>;
+	execute: (i: Interaction, cache?: unknown) => UnknownResponse;
 }
 
 export function createInteraction(i: BaseInteraction) {

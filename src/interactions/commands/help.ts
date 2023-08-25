@@ -1,15 +1,6 @@
-import {
-	APIApplicationCommandOptionChoice,
-	ChannelType,
-	EmbedBuilder,
-	GuildMember,
-	InviteTargetType,
-	SlashCommandBuilder,
-	TextChannel,
-} from 'discord.js';
+import { type APIApplicationCommandOptionChoice, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { newSlashCommand } from '../../structures/BotClient';
 
-const LIST_OF_STAFF = 'LIST_OF_STAFF';
 const options: Record<string, string> = {
 	'Wiki Main Page': 'https://discord-mafia-role-cards.fandom.com/wiki/Discord_Mafia_Role_cards_Wiki',
 	'List of Roles': 'https://discord-mafia-role-cards.fandom.com/wiki/List_of_roles',

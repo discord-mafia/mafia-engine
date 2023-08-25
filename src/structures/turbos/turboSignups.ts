@@ -1,6 +1,6 @@
-import { Guild, ChannelType, GuildMember, Colors } from 'discord.js';
+import { type Guild, ChannelType, Colors } from 'discord.js';
 import { client, prisma } from '../..';
-import { FullSignup, createAutomatedGame, getOrCreateUser } from '../../util/database';
+import { type FullSignup, createAutomatedGame } from '../../util/database';
 import { formatSignupEmbed } from '../../util/embeds';
 
 async function getMessage(guild: Guild, channelId: string, messageId: string) {
@@ -145,7 +145,7 @@ export async function setupTurbo(signup: FullSignup) {
 		},
 	});
 
-	const updatedGame = await prisma.automatedGame.update({
+	await prisma.automatedGame.update({
 		where: {
 			id: game.id,
 		},

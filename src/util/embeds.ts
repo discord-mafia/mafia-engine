@@ -1,6 +1,5 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Snowflake } from 'discord.js';
-import { FullSignup } from './database';
-import { sign } from 'crypto';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, type Snowflake } from 'discord.js';
+import { type FullSignup } from './database';
 import { turboExpirySeconds } from '../clock/turbos';
 
 export function formatSignupEmbed(signup: FullSignup) {
@@ -29,8 +28,8 @@ export function formatSignupEmbed(signup: FullSignup) {
 				return `> ${index + 1}. ${user.user.username}${user.isTurboHost ? ' (Host)' : ''}`;
 			});
 
-		let fieldName = `${name}${limit && limit > 0 ? ` (${userIds.length}/${limit})` : ` (${userIds.length})`}`;
-		let value = userIds.join('\n').trim();
+		const fieldName = `${name}${limit && limit > 0 ? ` (${userIds.length}/${limit})` : ` (${userIds.length})`}`;
+		const value = userIds.join('\n').trim();
 
 		embed.addFields({
 			name: fieldName,

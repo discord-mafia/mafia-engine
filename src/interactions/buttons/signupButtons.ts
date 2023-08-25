@@ -1,11 +1,10 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, Role } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, type Role } from 'discord.js';
 import { prisma } from '../..';
 import { Button } from '../../structures/interactions';
 import { getSignup } from '../../util/database';
-import { sign } from 'crypto';
 import { formatSignupEmbed } from '../../util/embeds';
-import { LogType, sendInfoLog, sendLog } from '../../structures/logs';
-import { isTurboFull, turboSignupFull } from '../../clock/turbos';
+import { sendInfoLog } from '../../structures/logs';
+import { isTurboFull } from '../../clock/turbos';
 import { setupTurbo } from '../../structures/turbos/turboSignups';
 
 export default new Button('button-category')
@@ -38,7 +37,7 @@ export default new Button('button-category')
 			}));
 		// Fetch or Create the user.
 
-		const removeFromCategory = async (categoryId: number, discordId: string) => {
+		const removeFromCategory = async (categoryId: number, _discordId: string) => {
 			try {
 				const deleted = await prisma.signupUserJunction.deleteMany({
 					where: {

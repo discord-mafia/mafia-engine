@@ -1,4 +1,4 @@
-import { ChannelType, ChatInputCommandInteraction, SlashCommandBuilder, Snowflake } from 'discord.js';
+import { type ChatInputCommandInteraction, SlashCommandBuilder, type Snowflake } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../structures/BotClient';
 import { getOrCreateUser, getSignup } from '../../util/database';
 import { formatSignupEmbed } from '../../util/embeds';
@@ -25,9 +25,9 @@ export default newSlashCommand({
 	data,
 	serverType: [ServerType.MAIN, ServerType.TURBO],
 	execute: async (i: ChatInputCommandInteraction) => {
-		const setup = i.options.getString('setup', true);
-		const days = i.options.getString('days', false) ?? 20;
-		const nights = i.options.getString('nights', false) ?? 10;
+		// const setup = i.options.getString('setup', true);
+		// const days = i.options.getString('days', false) ?? 20;
+		// const nights = i.options.getString('nights', false) ?? 10;
 
 		const member = await i.guild?.members.fetch(i.user.id);
 		if (!member) return i.reply({ content: 'You must be in the server to use this command.', ephemeral: true });

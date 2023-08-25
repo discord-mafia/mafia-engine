@@ -1,4 +1,4 @@
-import { ChannelType, InviteTargetType, SlashCommandBuilder, TextChannel } from 'discord.js';
+import { ChannelType, SlashCommandBuilder, type TextChannel } from 'discord.js';
 import { newSlashCommand } from '../../structures/BotClient';
 
 const data = new SlashCommandBuilder().setName('createinvite').setDescription('See the invite links for our servers');

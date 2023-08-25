@@ -3,18 +3,16 @@ import {
 	ButtonBuilder,
 	ButtonStyle,
 	ChannelType,
-	ChatInputCommandInteraction,
+	type ChatInputCommandInteraction,
 	EmbedBuilder,
 	SlashCommandBuilder,
-	SlashCommandStringOption,
-	StringSelectMenuBuilder,
+	type SlashCommandStringOption,
 } from 'discord.js';
 import { newSlashCommand } from '../../structures/BotClient';
 import { prisma } from '../..';
-import { FullArchive, getArchive, getUser } from '../../util/database';
+import { type FullArchive, getArchive, getUser } from '../../util/database';
 import { createViewArchiveButton } from '../buttons/archiveManageMembers';
 import viewArchiveMentions from '../buttons/viewArchiveMentions';
-import { arch } from 'os';
 import refreshArchive from '../buttons/refreshArchive';
 
 const data = new SlashCommandBuilder().setName('archive').setDescription('Manage an archive');
@@ -287,11 +285,9 @@ async function addHost(i: ChatInputCommandInteraction) {
 	const queue = i.options.getString('queue', true);
 	const number = i.options.getInteger('number', true);
 	const hostNumber = i.options.getString('discordid', false);
-	const username = i.options.getString('username', false);
 	const member = i.options.getUser('member', false);
 	const gameTag = getGameTag(queue, number);
 
-	const isUsingDiscordID = !member && hostNumber;
 	const discordID = member?.id || hostNumber?.toString();
 	if (!discordID) return i.reply({ content: 'No member or discord id provided.', ephemeral: true });
 

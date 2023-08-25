@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { ServerType, newSlashCommand } from '../../structures/BotClient';
+import { newSlashCommand } from '../../structures/BotClient';
 import { getAllWithRole } from '../../util/discordRole';
 import config from '../../config';
 
@@ -24,6 +24,7 @@ export default newSlashCommand({
 			const allStaff: Record<string, string[]> = {};
 			for (let j = 0; j < StaffRoles.length; j++) {
 				const staffRoleID = StaffRoles[j];
+				if (!staffRoleID) continue;
 				const data = await getAllWithRole(mainGuild, staffRoleID);
 				if (!data) continue;
 				const { role, members } = data;
@@ -32,6 +33,7 @@ export default newSlashCommand({
 					let isUnique = true;
 					for (const staffTier in allStaff) {
 						const staff = allStaff[staffTier];
+						if (!staff) continue;
 						if (staff.includes(v.id)) isUnique = false;
 					}
 
@@ -44,7 +46,7 @@ export default newSlashCommand({
 			const embed = new EmbedBuilder().setTitle('Current Staff').setThumbnail(i.guild.iconURL()).setColor('White');
 
 			for (const staffTier in allStaff) {
-				const staff = allStaff[staffTier];
+				const staff = allStaff[staffTier] ?? [];
 
 				let combinedStr = '';
 				staff.forEach((v) => (combinedStr += `<@${v}>\n`));
