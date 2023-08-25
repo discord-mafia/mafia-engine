@@ -1,0 +1,259 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Status {
+  None
+  Bronze
+  Silver
+  Gold
+  Diamond
+  Platinum
+}
+
+model User {
+  id        Int    @id @default(autoincrement())
+  discordId String @unique
+  username  String @unique
+
+  mvpStatus Status @default(None)
+
+  signupCategories SignupUserJunction[]
+  playerAccounts   Player[]
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  gameHosts GameHost[]
+
+  // Archives
+  archivedGame ArchivedGameUserJunction[]
+}
+
+model GameHost {
+  id       String @id @default(uuid())
+  signup   Signup @relation(fields: [signupId], references: [id])
+  user     User   @relation(fields: [userId], references: [id])
+  signupId Int
+  userId   Int
+}
+
+model Signup {
+  id         Int              @id @default(autoincrement())
+  name       String?
+  serverId   String
+  channelId  String
+  messageId  String           @unique
+  categories SignupCategory[]
+  hostRoleId String?
+
+  isActive        Boolean    @default(true)
+  requiredServers String[]   @default([])
+  isTurbo         Boolean    @default(false)
+  hosts           GameHost[]
+
+  createdAt DateTime @default(now())
+}
+
+model SignupCategory {
+  id             Int     @id @default(autoincrement())
+  signup         Signup  @relation(fields: [signupId], references: [id])
+  signupId       Int
+  name           String
+  isFocused      Boolean @default(false)
+  limit          Int     @default(-1)
+  isLocked       Boolean @default(false)
+  emoji          String?
+  attachedRoleId String?
+
+  users      SignupUserJunction[]
+  buttonName String? // Uses the name if not set
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SignupUserJunction {
+  id               Int            @id @default(autoincrement())
+  signupCategory   SignupCategory @relation(fields: [signupCategoryId], references: [id])
+  signupCategoryId Int
+  user             User           @relation(fields: [userId], references: [id])
+  userId           Int
+  isTurboHost      Boolean        @default(false)
+}
+
+// Archives
+model ArchivedGame {
+  id                String  @id @default(uuid())
+  gameHandle        String  @unique
+  gameTitle         String
+  channelId         String?
+  messageId         String? @unique
+  managingMessageId String? @unique
+
+  actions             ArchivedGameAction[]
+  urls                ArchivedURL[]
+  users               ArchivedGameUserJunction[]
+  spreadsheetURL      String?
+  spreadsheetImageURL String?
+  additionalURLs      String[]                   @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ArchivedGameUserJunction {
+  id             String               @id @default(uuid())
+  userId         Int
+  archivedGameId String
+  isHost         Boolean              @default(false)
+  isCoHost       Boolean              @default(false)
+  isWinner       Boolean              @default(false)
+  isLoser        Boolean              @default(false)
+  role           String?
+  alignment      String?
+  user           User                 @relation(fields: [userId], references: [id])
+  archivedGame   ArchivedGame         @relation(fields: [archivedGameId], references: [id])
+  actions        ArchivedGameAction[]
+}
+
+model ArchivedGameAction {
+  id             String                    @id @default(uuid())
+  archivedGameId String
+  userId         String?
+  game           ArchivedGame              @relation(fields: [archivedGameId], references: [id])
+  user           ArchivedGameUserJunction? @relation(fields: [userId], references: [id])
+  actionDetails  String
+  phase          String
+  phaseNumber    Int
+}
+
+model ArchivedURL {
+  id             String       @id @default(uuid())
+  archivedGameId String
+  archivedGame   ArchivedGame @relation(fields: [archivedGameId], references: [id])
+  url            String
+  name           String?
+}
+
+// Vote Counter
+
+model Player {
+  id              Int     @id @default(autoincrement())
+  voteCounterId   Int?
+  discordId       String
+  automatedGameId String?
+
+  voteCounter   VoteCounter? @relation(fields: [voteCounterId], references: [id])
+  user          User         @relation(fields: [discordId], references: [discordId])
+  votesIncoming Vote[]       @relation(name: "votedTarget")
+  votesOutgoing Vote[]       @relation(name: "voter")
+
+  automatedGame  AutomatedGame?  @relation(fields: [automatedGameId], references: [id])
+  automatedRoles AutomatedRole[]
+  confessionalId String?
+
+  @@unique([voteCounterId, discordId])
+}
+
+model VoteCounter {
+  id        Int      @id @default(autoincrement())
+  channelId String   @unique
+  votes     Vote[]
+  players   Player[]
+
+  currentRound     Int            @default(1)
+  currentIteration Int            @default(0)
+  lastCheckedVotes DateTime       @default(now())
+  automatedGame    AutomatedGame?
+
+  noLynch  Boolean @default(true)
+  majority Boolean @default(true)
+}
+
+model Vote {
+  id            Int  @id @default(autoincrement())
+  voteCounterId Int
+  votedTargetId Int?
+  voterId       Int
+
+  voteCounter VoteCounter @relation(fields: [voteCounterId], references: [id])
+  votedTarget Player?     @relation(fields: [votedTargetId], references: [id], name: "votedTarget")
+  voter       Player      @relation(fields: [voterId], references: [id], name: "voter")
+  reason      String?
+
+  isNoLynch Boolean @default(false)
+
+  createdAt DateTime @default(now())
+}
+
+enum Phase {
+  Pregame
+  Day
+  Night
+  Postgame
+}
+
+model AutomatedGame {
+  id            String @id @default(uuid())
+  voteCounterId Int?   @unique
+
+  currentPhase      Phase           @default(Pregame)
+  currentCycle      Int             @default(0)
+  scheduledPhaseEnd DateTime?
+  voteCounter       VoteCounter?    @relation(fields: [voteCounterId], references: [id])
+  players           Player[]
+  roles             AutomatedRole[]
+
+  guildId        String
+  infoChannelId  String?            @unique
+  chatChannelId  String?            @unique
+  mafiaChannelId String?            @unique
+  confessionals  AutoConfessional[]
+}
+
+model AutoConfessional {
+  id     String @id @default(uuid())
+  gameId String
+  roleId String @unique
+
+  game AutomatedGame @relation(fields: [gameId], references: [id])
+  role AutomatedRole @relation(fields: [roleId], references: [id])
+
+  channelId String @unique
+}
+
+model AutomatedRole {
+  id              String @id @default(uuid())
+  automatedGameId String
+  playerId        Int
+
+  roleName      String
+  data          String[]          @default([])
+  automatedGame AutomatedGame     @relation(fields: [automatedGameId], references: [id])
+  player        Player            @relation(fields: [playerId], references: [id])
+  confessional  AutoConfessional?
+
+  isConfirmed Boolean?
+}
+
+// Role Cards
+model Role {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  otherNames   String[]
+  alignment    String
+  abilities    String
+  winCondition String
+  iconUrl      String?
+  flavourText  String?
+  roleColour   String?
+  wikiUrl      String?
+}
