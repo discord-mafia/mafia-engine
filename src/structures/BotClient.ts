@@ -123,39 +123,31 @@ export class BotClient extends Client {
 			};
 
 			slashCommands.forEach((val) => {
-				if (!val.serverType) return commandList[ServerType.ALL].push(val);
-				else if (Array.isArray(val.serverType)) {
-					val.serverType.forEach((type) => {
-						commandList[type].push(val);
-					});
-				} else if (val.serverType) {
-					commandList[val.serverType].push(val);
-				} else {
-					commandList[ServerType.NONE].push(val);
-				}
+				return commandList[ServerType.ALL].push(val);
+				// else if (Array.isArray(val.serverType)) {
+				// 	val.serverType.forEach((type) => {
+				// 		commandList[type].push(val);
+				// 	});
+				// } else if (val.serverType) {
+				// 	commandList[val.serverType].push(val);
+				// } else {
+				// 	commandList[ServerType.NONE].push(val);
+				// }
 			});
 
 			// Go through each and register them
 
 			console.log(`\x1b[33mRegistering all application (/) commands...\x1b[0m`);
+			const list: any[] = commandList.ALL.map((cmd) => {
+				return cmd.data;
+			});
 
-			const register = async (serverType: ServerType, commands: SlashCommand[], serverId?: string) => {
-				console.log(`\x1b[33mRegistering ${commands.length} application (/) commands for ${serverType}...\x1b[0m`);
-				const list: any[] = commands.map((cmd) => {
-					console.log(`- ${cmd.data.name}`);
-					return cmd.data;
-				});
-				const registeredCommands = (await this.rest.put(Routes.applicationCommands(this.clientID), { body: list })) as any;
-
-				if (registeredCommands.length != commands.length) {
-					console.log(`\x1B[31mFailed to load ${commands.length - registeredCommands.length} commands`);
-				}
-			};
-
-			await register(ServerType.ALL, commandList['ALL']);
-			await register(ServerType.MAIN, commandList['MAIN'], config.PLAYERCHAT_SERVER_ID);
-			await register(ServerType.PLAYERCHAT, commandList['PLAYERCHAT'], config.PLAYERCHAT_SERVER_ID);
-			await register(ServerType.TURBO, commandList['TURBO'], config.TURBO_SERVER_ID);
+			const registeredCommands = (await this.rest.put(Routes.applicationGuildCommands(this.clientID, '648663810772697089'), {
+				body: list,
+			})) as any;
+			if (registeredCommands.length != list.length) {
+				console.log(`\x1B[31mFailed to load ${list.length - registeredCommands.length} commands`);
+			}
 		} catch (err) {
 			console.error(err);
 		}

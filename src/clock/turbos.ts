@@ -3,9 +3,6 @@ import { sendErrorLog, sendLog } from '../structures/logs';
 import { client, prisma } from '..';
 import { FullSignup, createAutomatedGame, getOrCreateUser, getSignup } from '../util/database';
 import { formatSignupEmbed } from '../util/embeds';
-import config from '../config';
-import { sign } from 'crypto';
-import { Player } from '@prisma/client';
 
 export const turboExpirySeconds = 60 * 60 * 3;
 

@@ -8,8 +8,10 @@ import { calculateVoteCount, formatVoteCount } from '../../util/votecount';
 const data = new SlashCommandBuilder().setName('vote').setDescription('Vote for a player');
 data.addUserOption((option) => option.setName('player').setDescription('The player you are voting for').setRequired(false));
 data.addStringOption((option) => option.setName('reason').setDescription('The reason you are voting for this player').setRequired(false));
+
+data.addBooleanOption((option) => option.setName('unvote').setDescription('Remove your vote (overrides all other options)').setRequired(false));
 data.addBooleanOption((option) =>
-	option.setName('no-lynch').setDescription('Vote for no-lynch (if true, overrides player option)').setRequired(false)
+	option.setName('nolynch').setDescription('Vote for no-lynch (if true, overrides player option)').setRequired(false)
 );
 
 export default newSlashCommand({
@@ -17,9 +19,10 @@ export default newSlashCommand({
 	serverType: ServerType.MAIN,
 	execute: async (i) => {
 		if (!i.guild) return;
-		const votedPlayerUser = i.options.getUser('player', false);
+		const unvote = i.options.getBoolean('unvote', false) ?? false;
+		const votedPlayerUser = unvote ? null : i.options.getUser('player', false);
 		const reason = i.options.getString('reason', false);
-		const noLynch = i.options.getBoolean('no-lynch', false) ?? false;
+		const noLynch = unvote ? false : i.options.getBoolean('no-lynch', false) ?? false;
 
 		try {
 			const voteCounter = await prisma.voteCounter.findUnique({ where: { channelId: i.channelId } });
@@ -31,7 +34,8 @@ export default newSlashCommand({
 			let focusPlayerId: number | undefined;
 			let focusPlayerDiscordId: string | undefined;
 
-			if (votedPlayerUser && !noLynch) {
+			if (unvote) {
+			} else if (votedPlayerUser && !noLynch) {
 				const votedMember = await i.guild.members.fetch(votedPlayerUser.id);
 				if (!votedMember) return i.reply({ content: 'The player you are voting for is not in the server', ephemeral: true });
 				const votingPlayer = await getOrCreatePlayer(voteCounter.id, votedPlayerUser.id);
@@ -39,9 +43,7 @@ export default newSlashCommand({
 
 				focusPlayerId = votingPlayer.id;
 				focusPlayerDiscordId = votingPlayer.discordId;
-			}
-
-			if (!noLynch && !(focusPlayerId && focusPlayerDiscordId))
+			} else if (!unvote && !noLynch && !(focusPlayerId && focusPlayerDiscordId))
 				return i.reply({ content: 'You must specify a player to vote for or no lynch', ephemeral: true });
 
 			const vote = await prisma.vote.create({
@@ -55,7 +57,14 @@ export default newSlashCommand({
 			});
 
 			if (vote) {
-				if (noLynch) {
+				if (unvote) {
+					await i.reply({
+						content: `<@${i.user.id}> has removed their vote`,
+						allowedMentions: {
+							users: [],
+						},
+					});
+				} else if (noLynch) {
 					await i.reply({
 						content: `<@${i.user.id}> has voted to no-lynch`,
 						allowedMentions: {

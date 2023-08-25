@@ -5,7 +5,6 @@ import { formatSignupEmbed } from '../../util/embeds';
 import { prisma } from '../..';
 
 const data = new SlashCommandBuilder().setName('signups').setDescription('Create a signup post');
-data.addRoleOption((role) => role.setName('hostrole').setDescription('Role that the host/s have').setRequired(true));
 data.addStringOption((title) => title.setName('title').setDescription('Title for the signup').setRequired(false));
 data.addIntegerOption((limit) => limit.setName('limit').setDescription('Limit the number of signups').setRequired(false));
 
@@ -15,7 +14,6 @@ export default newSlashCommand({
 	execute: async (i: ChatInputCommandInteraction) => {
 		const title = i.options.getString('title') ?? 'Game Signups';
 		const limit = i.options.getInteger('limit') ?? undefined;
-		const role = i.options.getRole('role', true);
 
 		if (!i.guild || !i.channelId) return i.reply({ content: 'This command can only be used in a server.', ephemeral: true });
 
@@ -26,7 +24,6 @@ export default newSlashCommand({
 				channelId: i.channelId,
 				messageId: deferred.id,
 				serverId: i.guild.id,
-				hostRoleId: role.id,
 				categories: {
 					createMany: {
 						skipDuplicates: true,

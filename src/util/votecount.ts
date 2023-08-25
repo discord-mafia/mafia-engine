@@ -23,6 +23,7 @@ export function calculateVoteCount(vc: FullVoteCount) {
 		const voterId = vote.voter.discordId;
 		const votedTargetId = vote.votedTarget?.discordId;
 		const isNoLynch = vc.noLynch && vote.isNoLynch;
+		const isUnvote = !votedTargetId && !isNoLynch;
 
 		if (votedTargetId && !wagons.get(votedTargetId)) wagons.set(votedTargetId, []);
 
@@ -37,7 +38,7 @@ export function calculateVoteCount(vc: FullVoteCount) {
 
 		wagons.forEach((wagon, key) => {
 			const exists = wagon.includes(voterId);
-			const isFocused = !isNoLynch && key == votedTargetId;
+			const isFocused = !isNoLynch && !isUnvote && key == votedTargetId;
 
 			if (exists && !isFocused) {
 				votingNoLynch = votingNoLynch.filter((id) => id != voterId);
@@ -50,12 +51,13 @@ export function calculateVoteCount(vc: FullVoteCount) {
 
 		if (isNoLynch) votingNoLynch = [...votingNoLynch.filter((id) => id != voterId), voterId];
 
-		wagons.forEach((wagon) => {
-			nonVoters.forEach((id) => {
-				if (wagon.includes(id)) {
-					nonVoters = nonVoters.filter((x) => x != id);
-				}
+		nonVoters = [];
+		Array.from(players.keys()).forEach((player) => {
+			let isVoting = false;
+			wagons.forEach((wagon) => {
+				if (wagon.includes(player)) isVoting = true;
 			});
+			if (!isVoting && !votingNoLynch.includes(player)) nonVoters.push(player);
 		});
 	}
 
