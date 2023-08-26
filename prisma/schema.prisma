@@ -19,22 +19,28 @@ enum Status {
   Platinum
 }
 
+enum Permission {
+  Admin
+  Moderator
+  Host
+  User
+}
+
 model User {
   id        Int    @id @default(autoincrement())
   discordId String @unique
   username  String @unique
 
-  mvpStatus Status @default(None)
+  mvpStatus  Status     @default(None)
+  permission Permission @default(User) // Replace with guild-specific perms later
 
+  gameHosts        GameHost[]
   signupCategories SignupUserJunction[]
   playerAccounts   Player[]
+  archivedGame     ArchivedGameUserJunction[]
 
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  gameHosts GameHost[]
-
-  // Archives
-  archivedGame ArchivedGameUserJunction[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model GameHost {
