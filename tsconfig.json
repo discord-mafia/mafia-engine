@@ -13,7 +13,6 @@
 		"checkJs": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
-		"noEmit": true,
 		"moduleResolution": "node",
 		"isolatedModules": true,
 		"incremental": true,
