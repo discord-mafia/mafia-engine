@@ -50,6 +50,22 @@ export default newSlashCommand({
 		if (!fetchedSignup) return i.editReply({ content: 'Failed to create signup post.' });
 
 		const { embed, row } = formatSignupEmbed(fetchedSignup);
+
+		try {
+			const thread = await deferred.startThread({
+				name: 'Discussion',
+			});
+			if (thread) {
+				await thread.send({
+					content:
+						'This is the discussion thread for the signup post. Feel free to discuss the game here. There is a common mobile bug that shows buttons for the above embed, they do not work in this thread, use these instead',
+					components: row.components.length > 0 ? [row] : undefined,
+				});
+			}
+		} catch (err) {
+			console.log(err);
+		}
+
 		await i.editReply({ content: '', embeds: [embed], components: row.components.length > 0 ? [row] : undefined });
 	},
 });
