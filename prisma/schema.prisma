@@ -256,6 +256,7 @@ model Role {
   name         String   @unique
   otherNames   String[]
   alignment    String
+  subAlignment String?
   abilities    String
   winCondition String
   iconUrl      String?
