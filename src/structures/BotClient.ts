@@ -8,6 +8,7 @@ import {
 	REST,
 	Routes,
 	type SlashCommandBuilder,
+	type AutocompleteInteraction,
 } from 'discord.js';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -41,6 +42,7 @@ export interface SlashCommand {
 	data: SlashCommandBuilder;
 	serverType?: ServerType | ServerType[];
 	execute: (i: ChatInputCommandInteraction) => UnknownResponse;
+	autocomplete?: (i: AutocompleteInteraction) => void | Promise<void>;
 }
 
 export async function newSlashCommand(cmd: SlashCommand) {
