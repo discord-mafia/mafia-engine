@@ -98,7 +98,7 @@ export default newSlashCommand({
 				combinedStr.trim();
 				if (combinedStr === '') combinedStr = '\u200B';
 
-				fullStr += `### ${staffTier}\n${combinedStr}/`;
+				fullStr += `### ${staffTier}\n${combinedStr}`;
 			}
 
 			embed.setDescription(fullStr);
