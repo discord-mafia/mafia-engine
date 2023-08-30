@@ -1,35 +1,16 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, type ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { type ColorResolvable, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { newSlashCommand } from '../../structures/BotClient';
-import { addQueueOptions, formatArchiveEmbed, getGameTag } from './archive';
-import { getArchive } from '../../util/database';
-import { formatArchive } from './archive';
-import viewArchiveMentions from '../buttons/viewArchiveMentions';
+import { addHiddenOption } from '../../util/commands';
+import { getAllRoleNames, getRole } from '../../util/database';
+import stringSimilarity from 'string-similarity';
 const data = new SlashCommandBuilder().setName('view').setDescription('View something');
 
-data.addSubcommand((subcommand) =>
-	subcommand
-		.setName('archive')
-		.setDescription('View an archive')
-		.addStringOption(addQueueOptions)
-		.addIntegerOption((opt) => opt.setName('number').setDescription('The number of the game').setRequired(true))
-		.addStringOption((opt) =>
-			opt
-				.setName('type')
-				.setDescription('The format to post this in')
-				.setChoices(
-					...[
-						{
-							name: 'Embed',
-							value: 'embed',
-						},
-						{
-							name: 'Text',
-							value: 'text',
-						},
-					]
-				)
-		)
-		.addBooleanOption((opt) => opt.setName('hidden').setDescription('Whether to see this just for yourself').setRequired(false))
+data.addSubcommand((sub) =>
+	sub
+		.setName('role')
+		.setDescription('View a role')
+		.addStringOption((option) => option.setName('name').setDescription('The name of the role').setRequired(true).setAutocomplete(true))
+		.addBooleanOption(addHiddenOption)
 );
 
 export default newSlashCommand({
@@ -38,59 +19,64 @@ export default newSlashCommand({
 		if (!i.guild) return;
 
 		const subcommand = i.options.getSubcommand(true);
+
+		const embed = new EmbedBuilder();
+
 		switch (subcommand) {
-			case 'archive':
-				return viewArchive(i);
+			case 'role':
+				const reqRoleName = i.options.getString('name', true);
+				const allRoleNames = await getAllRoleNames();
+				if (!allRoleNames) return i.reply({ content: 'Failed to fetch roles', ephemeral: true });
+
+				const roleBestMatch = stringSimilarity.findBestMatch(reqRoleName.toLowerCase(), allRoleNames).bestMatch;
+
+				const requestedRole = await getRole(roleBestMatch.target);
+
+				if (!requestedRole) return i.reply({ content: 'Role not found', ephemeral: true });
+
+				embed.setTitle(`${requestedRole.name} - ${requestedRole.alignment} ${requestedRole.subAlignment}`);
+				embed.setColor(requestedRole.roleColour as ColorResolvable);
+
+				if (requestedRole.flavourText) embed.setDescription(`*${requestedRole.flavourText}*`);
+
+				if (requestedRole.wikiUrl) embed.setURL(requestedRole.wikiUrl);
+
+				embed.addFields(
+					{
+						name: 'Abilities',
+						value: requestedRole.abilities,
+					},
+					{
+						name: 'Win Condition',
+						value: requestedRole.winCondition,
+					}
+				);
+
+				await i.reply({ embeds: [embed], ephemeral: false });
+
+				break;
 			default:
 				return i.reply({ content: 'Invalid subcommand', ephemeral: true });
 		}
 	},
+	autocomplete: async (i) => {
+		const focused = i.options.getFocused();
+		const subcommand = i.options.getSubcommand(true);
+
+		const getClosestMatches = (str: string, arr: string[], total: number = 1) => {
+			const matches = stringSimilarity.findBestMatch(str.toLowerCase(), arr).ratings;
+			const sorted = matches.sort((a, b) => b.rating - a.rating);
+			return sorted.slice(0, total);
+		};
+
+		switch (subcommand) {
+			case 'role':
+				if (!focused) return i.respond([]);
+				const roleNames = (await getAllRoleNames()) ?? [];
+				const roleMatches = getClosestMatches(focused, roleNames, 5);
+				return i.respond(roleMatches.map((m) => ({ name: m.target.charAt(0).toUpperCase() + m.target.slice(1), value: m.target })));
+			default:
+				return i.respond([]);
+		}
+	},
 });
-
-async function viewArchive(i: ChatInputCommandInteraction) {
-	const queue = i.options.getString('queue', true);
-	const number = i.options.getInteger('number', true);
-	const formatType = i.options.getString('type', false);
-	const hidden = i.options.getBoolean('hidden', false) ?? false;
-
-	const gameTag = getGameTag(queue, number);
-
-	await i.deferReply({ ephemeral: hidden });
-
-	const archive = await getArchive(gameTag);
-	if (!archive) return i.editReply({ content: 'This archive does not exist' });
-
-	if (formatType === 'embed') {
-		const data = formatArchiveEmbed(archive);
-		if (!data) return i.editReply({ content: 'This archive does not exist' });
-
-		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-			new ButtonBuilder().setCustomId(viewArchiveMentions.createCustomID(gameTag)).setLabel('View Mentions').setStyle(ButtonStyle.Secondary)
-		);
-
-		return i.editReply({
-			embeds: [data],
-			components: [row],
-		});
-	} else {
-		const data = formatArchive(archive);
-		if (!data) return i.editReply({ content: 'This archive does not exist' });
-		const { content, image } = data;
-
-		const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
-			new ButtonBuilder().setCustomId(viewArchiveMentions.createCustomID(gameTag)).setLabel('View Mentions').setStyle(ButtonStyle.Secondary)
-		);
-		return i.editReply({
-			content,
-			files: image
-				? [
-						{
-							attachment: image,
-							name: 'archive.png',
-						},
-				  ]
-				: undefined,
-			components: [row],
-		});
-	}
-}

@@ -2,9 +2,11 @@ import { SlashCommandBuilder, EmbedBuilder, type ColorResolvable } from 'discord
 import { newSlashCommand } from '../../structures/BotClient';
 import { prisma } from '../../';
 import stringSimilarity from 'string-similarity';
+import { getAllRoleNames } from '../../util/database';
 
 const data = new SlashCommandBuilder().setName('role').setDescription('View a role');
 data.addStringOption((option) => option.setName('name').setDescription('The name of the role').setRequired(true).setAutocomplete(true));
+
 export default newSlashCommand({
 	data,
 	execute: async (i) => {
@@ -60,13 +62,7 @@ export default newSlashCommand({
 	autocomplete: async (i) => {
 		const focused = i.options.getFocused();
 
-		const roleNames = (
-			await prisma.role.findMany({
-				select: {
-					name: true,
-				},
-			})
-		).map((r) => r.name.toLowerCase());
+		const roleNames = (await getAllRoleNames()) ?? [];
 
 		const getClosestMatches = (str: string, arr: string[], total: number = 1) => {
 			const matches = stringSimilarity.findBestMatch(str.toLowerCase(), arr).ratings;

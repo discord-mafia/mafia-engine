@@ -233,3 +233,34 @@ export async function getAutomatedGameOrThrow(query: GameQuery) {
 	if (!game) throw new Error('Game not found');
 	return game;
 }
+
+export async function getAllRoleNames() {
+	try {
+		const roleNames = (
+			await prisma.role.findMany({
+				select: {
+					name: true,
+				},
+			})
+		).map((r) => r.name.toLowerCase());
+		return roleNames;
+	} catch (err) {
+		return null;
+	}
+}
+
+export async function getRole(name: string) {
+	try {
+		const role = await prisma.role.findFirst({
+			where: {
+				name: {
+					equals: name,
+					mode: 'insensitive',
+				},
+			},
+		});
+		return role;
+	} catch (err) {
+		return null;
+	}
+}

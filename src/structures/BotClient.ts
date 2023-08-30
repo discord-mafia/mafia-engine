@@ -16,7 +16,7 @@ import { type Button, type Modal, type SelectMenu } from './interactions';
 import OnClientReady from '../interactions/events/clientReady';
 import OnInteraction from '../interactions/events/onInteraction';
 import { type ContextMenuCommandBuilder } from 'discord.js';
-import type { UnknownResponse } from '~/util/types';
+import type { UnknownResponse } from '../util/types';
 
 export const DEFAULT_INTENTS = {
 	intents: [

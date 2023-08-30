@@ -31,7 +31,6 @@ model User {
   discordId String @unique
   username  String @unique
 
-  mvpStatus  Status     @default(None)
   permission Permission @default(User) // Replace with guild-specific perms later
 
   gameHosts        GameHost[]
