@@ -31,7 +31,9 @@ model User {
   discordId String @unique
   username  String @unique
 
-  permission Permission @default(User) // Replace with guild-specific perms later
+  permission   Permission @default(User) // Replace with guild-specific perms later
+  signupBanned Boolean    @default(false)
+  mvpStatus    Status     @default(None)
 
   gameHosts        GameHost[]
   signupCategories SignupUserJunction[]

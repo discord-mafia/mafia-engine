@@ -145,6 +145,7 @@ export default new Button('button-category')
 				if (category.id == categoryId) {
 					const exists = category.users.find((x) => x.id == fetchedUser.id);
 					if (exists) return i.editReply({ content: 'You are already in this category' });
+					else if (fetchedUser.signupBanned) return i.editReply({ content: 'You are banned from signing up' });
 					else {
 						await prisma.signupUserJunction.create({ data: { signupCategoryId: categoryId, userId: fetchedUser.id } });
 
