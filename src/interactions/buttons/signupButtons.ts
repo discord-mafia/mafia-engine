@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, type Role } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, UserSelectMenuBuilder, type Role } from 'discord.js';
 import { prisma } from '../..';
 import { Button } from '../../structures/interactions';
 import { getSignup } from '../../util/database';
@@ -6,6 +6,7 @@ import { formatSignupEmbed } from '../../util/embeds';
 import { sendInfoLog } from '../../structures/logs';
 import { isTurboFull } from '../../clock/turbos';
 import { setupTurbo } from '../../structures/turbos/turboSignups';
+import removeUserFromSignup from '../selectmenu/removeUserFromSignup';
 
 export default new Button('button-category')
 	.setButton(new ButtonBuilder().setLabel('Delete').setStyle(ButtonStyle.Danger))
@@ -105,8 +106,7 @@ export default new Button('button-category')
 			}
 		} else if (cache == 'settings') {
 			const isAdmin = member.permissions.has('Administrator');
-			const isHost = signup.hostRoleId ? member.roles.cache.has(signup.hostRoleId) : false;
-			if (!isAdmin && !isHost) return i.editReply({ content: 'You do not have permission to edit this signup' });
+			if (!isAdmin) return i.editReply({ content: 'You do not have permission to edit this signup' });
 
 			const embed = new EmbedBuilder();
 			embed.setColor('White');
@@ -126,12 +126,13 @@ export default new Button('button-category')
 				}
 			);
 
-			const row = new ActionRowBuilder<ButtonBuilder>();
-			row.addComponents(new ButtonBuilder().setCustomId('signup-manage-role').setLabel('Add Roles').setStyle(ButtonStyle.Secondary));
+			const row = new ActionRowBuilder<UserSelectMenuBuilder>();
 			row.addComponents(
-				new ButtonBuilder().setCustomId('signup-manage-category').setLabel('Manage Categories').setStyle(ButtonStyle.Secondary)
+				new UserSelectMenuBuilder()
+					.setCustomId(removeUserFromSignup.createCustomID(signup.messageId))
+					.setPlaceholder('Select a user to remove from the signups')
+					.setMaxValues(20)
 			);
-			row.addComponents(new ButtonBuilder().setCustomId('signup-manage-chats').setLabel('Create Player Chats').setStyle(ButtonStyle.Secondary));
 
 			return i.editReply({ embeds: [embed], components: [row] });
 		} else {
