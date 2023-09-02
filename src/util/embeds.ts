@@ -19,7 +19,10 @@ export function formatSignupEmbed(signup: FullSignup) {
 		});
 	}
 
-	for (const category of signup.categories) {
+	// Order by focused first
+	const sortedCategories = signup.categories.sort((a, b) => (a.isFocused && !b.isFocused ? -1 : 1));
+
+	for (const category of sortedCategories) {
 		const { name, isLocked, limit } = category;
 		const userIds = category.users
 			.sort((a, b) => (a.isTurboHost && !b.isTurboHost ? -1 : 1))
