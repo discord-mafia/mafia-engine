@@ -1,5 +1,5 @@
 import { Collection, type Interaction } from 'discord.js';
-import type { UnknownResponse } from '~/util/types';
+import type { UnknownResponse } from '../util/types';
 
 export type CustomID = string;
 export interface FilledCustomID {
