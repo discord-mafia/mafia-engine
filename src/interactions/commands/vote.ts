@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../structures/BotClient';
 import { prisma } from '../..';
-import { getOrCreatePlayer, getPlayer, getVoteCounter } from '../../util/database';
+import { getPlayer, getVoteCounter } from '../../util/database';
 import { calculateVoteCount, formatVoteCount } from '../../util/votecount';
 
 const data = new SlashCommandBuilder().setName('vote').setDescription('Vote for a player');
