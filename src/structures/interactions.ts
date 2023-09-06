@@ -10,7 +10,7 @@ import {
 	type Interaction as CoreInteraction,
 	type MessagePayload,
 } from 'discord.js';
-import type { UnknownResponse } from '~/util/types';
+import type { UnknownResponse } from '../util/types';
 type CustomID = string;
 
 export class Interaction {

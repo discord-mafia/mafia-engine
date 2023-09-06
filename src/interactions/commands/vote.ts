@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../structures/BotClient';
 import { prisma } from '../..';
-import { getOrCreatePlayer, getPlayer, getVoteCounter } from '../../util/database';
+import { getPlayer, getVoteCounter } from '../../util/database';
 import { calculateVoteCount, formatVoteCount } from '../../util/votecount';
 
 const data = new SlashCommandBuilder().setName('vote').setDescription('Vote for a player');
@@ -37,7 +37,7 @@ export default newSlashCommand({
 			} else if (votedPlayerUser && !noLynch) {
 				const votedMember = await i.guild.members.fetch(votedPlayerUser.id);
 				if (!votedMember) return i.reply({ content: 'The player you are voting for is not in the server', ephemeral: true });
-				const votingPlayer = await getOrCreatePlayer(voteCounter.id, votedPlayerUser.id);
+				const votingPlayer = await getPlayer(voteCounter.id, votedPlayerUser.id);
 				if (!votingPlayer) return i.reply({ content: 'Unable to fetch the player', ephemeral: true });
 
 				focusPlayerId = votingPlayer.id;

@@ -34,6 +34,7 @@ model User {
   permission   Permission @default(User) // Replace with guild-specific perms later
   signupBanned Boolean    @default(false)
   mvpStatus    Status     @default(None)
+  onWaitlist   Boolean    @default(false)
 
   gameHosts        GameHost[]
   signupCategories SignupUserJunction[]
@@ -162,6 +163,7 @@ model Player {
   user          User         @relation(fields: [discordId], references: [discordId])
   votesIncoming Vote[]       @relation(name: "votedTarget")
   votesOutgoing Vote[]       @relation(name: "voter")
+  voteWeight    Int          @default(1)
 
   automatedGame  AutomatedGame?  @relation(fields: [automatedGameId], references: [id])
   automatedRoles AutomatedRole[]

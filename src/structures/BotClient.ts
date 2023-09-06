@@ -140,7 +140,7 @@ export class BotClient extends Client {
 				return cmd.data;
 			});
 
-			const registeredCommands = (await this.rest.put(Routes.applicationGuildCommands(this.clientID, '648663810772697089'), {
+			const registeredCommands = (await this.rest.put(Routes.applicationCommands(this.clientID), {
 				body: list,
 			})) as unknown;
 
