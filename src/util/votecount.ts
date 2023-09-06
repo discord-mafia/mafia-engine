@@ -5,6 +5,7 @@ export type CalculatedVoteCount = ReturnType<typeof calculateVoteCount>;
 export function calculateVoteCount(vc: FullVoteCount) {
 	const players = new Map<Snowflake, string>();
 	const wagons = new Map<Snowflake, Snowflake[]>();
+	const weights = new Map<Snowflake, number>();
 
 	let votingNoLynch: Snowflake[] = [];
 	let nonVoters: Snowflake[] = [];
@@ -14,6 +15,7 @@ export function calculateVoteCount(vc: FullVoteCount) {
 
 	for (const player of vc.players) {
 		players.set(player.discordId, player.user.username);
+		weights.set(player.discordId, player.voteWeight);
 		nonVoters.push(player.discordId);
 	}
 
@@ -27,7 +29,10 @@ export function calculateVoteCount(vc: FullVoteCount) {
 
 		if (votedTargetId && !wagons.get(votedTargetId)) wagons.set(votedTargetId, []);
 
-		const wagonArray = Array.from(wagons.values()).map((val) => val.length);
+		const wagonArray = Array.from(wagons.values()).map((val) => {
+			const totalVoteWeight = val.reduce((acc, cur) => acc + (weights.get(cur) ?? 1), 0);
+			return totalVoteWeight;
+		});
 		const highestWagon = Math.max(...wagonArray);
 
 		// If majority is reached, skip
@@ -67,6 +72,7 @@ export function calculateVoteCount(vc: FullVoteCount) {
 		nonVoters,
 		votingNoLynch,
 		majorityReached,
+		weights,
 		settings: {
 			majority: vc.majority,
 		},
@@ -83,14 +89,16 @@ export function formatVoteCount(calculated: CalculatedVoteCount) {
 
 	wagons.forEach((wagon, key) => {
 		if (wagon.length > 0) {
-			const name = `${players.get(key) ?? `<@${key}>`} (${wagon.length})`;
+			const wagonVoteWeight = wagon.reduce((acc, cur) => acc + (calculated.weights.get(cur) ?? 1), 0);
+			const name = `${players.get(key) ?? `<@${key}>`} (${wagonVoteWeight})`;
 			const value = wagon.length > 0 ? wagon.map((id) => players.get(id) ?? `<@${id}>`).join(', ') : 'None';
 			format += `${name} - ${value}\n`;
 		}
 	});
 
 	if (calculated.votingNoLynch.length > 0) {
-		const name = `No-Lynch (${calculated.votingNoLynch.length})`;
+		const noLynchVoteWeight = calculated.votingNoLynch.reduce((acc, cur) => acc + (calculated.weights.get(cur) ?? 1), 0);
+		const name = `No-Lynch (${noLynchVoteWeight})`;
 		const value = calculated.votingNoLynch.map((id) => players.get(id) ?? `<@${id}>`).join(', ');
 		format += `\n${name} - ${value}\n`;
 	}

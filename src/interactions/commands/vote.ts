@@ -37,7 +37,7 @@ export default newSlashCommand({
 			} else if (votedPlayerUser && !noLynch) {
 				const votedMember = await i.guild.members.fetch(votedPlayerUser.id);
 				if (!votedMember) return i.reply({ content: 'The player you are voting for is not in the server', ephemeral: true });
-				const votingPlayer = await getOrCreatePlayer(voteCounter.id, votedPlayerUser.id);
+				const votingPlayer = await getPlayer(voteCounter.id, votedPlayerUser.id);
 				if (!votingPlayer) return i.reply({ content: 'Unable to fetch the player', ephemeral: true });
 
 				focusPlayerId = votingPlayer.id;
