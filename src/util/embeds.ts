@@ -19,6 +19,41 @@ export function formatSignupEmbed(signup: FullSignup) {
 		});
 	}
 
+	const hostList = signup.hosts.map((host) => host.user.username);
+	const moderatorList = signup.moderators.map((moderator) => moderator.user.username);
+	const balancerList = signup.balancers.map((balancer) => balancer.user.username);
+
+	if ([...hostList, ...moderatorList, ...balancerList].length > 0) {
+		embed.setDescription((embed.data.description += `\n\n**__[ RUN BY ]__**`));
+
+		if (hostList.length > 0) {
+			embed.addFields({
+				name: 'Hosts',
+				value: `> ${hostList.join('\n> ')}`,
+				inline: true,
+			});
+		}
+
+		if (moderatorList.length > 0) {
+			embed.addFields({
+				name: 'Moderator',
+				value: `> ${moderatorList.join('\n> ')}`,
+				inline: true,
+			});
+		}
+
+		if (balancerList.length > 0) {
+			embed.addFields({
+				name: 'Balancers',
+				value: `> ${balancerList.join('\n> ')}`,
+				inline: true,
+			});
+		}
+	}
+	embed.addFields({
+		name: '\u200B',
+		value: '**__[ SIGNED UP ]__**',
+	});
 	// Order by focused first
 	const sortedCategories = signup.categories.sort((a, b) => (a.isFocused && !b.isFocused ? -1 : 1));
 

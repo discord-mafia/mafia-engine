@@ -18,6 +18,7 @@
 		"zod": "^3.22.1"
 	},
 	"devDependencies": {
+		"@faker-js/faker": "^8.1.0",
 		"@types/node": "^20.4.2",
 		"@types/string-similarity": "^4.0.0",
 		"@typescript-eslint/eslint-plugin": "^6.4.1",

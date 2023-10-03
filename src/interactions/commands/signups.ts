@@ -1,6 +1,6 @@
 import { type ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../structures/BotClient';
-import { getSignup } from '../../util/database';
+import { getOrCreateUser, getSignup } from '../../util/database';
 import { formatSignupEmbed } from '../../util/embeds';
 import { prisma } from '../..';
 
@@ -23,6 +23,12 @@ data.addStringOption((template) =>
 		)
 );
 
+data.addUserOption((user) => user.setName('host').setDescription('Game host #1').setRequired(false));
+data.addUserOption((user) => user.setName('host2').setDescription('Game host #2').setRequired(false));
+data.addUserOption((user) => user.setName('moderator').setDescription('Game moderator').setRequired(false));
+data.addUserOption((user) => user.setName('balancer').setDescription('Game balancer').setRequired(false));
+data.addUserOption((user) => user.setName('balancer2').setDescription('Game balancer #2').setRequired(false));
+
 export default newSlashCommand({
 	data,
 	serverType: ServerType.MAIN,
@@ -30,6 +36,24 @@ export default newSlashCommand({
 		const title = i.options.getString('title') ?? 'Game Signups';
 		const limit = i.options.getInteger('limit') ?? undefined;
 		const template = i.options.getString('template') ?? signupTemplates[0];
+
+		const hosts = (() => {
+			const host1 = i.options.getUser('host');
+			const host2 = i.options.getUser('host2');
+			if (!host1) return [];
+			if (!host2) return [host1];
+			return [host1, host2];
+		})();
+
+		const moderator = i.options.getUser('moderator');
+
+		const balancers = (() => {
+			const balancer1 = i.options.getUser('balancer');
+			const balancer2 = i.options.getUser('balancer2');
+			if (!balancer1) return [];
+			if (!balancer2) return [balancer1];
+			return [balancer1, balancer2];
+		})();
 
 		if (!i.guild || !i.channelId) return i.reply({ content: 'This command can only be used in a server.', ephemeral: true });
 
@@ -85,22 +109,56 @@ export default newSlashCommand({
 			},
 		});
 
+		for (const host of hosts) {
+			const member = i.guild.members.cache.get(host.id);
+			if (!member) continue;
+			const user = await getOrCreateUser(member);
+			if (!user) continue;
+			await prisma.signupHostJunc.create({
+				data: {
+					signupId: signup.id,
+					userId: user.id,
+				},
+			});
+		}
+
+		if (moderator) {
+			const member = i.guild.members.cache.get(moderator.id);
+			if (member) {
+				const user = await getOrCreateUser(member);
+				if (user) {
+					await prisma.signupModJunc.create({
+						data: {
+							signupId: signup.id,
+							userId: user.id,
+						},
+					});
+				}
+			}
+		}
+
+		for (const balancer of balancers) {
+			const member = i.guild.members.cache.get(balancer.id);
+			if (!member) continue;
+			const user = await getOrCreateUser(member);
+			if (!user) continue;
+			await prisma.signupBalancerJunc.create({
+				data: {
+					signupId: signup.id,
+					userId: user.id,
+				},
+			});
+		}
+
 		const fetchedSignup = await getSignup({ signupId: signup.id });
 		if (!fetchedSignup) return i.editReply({ content: 'Failed to create signup post.' });
 
 		const { embed, row } = formatSignupEmbed(fetchedSignup);
 
 		try {
-			const thread = await deferred.startThread({
+			await deferred.startThread({
 				name: 'Discussion',
 			});
-			if (thread) {
-				await thread.send({
-					content:
-						'This is the discussion thread for the signup post. Feel free to discuss the game here. There is a common mobile bug that shows buttons for the above embed, they do not work in this thread, use these instead',
-					components: row.components.length > 0 ? [row] : undefined,
-				});
-			}
 		} catch (err) {
 			console.log(err);
 		}

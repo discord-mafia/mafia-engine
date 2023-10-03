@@ -18,5 +18,5 @@
 		"incremental": true,
 		"noUncheckedIndexedAccess": true
 	},
-	"exclude": ["node_modules", "build", "client"]
+	"exclude": ["node_modules", "build", "client", "**/*.test.ts", "**/*.mock.ts"]
 }
