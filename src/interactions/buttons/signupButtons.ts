@@ -14,15 +14,14 @@ export default new Button('button-category')
 		if (!cache) return i.reply({ content: 'This button is invalid', ephemeral: true });
 		if (!i.guild) return;
 
-		const messageId = i.message.id;
-		if (!messageId) return i.reply({ content: 'This button is invalid', ephemeral: true });
-		const signup = await getSignup({ messageId });
-		if (!signup) return i.reply({ content: 'This button is invalid', ephemeral: true });
-
 		await i.deferReply({ ephemeral: true });
 
 		const member = await i.guild.members.fetch(i.user.id);
 		if (!member) return i.editReply({ content: 'Failed to fetch member.' });
+		const messageId = i.message.id;
+		if (!messageId) return i.editReply({ content: 'This button is invalid' });
+		const signup = await getSignup({ messageId });
+		if (!signup) return i.editReply({ content: 'This button is invalid' });
 
 		const fetchedUser =
 			(await prisma.user.findUnique({
@@ -105,13 +104,30 @@ export default new Button('button-category')
 					);
 			}
 		} else if (cache == 'settings') {
-			const isAdmin = member.permissions.has('Administrator');
-			if (!isAdmin) return i.editReply({ content: 'You do not have permission to edit this signup' });
+			if (!member.permissions.has('ManageChannels')) return i.editReply({ content: 'You do not have permission to edit this signup' });
 
 			const embed = new EmbedBuilder();
 			embed.setColor('White');
 			embed.setTitle('Signup Management');
 			embed.setDescription('This is your hub to manage the signup. Only designated hosts and admins can access this.');
+
+			for (const category of signup.categories) {
+				if (category.users.length == 0) continue;
+				const name = category.name;
+				const users = category.users;
+
+				let userStr = '```';
+				for (const user of users) {
+					userStr += `<@${user.user.discordId}>\n`;
+				}
+				userStr += '```';
+
+				embed.addFields({
+					name: name,
+					value: userStr,
+					inline: true,
+				});
+			}
 
 			embed.addFields(
 				{
