@@ -27,30 +27,21 @@ enum Permission {
 }
 
 model User {
-  id        Int    @id @default(autoincrement())
-  discordId String @unique
-  username  String @unique
-
-  permission   Permission @default(User) // Replace with guild-specific perms later
-  signupBanned Boolean    @default(false)
-  mvpStatus    Status     @default(None)
-  onWaitlist   Boolean    @default(false)
-
-  gameHosts        GameHost[]
+  id               Int                        @id @default(autoincrement())
+  discordId        String                     @unique
+  username         String                     @unique
+  permission       Permission                 @default(User) // Replace with guild-specific perms later
+  signupBanned     Boolean                    @default(false)
+  mvpStatus        Status                     @default(None)
+  onWaitlist       Boolean                    @default(false)
   signupCategories SignupUserJunction[]
   playerAccounts   Player[]
   archivedGame     ArchivedGameUserJunction[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model GameHost {
-  id       String @id @default(uuid())
-  signup   Signup @relation(fields: [signupId], references: [id])
-  user     User   @relation(fields: [userId], references: [id])
-  signupId Int
-  userId   Int
+  signupHosts      SignupHostJunc[]
+  signupMods       SignupModJunc[]
+  signupBalancers  SignupBalancerJunc[]
+  createdAt        DateTime                   @default(now())
+  updatedAt        DateTime                   @updatedAt
 }
 
 model Signup {
@@ -62,12 +53,39 @@ model Signup {
   categories SignupCategory[]
   hostRoleId String?
 
-  isActive        Boolean    @default(true)
-  requiredServers String[]   @default([])
-  isTurbo         Boolean    @default(false)
-  hosts           GameHost[]
+  isActive        Boolean  @default(true)
+  requiredServers String[] @default([])
+  isTurbo         Boolean  @default(false)
+
+  hosts      SignupHostJunc[]
+  moderators SignupModJunc[]
+  balancers  SignupBalancerJunc[]
 
   createdAt DateTime @default(now())
+}
+
+model SignupHostJunc {
+  id       Int    @id @default(autoincrement())
+  signup   Signup @relation(fields: [signupId], references: [id])
+  user     User   @relation(fields: [userId], references: [id])
+  signupId Int
+  userId   Int
+}
+
+model SignupModJunc {
+  id       Int    @id @default(autoincrement())
+  signup   Signup @relation(fields: [signupId], references: [id])
+  user     User   @relation(fields: [userId], references: [id])
+  signupId Int
+  userId   Int
+}
+
+model SignupBalancerJunc {
+  id       Int    @id @default(autoincrement())
+  signup   Signup @relation(fields: [signupId], references: [id])
+  user     User   @relation(fields: [userId], references: [id])
+  signupId Int
+  userId   Int
 }
 
 model SignupCategory {

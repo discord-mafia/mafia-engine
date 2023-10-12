@@ -19,11 +19,29 @@ export async function getSignup(query: SignupQuery) {
 					},
 				},
 			},
+			balancers: {
+				include: {
+					user: true,
+				},
+			},
+			hosts: {
+				include: {
+					user: true,
+				},
+			},
+			moderators: {
+				include: {
+					user: true,
+				},
+			},
 		};
 
 		switch (true) {
 			case query.messageId != null:
-				return await prisma.signup.findUnique({ where: { messageId: query.messageId }, include: includeScript });
+				return await prisma.signup.findUnique({
+					where: { messageId: query.messageId },
+					include: includeScript,
+				});
 			case query.signupId != null:
 				return await prisma.signup.findUnique({ where: { id: query.signupId }, include: includeScript });
 			default:

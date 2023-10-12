@@ -1,11 +1,11 @@
 {
 	"scripts": {
-		"start": "bun ./src/index.ts",
+		"start": "node ./build/index.js",
 		"build:prisma": "npx prisma format && npx prisma generate && npx prisma db push",
 		"build": "tsc",
 		"start:local": "pm2 start ./build/index.js --name betrayal-bot",
 		"lint": "eslint . --ext .ts",
-		"dev": "bun --watch ./src/index.ts",
+		"dev": "nodemon src/index.ts",
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
@@ -18,17 +18,12 @@
 		"zod": "^3.22.1"
 	},
 	"devDependencies": {
+		"@faker-js/faker": "^8.1.0",
 		"@types/node": "^20.4.2",
 		"@types/string-similarity": "^4.0.0",
 		"@typescript-eslint/eslint-plugin": "^6.4.1",
 		"@typescript-eslint/parser": "^6.4.1",
 		"eslint": "^8.48.0",
-		"bun-types": "latest"
-	},
-	"name": "mafia-engine-2.0",
-	"module": "index.ts",
-	"type": "module",
-	"peerDependencies": {
-		"typescript": "^5.0.0"
+		"ts-node": "^10.9.1"
 	}
 }
