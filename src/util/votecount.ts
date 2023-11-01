@@ -83,18 +83,37 @@ export function calculateVoteCount(vc: FullVoteCount) {
 export function formatVoteCount(calculated: CalculatedVoteCount) {
 	const { wagons, nonVoters, players } = calculated;
 
-	let format = `\`\`\`yaml\nVote Count ${calculated.iteration[0]}.${calculated.iteration[1]}\n\n`;
+	let format = `\`\`\`yaml\nDay ${calculated.iteration[0]} Votecount ${calculated.iteration[1]}\n\n`;
 
 	if (calculated.majorityReached) format += '- Majority has been reached -\n\n';
+
+	type Wagon = {
+		name: string;
+		size: number;
+		value: string;
+	};
+	const rawWagons: Wagon[] = [];
+
+	// Name: [padded value] XX - List of players
 
 	wagons.forEach((wagon, key) => {
 		if (wagon.length > 0) {
 			const wagonVoteWeight = wagon.reduce((acc, cur) => acc + (calculated.weights.get(cur) ?? 1), 0);
-			const name = `${players.get(key) ?? `<@${key}>`} (${wagonVoteWeight})`;
+			const name = `${players.get(key) ?? `<@${key}>`}: `;
 			const value = wagon.length > 0 ? wagon.map((id) => players.get(id) ?? `<@${id}>`).join(', ') : 'None';
-			format += `${name} - ${value}\n`;
+			rawWagons.push({ name, size: wagonVoteWeight, value });
 		}
 	});
+
+	// Go through rawWagons and make all the first element in the array the same length, pad with spaces
+	const longestWagonName = Math.max(...rawWagons.map((wagon) => wagon.name.length));
+	const longestSizeCharacters = Math.max(...rawWagons.map((wagon) => wagon.size.toString().length));
+	rawWagons.forEach(({ name, size, value }) => {
+		const paddedName = name.padEnd(longestWagonName, ' ');
+		const paddedSize = size.toString().padStart(longestSizeCharacters, ' ');
+		format += `${paddedName} ${paddedSize} - ${value}\n`;
+	});
+	// format += `${name} - ${value}\n`;
 
 	if (calculated.votingNoLynch.length > 0) {
 		const noLynchVoteWeight = calculated.votingNoLynch.reduce((acc, cur) => acc + (calculated.weights.get(cur) ?? 1), 0);

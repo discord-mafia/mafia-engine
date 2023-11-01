@@ -30,6 +30,15 @@ export default newSlashCommand({
 			const player = await getPlayer(voteCounter.id, i.user.id);
 			if (!player) return i.reply({ content: 'Unable to fetch the player', ephemeral: true });
 
+			const allVotes = await prisma.vote.findMany({
+				where: {
+					voteCounterId: voteCounter.id,
+					voterId: player.id,
+				},
+			});
+
+			if (voteCounter.lockVotes && allVotes.length > 0) return i.reply({ content: 'Your vote has already been locked in', ephemeral: true });
+
 			let focusPlayerId: number | undefined;
 			let focusPlayerDiscordId: string | undefined;
 
