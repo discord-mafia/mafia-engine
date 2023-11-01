@@ -11,7 +11,6 @@ export default newSlashCommand({
 	serverType: ServerType.MAIN,
 	execute: async (i) => {
 		if (!i.guild) return;
-
 		const hidden = i.options.getBoolean('hidden', false) ?? false;
 
 		try {
