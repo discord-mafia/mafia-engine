@@ -1,7 +1,7 @@
 import { type ColorResolvable, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { newSlashCommand } from '../../structures/BotClient';
 import { getAverageColor } from 'fast-average-color-node';
-import { prisma } from '../..';
+import { getOrCreateUser } from '../../util/database';
 
 const data = new SlashCommandBuilder().setName('citizenship').setDescription('View a members citizenship card');
 data.addUserOption((x) => x.setName('user').setDescription('The user to view the citizenship card of').setRequired(true));
@@ -14,16 +14,11 @@ export default newSlashCommand({
 
 		const user = i.options.getUser('user', true);
 		const hidden = i.options.getBoolean('hidden', false) ?? false;
+		const member = await i.guild.members.fetch(user.id);
 
-		const citizenship = await prisma.user.findUnique({
-			where: {
-				discordId: user.id,
-			},
-		});
+		const citizenship = await getOrCreateUser(member);
 
 		if (!citizenship) return i.reply({ content: 'This user does not have a citizenship card', ephemeral: true });
-
-		const member = await i.guild.members.fetch(user.id);
 
 		const displayName = member.displayName;
 		const avatarURL = member.avatarURL() ?? member.displayAvatarURL();
