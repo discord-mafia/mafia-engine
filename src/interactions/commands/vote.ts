@@ -1,8 +1,9 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../structures/BotClient';
 import { prisma } from '../..';
-import { getPlayer, getVoteCounter } from '../../util/database';
+import { getPlayer, getVoteCounter, getVoteCounterOrThrow, getVoteCounterPlayerOrThrow } from '../../util/database';
 import { calculateVoteCount, formatVoteCount } from '../../util/votecount';
+import { CustomError } from '../../util/errors';
 
 const data = new SlashCommandBuilder().setName('vote').setDescription('Vote for a player');
 data.addUserOption((option) => option.setName('player').setDescription('The player you are voting for').setRequired(false));
@@ -24,29 +25,21 @@ export default newSlashCommand({
 		const noLynch = unvote ? false : i.options.getBoolean('no-lynch', false) ?? false;
 
 		try {
-			const voteCounter = await prisma.voteCounter.findUnique({ where: { channelId: i.channelId } });
-			if (!voteCounter) return i.reply({ content: 'This is not a vote channel', ephemeral: true });
+			const vc = await getVoteCounterOrThrow({ channelId: i.channelId });
+			const player = await getVoteCounterPlayerOrThrow(vc.id, i.user.id);
 
-			const player = await getPlayer(voteCounter.id, i.user.id);
-			if (!player) return i.reply({ content: 'Unable to fetch the player', ephemeral: true });
+			if (vc.lockVotes && vc.votes.reduce((acc, curr) => acc + (curr.voterId == player.id ? 1 : 0), 0) > 0)
+				return i.reply({ content: 'You have already locked in your vote', ephemeral: true });
 
-			const allVotes = await prisma.vote.findMany({
-				where: {
-					voteCounterId: voteCounter.id,
-					voterId: player.id,
-				},
-			});
-
-			if (voteCounter.lockVotes && allVotes.length > 0) return i.reply({ content: 'Your vote has already been locked in', ephemeral: true });
+			const preCalculated = calculateVoteCount(vc);
+			if (preCalculated.majorityReached) return i.reply({ content: 'Majority has already been reached', ephemeral: true });
 
 			let focusPlayerId: number | undefined;
 			let focusPlayerDiscordId: string | undefined;
-
-			if (unvote) {
-			} else if (votedPlayerUser && !noLynch) {
+			if (votedPlayerUser && !noLynch) {
 				const votedMember = await i.guild.members.fetch(votedPlayerUser.id);
 				if (!votedMember) return i.reply({ content: 'The player you are voting for is not in the server', ephemeral: true });
-				const votingPlayer = await getPlayer(voteCounter.id, votedPlayerUser.id);
+				const votingPlayer = await getPlayer(vc.id, votedPlayerUser.id);
 				if (!votingPlayer) return i.reply({ content: 'Unable to fetch the player', ephemeral: true });
 
 				focusPlayerId = votingPlayer.id;
@@ -56,7 +49,7 @@ export default newSlashCommand({
 
 			const vote = await prisma.vote.create({
 				data: {
-					voteCounterId: voteCounter.id,
+					voteCounterId: vc.id,
 					voterId: player.id,
 					votedTargetId: focusPlayerId,
 					reason: reason || null,
@@ -71,6 +64,7 @@ export default newSlashCommand({
 						allowedMentions: {
 							users: [],
 						},
+						ephemeral: false,
 					});
 				} else if (noLynch) {
 					await i.reply({
@@ -78,6 +72,7 @@ export default newSlashCommand({
 						allowedMentions: {
 							users: [],
 						},
+						ephemeral: false,
 					});
 				} else {
 					await i.reply({
@@ -85,14 +80,17 @@ export default newSlashCommand({
 						allowedMentions: {
 							users: [],
 						},
+						ephemeral: false,
 					});
 				}
 
 				const vc = await getVoteCounter({ channelId: i.channelId });
 				if (vc) {
 					const calculated = calculateVoteCount(vc);
-					const voteAmount = await prisma.vote.count({ where: { voteCounterId: vc.id } });
+					const voteAmount = vc.votes.length;
 					const isInterval = voteAmount % 5;
+
+					console.log('MAJORITY', calculated.majorityReached);
 
 					if (calculated.majorityReached || isInterval == 0) {
 						const format = formatVoteCount(calculated);
@@ -111,8 +109,9 @@ export default newSlashCommand({
 				}
 			}
 		} catch (err) {
-			console.log(err);
-			return i.reply({ content: 'An error occured while voting', ephemeral: true });
+			if (err instanceof CustomError) await err.respond(i).catch((err) => console.log(err));
+			else if (i.isRepliable()) return i.reply({ content: 'An unknown error occurred', ephemeral: true }).catch((err) => console.log(err));
+			else console.log(err);
 		}
 	},
 });

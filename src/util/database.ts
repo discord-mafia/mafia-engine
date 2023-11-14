@@ -1,5 +1,6 @@
 import { prisma } from '..';
 import { type GuildMember, type Snowflake } from 'discord.js';
+import { CustomError } from './errors';
 
 export type FullSignup = NonNullable<Awaited<ReturnType<typeof getSignup>>>;
 
@@ -171,6 +172,18 @@ export async function getVoteCounter(query: VoteCountQuery) {
 			},
 		},
 	});
+}
+
+export async function getVoteCounterOrThrow(query: VoteCountQuery) {
+	const vc = await getVoteCounter(query);
+	if (!vc) throw new CustomError('Vote counter not found');
+	return vc;
+}
+
+export async function getVoteCounterPlayerOrThrow(vcId: number, discordId: string) {
+	const player = await getPlayer(vcId, discordId);
+	if (!player) throw new CustomError('Player not found');
+	return player;
 }
 
 export type FullArchive = NonNullable<Awaited<ReturnType<typeof getArchive>>>;

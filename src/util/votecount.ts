@@ -9,9 +9,14 @@ export function calculateVoteCount(vc: FullVoteCount) {
 
 	let votingNoLynch: Snowflake[] = [];
 	let nonVoters: Snowflake[] = [];
-	let majorityReached = false;
 
 	vc.votes.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+	const checkMajorityReached = () => {
+		return (
+			Math.max(...Array.from(wagons.values()).map((val) => val.reduce((acc, cur) => acc + (weights.get(cur) ?? 1), 0))) >=
+			Math.floor(vc.players.length / 2 + 1)
+		);
+	};
 
 	for (const player of vc.players) {
 		players.set(player.discordId, player.user.username);
@@ -20,7 +25,7 @@ export function calculateVoteCount(vc: FullVoteCount) {
 	}
 
 	for (const vote of vc.votes) {
-		if (majorityReached) continue;
+		if (vc.majority && checkMajorityReached()) continue;
 
 		const voterId = vote.voter.discordId;
 		const votedTargetId = vote.votedTarget?.discordId;
@@ -28,18 +33,6 @@ export function calculateVoteCount(vc: FullVoteCount) {
 		const isUnvote = !votedTargetId && !isNoLynch;
 
 		if (votedTargetId && !wagons.get(votedTargetId)) wagons.set(votedTargetId, []);
-
-		const wagonArray = Array.from(wagons.values()).map((val) => {
-			const totalVoteWeight = val.reduce((acc, cur) => acc + (weights.get(cur) ?? 1), 0);
-			return totalVoteWeight;
-		});
-		const highestWagon = Math.max(...wagonArray);
-
-		// If majority is reached, skip
-		if (vc.majority && highestWagon >= Math.floor(vc.players.length / 2 + 1)) {
-			majorityReached = true;
-			continue;
-		}
 
 		wagons.forEach((wagon, key) => {
 			const exists = wagon.includes(voterId);
@@ -71,7 +64,7 @@ export function calculateVoteCount(vc: FullVoteCount) {
 		wagons,
 		nonVoters,
 		votingNoLynch,
-		majorityReached,
+		majorityReached: vc.majority && checkMajorityReached(),
 		weights,
 		settings: {
 			majority: vc.majority,
