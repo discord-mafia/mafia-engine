@@ -9,9 +9,11 @@ const StaffRoles: string[] = [
 	'720121056320553021', // Helper
 ];
 
-const NonModerationStaffRoles: string[] = [
+const CommunityContributorRoles: string[] = [
 	'903394030904299541', // Technician
 	'1134180413288501398', // Archivist
+	'1163201195519787029', // Game Balancer
+	'1174433972718157924', // Wiki Editor
 ];
 
 const data = new SlashCommandBuilder().setName('staff').setDescription('See who the current staff are');
@@ -26,7 +28,7 @@ export default newSlashCommand({
 
 		try {
 			const allStaff: Record<string, string[]> = {};
-			const nonModerationStaff: Record<string, string[]> = {};
+			const communityContributors: Record<string, string[]> = {};
 
 			for (let j = 0; j < StaffRoles.length; j++) {
 				const staffRoleID = StaffRoles[j];
@@ -49,8 +51,8 @@ export default newSlashCommand({
 				allStaff[role.name] = uniqueMembers;
 			}
 
-			for (let j = 0; j < NonModerationStaffRoles.length; j++) {
-				const staffRoleID = NonModerationStaffRoles[j];
+			for (let j = 0; j < CommunityContributorRoles.length; j++) {
+				const staffRoleID = CommunityContributorRoles[j];
 				if (!staffRoleID) continue;
 				const data = await getAllWithRole(mainGuild, staffRoleID);
 				if (!data) continue;
@@ -67,7 +69,7 @@ export default newSlashCommand({
 					if (isUnique) uniqueMembers.push(v.id);
 				});
 
-				nonModerationStaff[role.name] = uniqueMembers;
+				communityContributors[role.name] = uniqueMembers;
 			}
 
 			const embed = new EmbedBuilder().setTitle('Current Staff').setThumbnail(i.guild.iconURL()).setColor('White');
@@ -88,10 +90,10 @@ export default newSlashCommand({
 				fullStr += `### ${staffTier}\n${combinedStr}`;
 			}
 
-			fullStr += '## Non-Moderation Staff\n';
+			fullStr += '## Community Contributor\n';
 
-			for (const staffTier in nonModerationStaff) {
-				const staff = nonModerationStaff[staffTier] ?? [];
+			for (const staffTier in communityContributors) {
+				const staff = communityContributors[staffTier] ?? [];
 
 				let combinedStr = '';
 				staff.forEach((v) => (combinedStr += `<@${v}>\n`));
