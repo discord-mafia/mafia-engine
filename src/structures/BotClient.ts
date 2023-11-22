@@ -83,6 +83,9 @@ export class BotClient extends Client {
 	private async assignEvents() {
 		this.on(Events.ClientReady, OnClientReady);
 		this.on(Events.InteractionCreate, OnInteraction);
+		this.on(Events.Error, (err) => {
+			console.error(err);
+		});
 	}
 
 	public start = () => {
