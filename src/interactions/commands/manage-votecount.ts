@@ -94,7 +94,7 @@ export default newSlashCommand({
 			case 'no-lynch':
 				return setNoLynch(i);
 			case 'majority':
-				return;
+				return setMajority(i);
 			case 'votes-locked':
 				return setVotesLocked(i);
 			case 'add-from-role':
@@ -376,6 +376,31 @@ async function setVotesLocked(i: ChatInputCommandInteraction) {
 		});
 
 		return await i.editReply({ content: `Successfully changed the votes locked setting` });
+	} catch (err) {
+		console.log(err);
+		return i.editReply({ content: `An error occured while removing player from the vote counter` });
+	}
+}
+
+async function setMajority(i: ChatInputCommandInteraction) {
+	const enable = i.options.getBoolean('enable', true);
+
+	await i.deferReply({ ephemeral: true });
+
+	try {
+		const voteCounter = await getVoteCounter({ channelId: i.channelId });
+		if (!voteCounter) return i.editReply({ content: `This is not a vote channel` });
+
+		await prisma.voteCounter.update({
+			where: {
+				id: voteCounter.id,
+			},
+			data: {
+				majority: enable,
+			},
+		});
+
+		return await i.editReply({ content: `Successfully changed the majority setting` });
 	} catch (err) {
 		console.log(err);
 		return i.editReply({ content: `An error occured while removing player from the vote counter` });
