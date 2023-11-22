@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, type ChatInputCommandInteraction } from 'discord.js';
-import { ServerType, newSlashCommand } from '../../structures/BotClient';
-import { prisma } from '../..';
-import { getOrCreateUser, getPlayer, getUser, getVoteCounter } from '../../util/database';
+import { ServerType, newSlashCommand } from '../../../structures/BotClient';
+import { prisma } from '../../..';
+import { getOrCreateUser, getPlayer, getUser, getVoteCounter } from '../../../util/database';
 
 const data = new SlashCommandBuilder().setName('manage-votecount').setDescription('Commands surrounding vote counts');
 data.addSubcommand((sub) => sub.setName('create').setDescription('Create a new vote count'));

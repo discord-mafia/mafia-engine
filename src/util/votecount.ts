@@ -48,6 +48,7 @@ export function calculateVoteCount(vc: FullVoteCount) {
 		});
 
 		if (isNoLynch) votingNoLynch = [...votingNoLynch.filter((id) => id != voterId), voterId];
+		if (isUnvote) votingNoLynch = votingNoLynch.filter((id) => id != voterId);
 
 		nonVoters = [];
 		Array.from(players.keys()).forEach((player) => {
@@ -74,7 +75,7 @@ export function calculateVoteCount(vc: FullVoteCount) {
 }
 
 export function formatVoteCount(calculated: CalculatedVoteCount) {
-	const { wagons, nonVoters, players } = calculated;
+	const { wagons, players } = calculated;
 
 	let format = `\`\`\`yaml\nDay ${calculated.iteration[0]} Votecount ${calculated.iteration[1]}\n\n`;
 
@@ -98,31 +99,41 @@ export function formatVoteCount(calculated: CalculatedVoteCount) {
 		}
 	});
 
+	if (calculated.votingNoLynch.length > 0) {
+		const noLynchVoteWeight = calculated.votingNoLynch.reduce((acc, cur) => acc + (calculated.weights.get(cur) ?? 1), 0);
+		const name = `Skipping: `;
+		const value = calculated.votingNoLynch.length > 0 ? calculated.votingNoLynch.map((id) => players.get(id) ?? `<@${id}>`).join(', ') : 'None';
+		rawWagons.push({ name, size: noLynchVoteWeight, value });
+	}
+
+	if (calculated.nonVoters.length > 0) {
+		const name = `Abstaining: `;
+		const value = calculated.nonVoters.map((id) => players.get(id) ?? `<@${id}>`).join(', ');
+		rawWagons.push({ name, size: calculated.nonVoters.length, value });
+	}
+
 	// Go through rawWagons and make all the first element in the array the same length, pad with spaces
 	const longestWagonName = Math.max(...rawWagons.map((wagon) => wagon.name.length));
 	const longestSizeCharacters = Math.max(...rawWagons.map((wagon) => wagon.size.toString().length));
+
+	let noLynchValue: string | undefined;
+	let notVotingValue: string | undefined;
 	rawWagons.forEach(({ name, size, value }) => {
 		const paddedName = name.padEnd(longestWagonName, ' ');
 		const paddedSize = size.toString().padStart(longestSizeCharacters, ' ');
-		format += `${paddedName} ${paddedSize} - ${value}\n`;
+		const parsedValue = `${paddedName} ${paddedSize} - ${value}`;
+
+		if (name.includes('Skipping')) noLynchValue = parsedValue;
+		else if (name.includes('Abstaining')) notVotingValue = parsedValue;
+		else format += `${parsedValue}\n`;
 	});
-	// format += `${name} - ${value}\n`;
 
-	if (calculated.votingNoLynch.length > 0) {
-		const noLynchVoteWeight = calculated.votingNoLynch.reduce((acc, cur) => acc + (calculated.weights.get(cur) ?? 1), 0);
-		const name = `No-Lynch (${noLynchVoteWeight})`;
-		const value = calculated.votingNoLynch.map((id) => players.get(id) ?? `<@${id}>`).join(', ');
-		format += `\n${name} - ${value}\n`;
-	}
-
-	if (nonVoters.length > 0) {
-		const name = `Not Voting (${nonVoters.length})`;
-		const value = nonVoters.map((id) => players.get(id) ?? `<@${id}>`).join(', ');
-		format += `\n${name} - ${value}`;
-	}
+	if (noLynchValue) format += `\n${noLynchValue}`;
+	if (notVotingValue) format += `\n${notVotingValue}`;
+	if (noLynchValue || notVotingValue) format += `\n`;
 
 	const hasSettings = calculated.settings.majority;
-	if (hasSettings) format += `\n\n- - - - -\n`;
+	if (hasSettings) format += `\n- - - - -\n`;
 	if (calculated.settings.majority) format += `\nWith ${players.size} players, majority is ${Math.floor(players.size / 2 + 1)} votes`;
 
 	format += `\n\`\`\``;

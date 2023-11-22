@@ -90,7 +90,7 @@ export class BotClient extends Client {
 		this.login(this.discordToken);
 	};
 
-	public async loadInteractions<T>(newPath: string, recursive: boolean = false) {
+	public async loadInteractions<T>(newPath: string, recursive: boolean = true) {
 		const commandPath = path.join(this.interactionsPath, newPath);
 
 		const loadFiles = async (dirPath: string) => {
