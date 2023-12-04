@@ -1,6 +1,6 @@
 import { BotClient } from './structures/BotClient';
 import { PrismaClient } from '@prisma/client';
-import config from './config';
+import config from '@/config';
 import { type Guild } from 'discord.js';
 
 export const prisma = new PrismaClient();

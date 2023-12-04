@@ -15,7 +15,12 @@
 		"moduleResolution": "node",
 		"isolatedModules": true,
 		"incremental": true,
-		"noUncheckedIndexedAccess": true
+		"noUncheckedIndexedAccess": true,
+
+		"baseUrl": "./src/",
+		"paths": {
+			"@/*": ["./*"]
+		}
 	},
 	"exclude": ["node_modules", "build", "client"]
 }

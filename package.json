@@ -17,6 +17,7 @@
 		"pg": "^8.11.3",
 		"prisma": "^5.0.0",
 		"string-similarity": "^4.0.4",
+		"tsconfig-paths": "^4.2.0",
 		"zod": "^3.22.1"
 	},
 	"devDependencies": {
@@ -29,5 +30,18 @@
 		"drizzle-kit": "^0.19.13",
 		"eslint": "^8.48.0",
 		"ts-node": "^10.9.1"
+	},
+	"nodemonConfig": {
+		"ignore": [
+			"**/*.test.ts",
+			"**/*.spec.ts",
+			".git",
+			"node_modules"
+		],
+		"watch": [
+			"src"
+		],
+		"exec": "node -r tsconfig-paths/register -r ts-node/register ./src/index.ts",
+		"ext": "ts, js"
 	}
 }
