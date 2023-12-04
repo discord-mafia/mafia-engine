@@ -31,7 +31,13 @@ export default class ReplacePlayersMenu extends UserSelectMenu {
 			else newSlot = value;
 		}
 
-		if (!(oldSlot && newSlot)) throw new InteractionError('Exactly 2 users must be provided. One must exist as a player, the other must not.');
+		if (!(oldSlot && newSlot)) {
+			const errorList: string[] = [];
+			if (!oldSlot) errorList.push('One player must be registered in this vote-count');
+			if (!newSlot) errorList.push('One player must __not__ be registered in this vote-count');
+			if (errorList.length == 0) errorList.push('An unknown error occurred');
+			throw new InteractionError(errorList.join('\n'));
+		}
 
 		const newMember = await i.guild.members.fetch(newSlot);
 		if (!newMember) throw new InteractionError('The new player must be a member of the server');
