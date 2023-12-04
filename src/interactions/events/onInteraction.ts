@@ -1,7 +1,9 @@
 import type { ChatInputCommandInteraction, Interaction } from 'discord.js';
 import { slashCommands } from '../../structures/BotClient';
 import { Button, Modal, SelectMenu } from '../../structures/interactions';
-
+import { CustomButton } from '../../structures/interactions/Button';
+import { UserSelectMenu } from '../../structures/interactions/UserSelectMenu';
+import { Modal as NewModal } from '../../structures/interactions/Modal';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function onInteraction(i: Interaction<any>) {
 	if (i.isAutocomplete()) {
@@ -22,10 +24,39 @@ export default async function onInteraction(i: Interaction<any>) {
 			console.log(err);
 		}
 	} else if (i.isButton()) {
-		const [customId, data] = Button.getDataFromCustomID(i.customId);
+		// Check new Buttons first
+		const [customId, data] = CustomButton.getDataFromCustomID(i.customId);
 		if (!customId) return;
-		const buttonInteraction = Button.buttons.get(customId);
-		if (buttonInteraction) buttonInteraction.execute(i, data);
+
+		const customButton = CustomButton.buttons.get(customId);
+		if (customButton)
+			try {
+				customButton.onExecute(i, data).catch((err) => {
+					customButton.onError(i, err);
+				});
+			} catch (err) {
+				customButton.onError(i, err);
+			}
+		else {
+			const buttonInteraction = Button.buttons.get(customId);
+			if (buttonInteraction) buttonInteraction.execute(i, data);
+		}
+	} else if (i.isUserSelectMenu()) {
+		const [customId, data] = UserSelectMenu.getDataFromCustomID(i.customId);
+		if (!customId) return;
+		const selectInteraction = UserSelectMenu.userSelectMenus.get(customId);
+		if (selectInteraction)
+			try {
+				selectInteraction.onExecute(i, data).catch((err) => {
+					selectInteraction.onError(i, err);
+				});
+			} catch (err) {
+				selectInteraction.onError(i, err);
+			}
+		else {
+			const newSelct = SelectMenu.selectMenus.get(customId);
+			if (newSelct) newSelct.execute(i, data);
+		}
 	} else if (i.isAnySelectMenu()) {
 		const [customId, data] = SelectMenu.getDataFromCustomID(i.customId);
 		if (!customId) return;
@@ -34,7 +65,19 @@ export default async function onInteraction(i: Interaction<any>) {
 	} else if (i.isModalSubmit()) {
 		const [customId, data] = Modal.getDataFromCustomID(i.customId);
 		if (!customId) return;
-		const modalInteraction = Modal.modals.get(customId);
-		if (modalInteraction) modalInteraction.execute(i, data);
+
+		const modal = NewModal.modals.get(customId);
+		if (!modal) {
+			const modalInteraction = Modal.modals.get(customId);
+			if (modalInteraction) modalInteraction.execute(i, data);
+		} else {
+			try {
+				modal.onExecute(i, data).catch((err) => {
+					modal.onError(i, err);
+				});
+			} catch (err) {
+				modal.onError(i, err);
+			}
+		}
 	}
 }

@@ -131,6 +131,7 @@ export async function getOrCreatePlayer(voteCountId: number, discordId: string) 
 	}
 }
 
+export type FullPlayer = NonNullable<Awaited<ReturnType<typeof getPlayer>>>;
 export async function getPlayer(voteCountId: number, discordId: string) {
 	try {
 		return await prisma.player.findUnique({
@@ -141,6 +142,33 @@ export async function getPlayer(voteCountId: number, discordId: string) {
 				},
 			},
 		});
+	} catch (err) {
+		console.log(err);
+		return null;
+	}
+}
+
+export async function deletePlayerAndVotes(votecountId: number, discordId: string) {
+	try {
+		const deletedVotes = await prisma.vote.deleteMany({
+			where: {
+				voter: {
+					discordId,
+				},
+				voteCounterId: votecountId,
+			},
+		});
+
+		const deletedPlayer = await prisma.player.delete({
+			where: {
+				voteCounterId_discordId: {
+					voteCounterId: votecountId,
+					discordId,
+				},
+			},
+		});
+
+		return { deletedVotes, deletedPlayer };
 	} catch (err) {
 		console.log(err);
 		return null;
