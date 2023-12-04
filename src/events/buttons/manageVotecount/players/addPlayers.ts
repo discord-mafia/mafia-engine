@@ -1,10 +1,10 @@
 import { type UserSelectMenuBuilder, type ButtonBuilder, type ButtonInteraction, type CacheType, ActionRowBuilder } from 'discord.js';
 import { CustomButton } from '../../../../structures/interactions/Button';
 import { getVoteCounter } from '../../../../util/database';
-import { manageVoteCountEmbeds } from '../../../../interactions/commands/voting/manage-votecount';
 import { generateManagePlayersEmbed } from '../gotoPlayersMenu';
 import AddPlayersMenu from '../../../selectMenus/manageVotecount/addPlayers';
 import { UserSelectMenu } from '../../../../structures/interactions/UserSelectMenu';
+import { manageVoteCountEmbeds } from '../goHome';
 
 export default class AddPlayersButton extends CustomButton {
 	static customId = 'manage-vc-players-add';

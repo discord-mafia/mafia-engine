@@ -1,7 +1,7 @@
 import { type UserSelectMenuBuilder, type ButtonBuilder, type ButtonInteraction, type CacheType, ActionRowBuilder } from 'discord.js';
 import { CustomButton } from '../../../../structures/interactions/Button';
 import { getVoteCounter } from '../../../../util/database';
-import { manageVoteCountEmbeds } from '../../../../interactions/commands/voting/manage-votecount';
+import { manageVoteCountEmbeds } from '../goHome';
 import { generateManagePlayersEmbed } from '../gotoPlayersMenu';
 import { UserSelectMenu } from '../../../../structures/interactions/UserSelectMenu';
 import RemovePlayersMenu from '../../../selectMenus/manageVotecount/removePlayers';

@@ -3,7 +3,7 @@ import { CustomButton } from '../../../structures/interactions/Button';
 import { getVoteCounter } from '../../../util/database';
 import { prisma } from '../../..';
 import { InteractionError } from '../../../structures/interactions';
-import { manageVoteCountEmbeds } from '../../../interactions/commands/voting/manage-votecount';
+import { manageVoteCountEmbeds } from './goHome';
 
 export default class CreateVotecountButton extends CustomButton {
 	static customId = 'manage-vc-create';

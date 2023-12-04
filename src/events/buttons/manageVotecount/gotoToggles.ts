@@ -1,9 +1,8 @@
 import { type ButtonInteraction, type CacheType, ButtonBuilder, type BaseMessageOptions, ActionRowBuilder, ButtonStyle } from 'discord.js';
-import { generateCreateVCEmbed } from '../../../interactions/commands/voting/manage-votecount';
 import { CustomButton } from '../../../structures/interactions/Button';
 import { getVoteCounter, type FullVoteCount } from '../../../util/database';
 import ToggleSettingsButton, { VCSettings } from './toggles/toggleSettings';
-import GoHomeButton, { generateBaseVcMenu } from './goHome';
+import GoHomeButton, { generateBaseVcMenu, generateCreateVCEmbed } from './goHome';
 
 export default class GotoTogglesMenu extends CustomButton {
 	static customId = 'manage-vc-toggles-menu';

@@ -2,7 +2,7 @@ import { ActionRowBuilder, type UserSelectMenuBuilder, type ButtonBuilder, type 
 import { CustomButton } from '../../../../structures/interactions/Button';
 import { getVoteCounter } from '../../../../util/database';
 import { generateManagePlayersEmbed } from '../gotoPlayersMenu';
-import { manageVoteCountEmbeds } from '../../../../interactions/commands/voting/manage-votecount';
+import { manageVoteCountEmbeds } from '../goHome';
 import { UserSelectMenu } from '../../../../structures/interactions/UserSelectMenu';
 import ReplacePlayersMenu from '../../../selectMenus/manageVotecount/replacePlayer';
 

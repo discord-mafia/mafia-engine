@@ -1,5 +1,5 @@
 import { type ButtonInteraction, type CacheType, type ButtonBuilder, type BaseMessageOptions, EmbedBuilder, ActionRowBuilder } from 'discord.js';
-import { manageVoteCountEmbeds } from '../../../interactions/commands/voting/manage-votecount';
+import { manageVoteCountEmbeds } from './goHome';
 import { CustomButton } from '../../../structures/interactions/Button';
 import { getVoteCounter, type FullVoteCount } from '../../../util/database';
 import AddPlayersButton from './players/addPlayers';
