@@ -1,6 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, type Snowflake } from 'discord.js';
 import { type FullSignup } from '@models/signups';
-import { turboExpirySeconds } from '../clock/turbos';
 
 export function formatSignupEmbed(signup: FullSignup) {
 	const embed = new EmbedBuilder();
@@ -10,14 +9,6 @@ export function formatSignupEmbed(signup: FullSignup) {
 	const row = new ActionRowBuilder<ButtonBuilder>();
 
 	const totalUsers: Snowflake[] = [];
-
-	if (signup.isTurbo) {
-		const currentTimestampInSeconds = Math.floor(Date.now() / 1000);
-		embed.addFields({
-			name: 'Expiry',
-			value: 'This lobby exires <t:' + (currentTimestampInSeconds + turboExpirySeconds) + ':R>',
-		});
-	}
 
 	const hostList = signup.hosts.map((host) => host.user.username);
 	const moderatorList = signup.moderators.map((moderator) => moderator.user.username);

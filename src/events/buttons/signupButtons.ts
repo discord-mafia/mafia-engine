@@ -1,6 +1,5 @@
 import { getSignup } from '@models/signups';
 import { formatSignupEmbed } from '@utils/embeds';
-import { isTurboFull } from 'clock/turbos';
 import {
 	ActionRowBuilder,
 	Colors,
@@ -15,7 +14,6 @@ import { prisma } from 'index';
 import { InteractionError } from 'structures/interactions';
 import { CustomButton } from 'structures/interactions/Button';
 import { sendInfoLog } from 'structures/logs';
-import { setupTurbo } from 'structures/turbos/turboSignups';
 
 export default class SignupCategoryButton extends CustomButton {
 	static customId = 'button-category';
@@ -210,9 +208,6 @@ export default class SignupCategoryButton extends CustomButton {
 
 		const reset = await getSignup({ messageId });
 		if (!reset) return i.editReply({ content: 'This button failed' });
-
-		const isTurboAndFull = isTurboFull(reset);
-		if (isTurboAndFull) setupTurbo(reset);
 
 		const { embed, row } = formatSignupEmbed(reset);
 
