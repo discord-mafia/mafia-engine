@@ -1,18 +1,23 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, UserSelectMenuBuilder, type Role } from 'discord.js';
-import { prisma } from '../..';
-import { Button } from '../../structures/interactions';
-import { formatSignupEmbed } from '../../util/embeds';
-import { sendInfoLog } from '../../structures/logs';
-import { isTurboFull } from '../../clock/turbos';
-import { setupTurbo } from '../../structures/turbos/turboSignups';
-import removeUserFromSignup from '../selectmenu/removeUserFromSignup';
 import { getSignup } from '@models/signups';
+import { formatSignupEmbed } from '@utils/embeds';
+import { isTurboFull } from 'clock/turbos';
+import { ActionRowBuilder, Colors, EmbedBuilder, type Role, UserSelectMenuBuilder, type ButtonBuilder, type ButtonInteraction } from 'discord.js';
+import { prisma } from 'index';
+import removeUserFromSignup from 'interactions/selectmenu/removeUserFromSignup';
+import { InteractionError } from 'structures/interactions';
+import { CustomButton } from 'structures/interactions/Button';
+import { sendInfoLog } from 'structures/logs';
+import { setupTurbo } from 'structures/turbos/turboSignups';
 
-export default new Button('button-category')
-	.setButton(new ButtonBuilder().setLabel('Delete').setStyle(ButtonStyle.Danger))
-	.onExecute(async (i, cache) => {
-		if (!cache) return i.reply({ content: 'This button is invalid', ephemeral: true });
-		if (!i.guild) return;
+export default class SignupCategoryButton extends CustomButton {
+	static customId = 'button-category';
+	constructor() {
+		super(SignupCategoryButton.customId);
+	}
+
+	async onExecute(i: ButtonInteraction, cache: string) {
+		if (!i.guild) return new InteractionError('This button cannot be used outside of a server');
+		if (!cache) return new InteractionError('This button is invalid as it has no valid cache attached');
 
 		await i.deferReply({ ephemeral: true });
 
@@ -35,7 +40,6 @@ export default new Button('button-category')
 					username: member.displayName,
 				},
 			}));
-		// Fetch or Create the user.
 
 		const removeFromCategory = async (categoryId: number, _discordId: string) => {
 			try {
@@ -210,4 +214,9 @@ export default new Button('button-category')
 
 		await i.message.edit({ embeds: [embed], components: row.components.length > 0 ? [row] : undefined });
 		await i.deleteReply();
-	});
+	}
+
+	generateButton(): ButtonBuilder {
+		return super.generateButton().setLabel('Manage Toggles');
+	}
+}
