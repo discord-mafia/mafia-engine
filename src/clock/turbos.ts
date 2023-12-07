@@ -1,9 +1,10 @@
 import { ChannelType, type Client, type Guild } from 'discord.js';
 import { sendErrorLog } from '../structures/logs';
 import { client, prisma } from '..';
-import { createAutomatedGame, getOrCreateUser } from '../util/database';
+import { createAutomatedGame } from '../util/database';
 import { formatSignupEmbed } from '../util/embeds';
 import { getSignup, type FullSignup } from '@models/signups';
+import { getOrCreateUser } from '@models/users';
 
 export const turboExpirySeconds = 60 * 60 * 3;
 

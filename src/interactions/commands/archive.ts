@@ -10,10 +10,11 @@ import {
 } from 'discord.js';
 import { newSlashCommand } from '../../structures/BotClient';
 import { prisma } from '../..';
-import { type FullArchive, getArchive, getUser } from '../../util/database';
+import { type FullArchive, getArchive } from '../../util/database';
 import { createViewArchiveButton } from '../buttons/archiveManageMembers';
 import viewArchiveMentions from '../buttons/viewArchiveMentions';
 import refreshArchive from '../buttons/refreshArchive';
+import { getUserById } from '@models/users';
 
 const data = new SlashCommandBuilder().setName('archive').setDescription('Manage an archive');
 
@@ -294,7 +295,7 @@ async function addHost(i: ChatInputCommandInteraction) {
 	const archivedGame = await getArchive(gameTag);
 	if (!archivedGame) return i.reply({ content: `No archive found for ${gameTag}.`, ephemeral: true });
 
-	const user = await getUser(discordID);
+	const user = await getUserById(discordID);
 	if (!user) return i.reply({ content: 'User not found and could not be created with the supplied props', ephemeral: true });
 
 	const userJunction = await prisma.archivedGameUserJunction.create({
@@ -326,7 +327,7 @@ async function addCoHost(i: ChatInputCommandInteraction) {
 	const archivedGame = await getArchive(gameTag);
 	if (!archivedGame) return i.reply({ content: `No archive found for ${gameTag}.`, ephemeral: true });
 
-	const fetchedUser = await getUser(discordID);
+	const fetchedUser = await getUserById(discordID);
 	if (!fetchedUser) {
 		if (isUsingDiscordID) {
 			if (!username)
@@ -354,7 +355,7 @@ async function addCoHost(i: ChatInputCommandInteraction) {
 		}
 	}
 
-	const user = await getUser(discordID);
+	const user = await getUserById(discordID);
 	if (!user) return i.reply({ content: 'User not found and could not be created with the supplied props', ephemeral: true });
 
 	const userJunction = await prisma.archivedGameUserJunction.create({
@@ -390,7 +391,7 @@ async function addWinner(i: ChatInputCommandInteraction) {
 	const archivedGame = await getArchive(gameTag);
 	if (!archivedGame) return i.reply({ content: `No archive found for ${gameTag}.`, ephemeral: true });
 
-	const fetchedUser = await getUser(discordID);
+	const fetchedUser = await getUserById(discordID);
 	if (!fetchedUser) {
 		if (isUsingDiscordID) {
 			if (!username)
@@ -418,7 +419,7 @@ async function addWinner(i: ChatInputCommandInteraction) {
 		}
 	}
 
-	const user = await getUser(discordID);
+	const user = await getUserById(discordID);
 	if (!user) return i.reply({ content: 'User not found and could not be created with the supplied props', ephemeral: true });
 
 	const userJunction = await prisma.archivedGameUserJunction.create({

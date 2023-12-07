@@ -1,6 +1,6 @@
 import { type ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../structures/BotClient';
-import { getOrCreateUser } from '../../util/database';
+import { getOrCreateUser } from '@models/users';
 import { formatSignupEmbed } from '../../util/embeds';
 import { prisma } from '../..';
 import { getSignup } from '@models/signups';

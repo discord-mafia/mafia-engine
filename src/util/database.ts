@@ -1,36 +1,6 @@
 import { prisma } from '..';
-import { type GuildMember, type Snowflake } from 'discord.js';
+import { type Snowflake } from 'discord.js';
 import { CustomError } from './errors';
-
-export async function getOrCreateUser(member: GuildMember) {
-	try {
-		const fetchedUser = await getUser(member.id);
-		if (fetchedUser) return fetchedUser;
-
-		return await prisma.user.create({
-			data: {
-				discordId: member.id,
-				username: member.displayName,
-			},
-		});
-	} catch (err) {
-		console.log(err);
-		return null;
-	}
-}
-
-export async function getUser(discordId: string) {
-	try {
-		return await prisma.user.findUnique({
-			where: {
-				discordId,
-			},
-		});
-	} catch (err) {
-		console.log(err);
-		return null;
-	}
-}
 
 type CitizenshipQuery =
 	| {

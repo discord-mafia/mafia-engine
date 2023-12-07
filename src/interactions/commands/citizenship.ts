@@ -1,7 +1,7 @@
 import { type ColorResolvable, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { newSlashCommand } from '../../structures/BotClient';
 import { getAverageColor } from 'fast-average-color-node';
-import { getOrCreateUser } from '../../util/database';
+import { getOrCreateUser } from '@models/users';
 
 const data = new SlashCommandBuilder().setName('citizenship').setDescription('View a members citizenship card');
 data.addUserOption((x) => x.setName('user').setDescription('The user to view the citizenship card of').setRequired(true));
