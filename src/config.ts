@@ -16,6 +16,8 @@ const envSchema = z.object({
 
 	VITE_REACT_APP_CLERK_PUBLISHABLE_KEY: z.string().optional(),
 	DISCORD_OAUTH_REDIRECT_URI: z.string(),
+
+	ERROR_LOG_WEBHOOK: z.string().url().optional(),
 });
 
 export const env = envSchema.parse(process.env);
