@@ -1,7 +1,7 @@
 import { type ColorResolvable, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { newSlashCommand } from '../../structures/BotClient';
 import { addHiddenOption } from '../../util/commands';
-import { getAllRoleNames, getRole } from '../../util/database';
+import { getAllRoleNames, getRole } from '@models/gameRoles';
 import stringSimilarity from 'string-similarity';
 const data = new SlashCommandBuilder().setName('view').setDescription('View something');
 

@@ -2,7 +2,7 @@ import { SlashCommandBuilder, EmbedBuilder, type ColorResolvable } from 'discord
 import { newSlashCommand } from '../../structures/BotClient';
 import { prisma } from '../../';
 import stringSimilarity from 'string-similarity';
-import { getAllRoleNames } from '../../util/database';
+import { getAllRoleNames } from '@models/gameRoles';
 
 const data = new SlashCommandBuilder().setName('role').setDescription('View a role');
 data.addStringOption((option) => option.setName('name').setDescription('The name of the role').setRequired(true).setAutocomplete(true));
