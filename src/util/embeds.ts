@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, type Snowflake } from 'discord.js';
-import { type FullSignup } from './database';
+import { type FullSignup } from '@models/signups';
 import { turboExpirySeconds } from '../clock/turbos';
 
 export function formatSignupEmbed(signup: FullSignup) {

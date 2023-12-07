@@ -1,8 +1,9 @@
 import { type ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../structures/BotClient';
-import { getOrCreateUser, getSignup } from '../../util/database';
+import { getOrCreateUser } from '../../util/database';
 import { formatSignupEmbed } from '../../util/embeds';
 import { prisma } from '../..';
+import { getSignup } from '@models/signups';
 
 const data = new SlashCommandBuilder().setName('signups').setDescription('Create a signup post');
 data.addStringOption((title) => title.setName('title').setDescription('Title for the signup').setRequired(false));

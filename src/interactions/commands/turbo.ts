@@ -1,9 +1,10 @@
 import { type ChatInputCommandInteraction, SlashCommandBuilder, type Snowflake } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../structures/BotClient';
-import { getOrCreateUser, getSignup } from '../../util/database';
+import { getOrCreateUser } from '../../util/database';
 import { formatSignupEmbed } from '../../util/embeds';
 import { prisma } from '../..';
 import config from '../../config';
+import { getSignup } from '@models/signups';
 
 const data = new SlashCommandBuilder().setName('turbo').setDescription('Start a turbo game');
 

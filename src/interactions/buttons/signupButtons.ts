@@ -1,12 +1,12 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, UserSelectMenuBuilder, type Role } from 'discord.js';
 import { prisma } from '../..';
 import { Button } from '../../structures/interactions';
-import { getSignup } from '../../util/database';
 import { formatSignupEmbed } from '../../util/embeds';
 import { sendInfoLog } from '../../structures/logs';
 import { isTurboFull } from '../../clock/turbos';
 import { setupTurbo } from '../../structures/turbos/turboSignups';
 import removeUserFromSignup from '../selectmenu/removeUserFromSignup';
+import { getSignup } from '@models/signups';
 
 export default new Button('button-category')
 	.setButton(new ButtonBuilder().setLabel('Delete').setStyle(ButtonStyle.Danger))

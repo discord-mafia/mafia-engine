@@ -19,7 +19,8 @@
 
 		"baseUrl": "./src/",
 		"paths": {
-			"@/*": ["./*"]
+			"@utils/*": ["util/*"],
+			"@models/*": ["models/*"]
 		}
 	},
 	"exclude": ["node_modules", "build", "client"]

@@ -1,7 +1,7 @@
 import { formatSignupEmbed } from '../../util/embeds';
 import { prisma } from '../..';
 import { SelectMenu } from '../../structures/interactions';
-import { getSignup } from '../../util/database';
+import { getSignup } from '@models/signups';
 
 export default new SelectMenu('remove-user-from-signup').onExecute(async (i, cache) => {
 	if (!cache) return i.reply({ content: 'This select menu is invalid', ephemeral: true });
