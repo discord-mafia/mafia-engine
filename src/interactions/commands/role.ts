@@ -42,8 +42,11 @@ export default newSlashCommand({
 		embed.setColor(role.roleColour as ColorResolvable);
 
 		if (role.flavourText) embed.setDescription(`*${role.flavourText}*`);
-
 		if (role.wikiUrl) embed.setURL(role.wikiUrl);
+		if (role.isRetired)
+			embed.setFooter({
+				text: 'This role is retired',
+			});
 
 		embed.addFields(
 			{

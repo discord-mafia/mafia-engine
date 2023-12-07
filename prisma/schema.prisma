@@ -285,4 +285,5 @@ model Role {
   flavourText  String?
   roleColour   String?
   wikiUrl      String?
+  isRetired    Boolean  @default(false)
 }
