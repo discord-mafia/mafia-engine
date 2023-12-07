@@ -1,7 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { Button } from '../../structures/interactions';
-import { getArchive } from '../../util/database';
 import { formatArchive } from '../commands/archive';
+import { getArchive } from '@models/automaticGames';
 
 export default new Button('archive-view')
 	.setButton(new ButtonBuilder().setLabel('Delete').setStyle(ButtonStyle.Danger))

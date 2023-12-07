@@ -1,6 +1,6 @@
 import { ButtonBuilder, ButtonStyle, EmbedBuilder } from 'discord.js';
 import { Button } from '../../structures/interactions';
-import { getArchive } from '../../util/database';
+import { getArchive } from '@models/automaticGames';
 
 export default new Button('view-archive-mentions')
 	.setButton(new ButtonBuilder().setLabel('Delete').setStyle(ButtonStyle.Danger))

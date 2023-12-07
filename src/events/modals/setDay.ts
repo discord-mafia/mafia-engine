@@ -8,10 +8,10 @@ import {
 } from 'discord.js';
 import { Modal } from '../../structures/interactions/Modal';
 import { InteractionError } from '../../structures/interactions';
-import { getVoteCounter } from '../../util/database';
 import { prisma } from '../..';
 import { generateManageStateEmbed } from '../buttons/manageVotecount/gotoStateMenu';
 import { manageVoteCountEmbeds } from '../buttons/manageVotecount/goHome';
+import { getVoteCounter } from '@models/automaticGames';
 
 export default class SetDayModal extends Modal {
 	static customId = 'manage-vc-players-set-day';

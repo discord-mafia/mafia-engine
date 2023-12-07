@@ -1,9 +1,9 @@
 import { type UserSelectMenuInteraction, type CacheType } from 'discord.js';
 import { UserSelectMenu } from '../../../structures/interactions/UserSelectMenu';
 import { InteractionError } from '../../../structures/interactions';
-import { deletePlayerAndVotes, getVoteCounter } from '../../../util/database';
 import { generateManagePlayersEmbed } from '../../buttons/manageVotecount/gotoPlayersMenu';
 import { manageVoteCountEmbeds } from '../../buttons/manageVotecount/goHome';
+import { deletePlayerAndVotes, getVoteCounter } from '@models/automaticGames';
 
 export default class RemovePlayersMenu extends UserSelectMenu {
 	static customId = 'manage-vc-players-remove';

@@ -2,7 +2,7 @@ import { type Guild, ChannelType, Colors } from 'discord.js';
 import { client, prisma } from '../..';
 import { formatSignupEmbed } from '../../util/embeds';
 import { type FullSignup } from '@models/signups';
-import { createAutomatedGame } from '@utils/database';
+import { createAutomatedGame } from '@models/automaticGames';
 
 async function getMessage(guild: Guild, channelId: string, messageId: string) {
 	try {

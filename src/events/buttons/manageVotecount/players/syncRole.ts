@@ -1,6 +1,6 @@
 import { type ButtonBuilder, type ButtonInteraction, type CacheType } from 'discord.js';
 import { CustomButton } from '../../../../structures/interactions/Button';
-import { getVoteCounter } from '../../../../util/database';
+import { getVoteCounter } from '@models/automaticGames';
 import { generatePlaceholder } from '../gotoPlayersMenu';
 
 export default class SyncRolePlayersButton extends CustomButton {

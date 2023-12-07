@@ -1,7 +1,7 @@
 import { type ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../../structures/BotClient';
-import { getVoteCounter } from '../../../util/database';
 import { calculateVoteCount, formatVoteCount } from '../../../util/votecount';
+import { getVoteCounter } from '@models/automaticGames';
 
 const data = new SlashCommandBuilder().setName('votecount').setDescription('View the vote count');
 data.addBooleanOption((opt) => opt.setName('hidden').setDescription('To make this for only you to see').setRequired(false));

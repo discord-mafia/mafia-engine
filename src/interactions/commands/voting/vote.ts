@@ -1,9 +1,9 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../../structures/BotClient';
 import { prisma } from '../../..';
-import { getPlayer, getVoteCounter, getVoteCounterOrThrow, getVoteCounterPlayerOrThrow } from '../../../util/database';
 import { calculateVoteCount, formatVoteCount } from '../../../util/votecount';
 import { CustomError } from '../../../util/errors';
+import { getVoteCounterOrThrow, getVoteCounterPlayerOrThrow, getPlayer, getVoteCounter } from '@models/automaticGames';
 
 const data = new SlashCommandBuilder().setName('vote').setDescription('[GAME] Vote for a player');
 data.addUserOption((option) => option.setName('player').setDescription('The player you are voting for').setRequired(true));

@@ -1,8 +1,8 @@
 import type { ButtonBuilder, ButtonInteraction, CacheType } from 'discord.js';
 import { CustomButton } from '../../../../structures/interactions/Button';
-import { getVoteCounter } from '../../../../util/database';
 import { prisma } from '../../../..';
 import { genTogglesMenu } from '../gotoToggles';
+import { getVoteCounter } from '@models/automaticGames';
 
 export enum VCSettings {
 	LOCK_VOTES = 'lock-votes',

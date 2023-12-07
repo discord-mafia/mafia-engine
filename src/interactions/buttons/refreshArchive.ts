@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { Button } from '../../structures/interactions';
-import { getArchive } from '../../util/database';
+import { getArchive } from '@models/automaticGames';
 import { formatArchive } from '../commands/archive';
 import viewArchiveMentions from './viewArchiveMentions';
 

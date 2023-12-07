@@ -1,6 +1,6 @@
 import { type ButtonBuilder, type ButtonInteraction, type CacheType } from 'discord.js';
 import { CustomButton } from '../../../../structures/interactions/Button';
-import { getVoteCounter } from '../../../../util/database';
+import { getVoteCounter } from '@models/automaticGames';
 import { generatePlaceholder } from '../gotoPlayersMenu';
 import { Modal } from '../../../../structures/interactions/Modal';
 import SetDayModal from '../../../modals/setDay';

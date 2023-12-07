@@ -1,5 +1,5 @@
+import { getAutomatedGameOrThrow, type FullAutomatedGame } from '@models/automaticGames';
 import { prisma } from '../..';
-import { type FullAutomatedGame, getAutomatedGameOrThrow } from '../../util/database';
 
 /**
  * Cycles through every stored automated game and starts the process to handle actions and events

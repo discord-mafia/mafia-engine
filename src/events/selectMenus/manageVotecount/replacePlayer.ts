@@ -1,11 +1,11 @@
 import { type UserSelectMenuInteraction, type CacheType } from 'discord.js';
 import { UserSelectMenu } from '../../../structures/interactions/UserSelectMenu';
 import { InteractionError } from '../../../structures/interactions';
-import { type FullPlayer, getPlayer, getVoteCounter } from '../../../util/database';
 import { generateManagePlayersEmbed } from '../../buttons/manageVotecount/gotoPlayersMenu';
 import { prisma } from '../../..';
 import { manageVoteCountEmbeds } from '../../buttons/manageVotecount/goHome';
 import { getOrCreateUser } from '@models/users';
+import { getVoteCounter, type FullPlayer, getPlayer } from '@models/automaticGames';
 
 export default class ReplacePlayersMenu extends UserSelectMenu {
 	static customId = 'manage-vc-players-replace';

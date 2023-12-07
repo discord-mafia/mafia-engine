@@ -1,6 +1,6 @@
 import type { ButtonBuilder, ButtonInteraction, CacheType } from 'discord.js';
 import { CustomButton } from '../../../structures/interactions/Button';
-import { getVoteCounter } from '../../../util/database';
+import { getVoteCounter } from '@models/automaticGames';
 import { prisma } from '../../..';
 import { InteractionError } from '../../../structures/interactions';
 import { manageVoteCountEmbeds } from './goHome';
