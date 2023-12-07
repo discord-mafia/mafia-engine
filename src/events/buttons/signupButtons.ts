@@ -1,9 +1,17 @@
 import { getSignup } from '@models/signups';
 import { formatSignupEmbed } from '@utils/embeds';
 import { isTurboFull } from 'clock/turbos';
-import { ActionRowBuilder, Colors, EmbedBuilder, type Role, UserSelectMenuBuilder, type ButtonBuilder, type ButtonInteraction } from 'discord.js';
+import {
+	ActionRowBuilder,
+	Colors,
+	EmbedBuilder,
+	type Role,
+	type UserSelectMenuBuilder,
+	type ButtonBuilder,
+	type ButtonInteraction,
+} from 'discord.js';
+import SignupRemovePlayerMenu from 'events/selectMenus/removeUserFromSignup';
 import { prisma } from 'index';
-import removeUserFromSignup from 'interactions/selectmenu/removeUserFromSignup';
 import { InteractionError } from 'structures/interactions';
 import { CustomButton } from 'structures/interactions/Button';
 import { sendInfoLog } from 'structures/logs';
@@ -147,12 +155,8 @@ export default class SignupCategoryButton extends CustomButton {
 			);
 
 			const row = new ActionRowBuilder<UserSelectMenuBuilder>();
-			row.addComponents(
-				new UserSelectMenuBuilder()
-					.setCustomId(removeUserFromSignup.createCustomID(signup.messageId))
-					.setPlaceholder('Select a user to remove from the signups')
-					.setMaxValues(20)
-			);
+			const selectMenu = SignupRemovePlayerMenu.getUserSelectMenuOrThrow(SignupRemovePlayerMenu.customId);
+			row.addComponents(selectMenu.generateUserSelectMenu(i.message.id));
 
 			return i.editReply({ embeds: [embed], components: [row] });
 		} else {
