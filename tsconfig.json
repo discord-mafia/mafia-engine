@@ -20,7 +20,8 @@
 		"baseUrl": "./src/",
 		"paths": {
 			"@utils/*": ["util/*"],
-			"@models/*": ["models/*"]
+			"@models/*": ["models/*"],
+			"@root/*": ["./*"]
 		}
 	},
 	"exclude": ["node_modules", "build", "client"]
