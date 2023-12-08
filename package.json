@@ -2,7 +2,7 @@
 	"scripts": {
 		"start": "node ./build/index.js",
 		"build:prisma": "npx prisma format && npx prisma generate && npx prisma db push",
-		"build": "tsc",
+		"build": "tsc && tsc-alias",
 		"start:local": "pm2 start ./build/index.js --name betrayal-bot",
 		"lint": "eslint . --ext .ts",
 		"dev": "nodemon src/index.ts",
@@ -29,6 +29,7 @@
 		"drizzle-kit": "^0.19.13",
 		"eslint": "^8.48.0",
 		"ts-node": "^10.9.1",
+		"tsc-alias": "^1.8.8",
 		"tsconfig-paths": "^4.2.0"
 	},
 	"nodemonConfig": {
