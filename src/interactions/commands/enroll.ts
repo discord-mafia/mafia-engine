@@ -1,7 +1,7 @@
 import { SlashCommandBuilder } from 'discord.js';
 import { ServerType, newSlashCommand } from '../../structures/BotClient';
 import { prisma } from '../..';
-import { getCitizenship } from '../../util/database';
+import { getCitizenship } from '@models/citizenship';
 
 const data = new SlashCommandBuilder().setName('enroll').setDescription('Enroll a member into our citizenship');
 data.addStringOption((opt) => opt.setName('name').setDescription('The name to register this member under').setRequired(true));

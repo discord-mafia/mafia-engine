@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import 'dotenv/config';
 
 const envSchema = z.object({
 	DATABASE_URL: z.string(),
@@ -16,10 +17,12 @@ const envSchema = z.object({
 
 	VITE_REACT_APP_CLERK_PUBLISHABLE_KEY: z.string().optional(),
 	DISCORD_OAUTH_REDIRECT_URI: z.string(),
+
+	ERROR_LOG_WEBHOOK: z.string().url().optional(),
 });
 
-export const env = envSchema.parse(process.env);
+export function fetchConfig() {
+	return envSchema.parse(process.env);
+}
 
-export default {
-	...env,
-};
+export default fetchConfig();

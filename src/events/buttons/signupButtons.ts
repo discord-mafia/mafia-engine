@@ -1,18 +1,29 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Colors, EmbedBuilder, UserSelectMenuBuilder, type Role } from 'discord.js';
-import { prisma } from '../..';
-import { Button } from '../../structures/interactions';
-import { getSignup } from '../../util/database';
-import { formatSignupEmbed } from '../../util/embeds';
-import { sendInfoLog } from '../../structures/logs';
-import { isTurboFull } from '../../clock/turbos';
-import { setupTurbo } from '../../structures/turbos/turboSignups';
-import removeUserFromSignup from '../selectmenu/removeUserFromSignup';
+import { getSignup } from '@models/signups';
+import { formatSignupEmbed } from '@utils/embeds';
+import {
+	ActionRowBuilder,
+	Colors,
+	EmbedBuilder,
+	type Role,
+	type UserSelectMenuBuilder,
+	type ButtonBuilder,
+	type ButtonInteraction,
+} from 'discord.js';
+import SignupRemovePlayerMenu from 'events/selectMenus/removeUserFromSignup';
+import { prisma } from 'index';
+import { InteractionError } from 'structures/interactions';
+import { CustomButton } from 'structures/interactions/Button';
+import { sendInfoLog } from 'structures/logs';
 
-export default new Button('button-category')
-	.setButton(new ButtonBuilder().setLabel('Delete').setStyle(ButtonStyle.Danger))
-	.onExecute(async (i, cache) => {
-		if (!cache) return i.reply({ content: 'This button is invalid', ephemeral: true });
-		if (!i.guild) return;
+export default class SignupCategoryButton extends CustomButton {
+	static customId = 'button-category';
+	constructor() {
+		super(SignupCategoryButton.customId);
+	}
+
+	async onExecute(i: ButtonInteraction, cache: string) {
+		if (!i.guild) return new InteractionError('This button cannot be used outside of a server');
+		if (!cache) return new InteractionError('This button is invalid as it has no valid cache attached');
 
 		await i.deferReply({ ephemeral: true });
 
@@ -35,7 +46,6 @@ export default new Button('button-category')
 					username: member.displayName,
 				},
 			}));
-		// Fetch or Create the user.
 
 		const removeFromCategory = async (categoryId: number, _discordId: string) => {
 			try {
@@ -143,12 +153,8 @@ export default new Button('button-category')
 			);
 
 			const row = new ActionRowBuilder<UserSelectMenuBuilder>();
-			row.addComponents(
-				new UserSelectMenuBuilder()
-					.setCustomId(removeUserFromSignup.createCustomID(signup.messageId))
-					.setPlaceholder('Select a user to remove from the signups')
-					.setMaxValues(20)
-			);
+			const selectMenu = SignupRemovePlayerMenu.getUserSelectMenuOrThrow(SignupRemovePlayerMenu.customId);
+			row.addComponents(selectMenu.generateUserSelectMenu(i.message.id));
 
 			return i.editReply({ embeds: [embed], components: [row] });
 		} else {
@@ -203,11 +209,13 @@ export default new Button('button-category')
 		const reset = await getSignup({ messageId });
 		if (!reset) return i.editReply({ content: 'This button failed' });
 
-		const isTurboAndFull = isTurboFull(reset);
-		if (isTurboAndFull) setupTurbo(reset);
-
 		const { embed, row } = formatSignupEmbed(reset);
 
 		await i.message.edit({ embeds: [embed], components: row.components.length > 0 ? [row] : undefined });
 		await i.deleteReply();
-	});
+	}
+
+	generateButton(): ButtonBuilder {
+		return super.generateButton().setLabel('Manage Toggles');
+	}
+}

@@ -1,7 +1,7 @@
 import { type ColorResolvable, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { newSlashCommand } from '../../structures/BotClient';
 import { addHiddenOption } from '../../util/commands';
-import { getAllRoleNames, getRole } from '../../util/database';
+import { getAllRoleNames, getRole } from '@models/gameRoles';
 import stringSimilarity from 'string-similarity';
 const data = new SlashCommandBuilder().setName('view').setDescription('View something');
 
@@ -38,8 +38,11 @@ export default newSlashCommand({
 				embed.setColor(requestedRole.roleColour as ColorResolvable);
 
 				if (requestedRole.flavourText) embed.setDescription(`*${requestedRole.flavourText}*`);
-
 				if (requestedRole.wikiUrl) embed.setURL(requestedRole.wikiUrl);
+				if (requestedRole.isRetired)
+					embed.setFooter({
+						text: 'This role is retired',
+					});
 
 				embed.addFields(
 					{

@@ -83,6 +83,9 @@ export class BotClient extends Client {
 	private async assignEvents() {
 		this.on(Events.ClientReady, OnClientReady);
 		this.on(Events.InteractionCreate, OnInteraction);
+		this.on(Events.Error, (err) => {
+			console.error(err);
+		});
 	}
 
 	public start = () => {
@@ -90,24 +93,33 @@ export class BotClient extends Client {
 		this.login(this.discordToken);
 	};
 
-	public async loadInteractions<T>(newPath: string) {
+	public async loadInteractions<T>(newPath: string, recursive: boolean = true) {
 		const commandPath = path.join(this.interactionsPath, newPath);
-		try {
-			const files = fs.readdirSync(commandPath).filter((file) => file.endsWith('.ts') || file.endsWith('.js'));
-			for (const file of files) {
-				try {
-					const filePath = path.join(commandPath, file);
-					// eslint-disable-next-line @typescript-eslint/no-var-requires
-					require(filePath).default as T;
-				} catch (err) {
-					console.log(`\x1B[31mFailed to load file: \x1B[34m${file}\x1B[0m`);
 
-					console.error(err);
+		const loadFiles = async (dirPath: string) => {
+			try {
+				const files = fs.readdirSync(dirPath);
+				for (const file of files) {
+					const filePath = path.join(dirPath, file);
+					const stats = fs.statSync(filePath);
+					if (stats.isDirectory() && recursive) {
+						await loadFiles(filePath); // Recursive call for subdirectories
+					} else if (stats.isFile() && (file.endsWith('.ts') || file.endsWith('.js'))) {
+						try {
+							// eslint-disable-next-line @typescript-eslint/no-var-requires
+							require(filePath).default as T;
+						} catch (err) {
+							console.log(`\x1B[31mFailed to load file: \x1B[34m${file}\x1B[0m`);
+							console.error(err);
+						}
+					}
 				}
+			} catch (err) {
+				console.log(`\x1B[31mFailed to load directory: \x1B[34m${newPath}\x1B[0m`);
 			}
-		} catch (err) {
-			console.log(`\x1B[31mFailed to load directory: \x1B[34m${newPath}\x1B[0m`);
-		}
+		};
+
+		await loadFiles(commandPath);
 	}
 
 	public async registerCommands() {

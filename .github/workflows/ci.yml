@@ -2,9 +2,6 @@ name: CI
 
 on: [push, pull_request]
 
-env:
-    DATABASE_URL: 'https://example.com'
-
 jobs:
     build:
         runs-on: ubuntu-latest
@@ -21,6 +18,3 @@ jobs:
 
             - name: Lint
               run: npm run lint
-
-            - name: Print Environment Variable
-              run: echo $MY_ENV_VAR
