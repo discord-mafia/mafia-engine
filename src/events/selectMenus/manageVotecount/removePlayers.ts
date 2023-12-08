@@ -3,7 +3,7 @@ import { UserSelectMenu } from '../../../structures/interactions/UserSelectMenu'
 import { InteractionError } from '../../../structures/interactions';
 import { generateManagePlayersEmbed } from '../../buttons/manageVotecount/gotoPlayersMenu';
 import { manageVoteCountEmbeds } from '../../buttons/manageVotecount/goHome';
-import { deletePlayerAndVotes, getVoteCounter } from '@models/automaticGames';
+import { deletePlayerAndVotes, getVoteCounter } from '@models/votecounter';
 
 export default class RemovePlayersMenu extends UserSelectMenu {
 	static customId = 'manage-vc-players-remove';

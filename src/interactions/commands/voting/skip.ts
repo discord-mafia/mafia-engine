@@ -3,7 +3,7 @@ import { ServerType, newSlashCommand } from '../../../structures/BotClient';
 import { prisma } from '../../..';
 import { calculateVoteCount, formatVoteCount } from '../../../util/votecount';
 import { CustomError } from '../../../util/errors';
-import { getVoteCounterOrThrow, getVoteCounterPlayerOrThrow, getVoteCounter } from '@models/automaticGames';
+import { getVoteCounterOrThrow, getVoteCounterPlayerOrThrow, getVoteCounter } from '@models/votecounter';
 
 const data = new SlashCommandBuilder().setName('skip').setDescription('[GAME] Vote to skip todays lynch (no-lynch)');
 export default newSlashCommand({

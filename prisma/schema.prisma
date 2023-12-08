@@ -183,10 +183,6 @@ model Player {
   votesOutgoing Vote[]       @relation(name: "voter")
   voteWeight    Int          @default(1)
 
-  automatedGame  AutomatedGame?  @relation(fields: [automatedGameId], references: [id])
-  automatedRoles AutomatedRole[]
-  confessionalId String?
-
   @@unique([voteCounterId, discordId])
 }
 
@@ -196,10 +192,9 @@ model VoteCounter {
   votes     Vote[]
   players   Player[]
 
-  currentRound     Int            @default(1)
-  currentIteration Int            @default(0)
-  lastCheckedVotes DateTime       @default(now())
-  automatedGame    AutomatedGame?
+  currentRound     Int      @default(1)
+  currentIteration Int      @default(0)
+  lastCheckedVotes DateTime @default(now())
 
   noLynch   Boolean @default(true)
   majority  Boolean @default(true)
@@ -220,56 +215,6 @@ model Vote {
   isNoLynch Boolean @default(false)
 
   createdAt DateTime @default(now())
-}
-
-enum Phase {
-  Pregame
-  Day
-  Night
-  Postgame
-}
-
-model AutomatedGame {
-  id            String @id @default(uuid())
-  voteCounterId Int?   @unique
-
-  currentPhase      Phase           @default(Pregame)
-  currentCycle      Int             @default(0)
-  scheduledPhaseEnd DateTime?
-  voteCounter       VoteCounter?    @relation(fields: [voteCounterId], references: [id])
-  players           Player[]
-  roles             AutomatedRole[]
-
-  guildId        String
-  infoChannelId  String?            @unique
-  chatChannelId  String?            @unique
-  mafiaChannelId String?            @unique
-  confessionals  AutoConfessional[]
-}
-
-model AutoConfessional {
-  id     String @id @default(uuid())
-  gameId String
-  roleId String @unique
-
-  game AutomatedGame @relation(fields: [gameId], references: [id])
-  role AutomatedRole @relation(fields: [roleId], references: [id])
-
-  channelId String @unique
-}
-
-model AutomatedRole {
-  id              String @id @default(uuid())
-  automatedGameId String
-  playerId        Int
-
-  roleName      String
-  data          String[]          @default([])
-  automatedGame AutomatedGame     @relation(fields: [automatedGameId], references: [id])
-  player        Player            @relation(fields: [playerId], references: [id])
-  confessional  AutoConfessional?
-
-  isConfirmed Boolean?
 }
 
 // Role Cards

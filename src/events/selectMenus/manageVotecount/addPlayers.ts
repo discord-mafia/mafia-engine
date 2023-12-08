@@ -5,7 +5,7 @@ import { prisma } from '../../..';
 import { generateManagePlayersEmbed } from '../../buttons/manageVotecount/gotoPlayersMenu';
 import { manageVoteCountEmbeds } from '../../buttons/manageVotecount/goHome';
 import { getOrCreateUser } from '@models/users';
-import { getVoteCounter, getPlayer } from '@models/automaticGames';
+import { getVoteCounter, getPlayer } from '@models/votecounter';
 export default class AddPlayersMenu extends UserSelectMenu {
 	static customId = 'manage-vc-players-add';
 	constructor() {

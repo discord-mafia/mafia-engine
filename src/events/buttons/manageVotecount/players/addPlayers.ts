@@ -1,6 +1,6 @@
 import { type UserSelectMenuBuilder, type ButtonBuilder, type ButtonInteraction, type CacheType, ActionRowBuilder } from 'discord.js';
 import { CustomButton } from '../../../../structures/interactions/Button';
-import { getVoteCounter } from '@models/automaticGames';
+import { getVoteCounter } from '@models/votecounter';
 import { generateManagePlayersEmbed } from '../gotoPlayersMenu';
 import AddPlayersMenu from '../../../selectMenus/manageVotecount/addPlayers';
 import { UserSelectMenu } from '../../../../structures/interactions/UserSelectMenu';

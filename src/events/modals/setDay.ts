@@ -11,7 +11,7 @@ import { InteractionError } from '../../structures/interactions';
 import { prisma } from '../..';
 import { generateManageStateEmbed } from '../buttons/manageVotecount/gotoStateMenu';
 import { manageVoteCountEmbeds } from '../buttons/manageVotecount/goHome';
-import { getVoteCounter } from '@models/automaticGames';
+import { getVoteCounter } from '@models/votecounter';
 
 export default class SetDayModal extends Modal {
 	static customId = 'manage-vc-players-set-day';

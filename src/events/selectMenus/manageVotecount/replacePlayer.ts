@@ -5,7 +5,7 @@ import { generateManagePlayersEmbed } from '../../buttons/manageVotecount/gotoPl
 import { prisma } from '../../..';
 import { manageVoteCountEmbeds } from '../../buttons/manageVotecount/goHome';
 import { getOrCreateUser } from '@models/users';
-import { getVoteCounter, type FullPlayer, getPlayer } from '@models/automaticGames';
+import { getVoteCounter, type FullPlayer, getPlayer } from '@models/votecounter';
 
 export default class ReplacePlayersMenu extends UserSelectMenu {
 	static customId = 'manage-vc-players-replace';

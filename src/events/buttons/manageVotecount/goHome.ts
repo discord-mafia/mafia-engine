@@ -8,7 +8,7 @@ import {
 	type BaseMessageOptions,
 } from 'discord.js';
 import { CustomButton } from '../../../structures/interactions/Button';
-import { getVoteCounter, type FullVoteCount } from '@models/automaticGames';
+import { getVoteCounter, type FullVoteCount } from '@models/votecounter';
 import ManagePlayersButton from './gotoPlayersMenu';
 import GotoStateButton from './gotoStateMenu';
 import GotoTogglesMenu from './gotoToggles';

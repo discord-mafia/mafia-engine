@@ -2,7 +2,7 @@ import { type ButtonInteraction, type CacheType, type ButtonBuilder, type BaseMe
 import { CustomButton } from '../../../structures/interactions/Button';
 import GoHomeButton, { generateBaseVcMenu, manageVoteCountEmbeds } from './goHome';
 import JumpToDayButton from './state/jumpToDay';
-import { type FullVoteCount, getVoteCounter } from '@models/automaticGames';
+import { type FullVoteCount, getVoteCounter } from '@models/votecounter';
 
 export default class GotoStateButton extends CustomButton {
 	static customId = 'manage-vc-state-menu';

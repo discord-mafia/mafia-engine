@@ -1,7 +1,7 @@
 import { type ButtonInteraction, type CacheType, type ButtonBuilder, type BaseMessageOptions, EmbedBuilder, ActionRowBuilder } from 'discord.js';
 import { manageVoteCountEmbeds } from './goHome';
 import { CustomButton } from '../../../structures/interactions/Button';
-import { getVoteCounter, type FullVoteCount } from '@models/automaticGames';
+import { getVoteCounter, type FullVoteCount } from '@models/votecounter';
 import AddPlayersButton from './players/addPlayers';
 import GoHomeButton, { generateBaseVcMenu } from './goHome';
 import RemovePlayersButton from './players/removePlayers';

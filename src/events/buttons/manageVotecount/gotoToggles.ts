@@ -2,7 +2,7 @@ import { type ButtonInteraction, type CacheType, ButtonBuilder, type BaseMessage
 import { CustomButton } from '../../../structures/interactions/Button';
 import ToggleSettingsButton, { VCSettings } from './toggles/toggleSettings';
 import GoHomeButton, { generateBaseVcMenu, generateCreateVCEmbed } from './goHome';
-import { getVoteCounter, type FullVoteCount } from '@models/automaticGames';
+import { getVoteCounter, type FullVoteCount } from '@models/votecounter';
 
 export default class GotoTogglesMenu extends CustomButton {
 	static customId = 'manage-vc-toggles-menu';
