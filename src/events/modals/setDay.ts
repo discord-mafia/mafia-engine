@@ -32,16 +32,21 @@ export default class SetDayModal extends Modal {
 		const vc = await getVoteCounter({ channelId: i.channel.id });
 		if (!vc) throw new InteractionError('No vote counter was found');
 
+		await prisma.vote.deleteMany({
+			where: {
+				voteCounterId: vc.id,
+			},
+		});
+
 		await prisma.voteCounter.update({
 			where: {
 				id: vc.id,
 			},
 			data: {
 				currentRound: dayNumber,
+				currentIteration: 0,
 			},
 		});
-
-		console.log(dayNumber);
 
 		const newVC = await getVoteCounter({ channelId: i.channel.id });
 		if (!newVC) return i.reply({ ...manageVoteCountEmbeds.create(), ephemeral: true });
