@@ -6,7 +6,6 @@ import AddPlayersButton from './players/addPlayers';
 import GoHomeButton, { generateBaseVcMenu } from './goHome';
 import RemovePlayersButton from './players/removePlayers';
 import ReplacePlayersButton from './players/replacePlayer';
-import SyncRolePlayersButton from './players/syncRole';
 
 export default class ManagePlayersButton extends CustomButton {
 	static customId = 'manage-vc-players-tab';
@@ -36,14 +35,12 @@ export function generateManagePlayersEmbed(vc: FullVoteCount): BaseMessageOption
 	const addPlayersButton = CustomButton.getButtonOrThrow(AddPlayersButton.customId);
 	const removePlayersButton = CustomButton.getButtonOrThrow(RemovePlayersButton.customId);
 	const replacePlayerButton = CustomButton.getButtonOrThrow(ReplacePlayersButton.customId);
-	const syncRoleButton = CustomButton.getButtonOrThrow(SyncRolePlayersButton.customId);
 
 	row.addComponents(
 		homeButton.generateButton(),
 		addPlayersButton.generateButton(),
 		removePlayersButton.generateButton(),
-		replacePlayerButton.generateButton(),
-		syncRoleButton.generateButton()
+		replacePlayerButton.generateButton()
 	);
 
 	return {
