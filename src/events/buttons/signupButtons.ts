@@ -13,7 +13,7 @@ import SignupRemovePlayerMenu from 'events/selectMenus/removeUserFromSignup';
 import { prisma } from 'index';
 import { InteractionError } from 'structures/interactions';
 import { CustomButton } from 'structures/interactions/Button';
-import { sendInfoLog } from 'structures/logs';
+import { sendInfoLog } from '@utils/logger';
 
 export default class SignupCategoryButton extends CustomButton {
 	static customId = 'button-category';
