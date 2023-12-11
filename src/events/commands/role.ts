@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, EmbedBuilder, type ColorResolvable } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 import { newSlashCommand } from '@structures/interactions/SlashCommand';
 import { capitalize } from '@utils/string';
 import { getRoleByName, getRoleNames } from '@models/gameRoles';
@@ -22,7 +22,6 @@ export default newSlashCommand({
 
 	autocomplete: async (i) => {
 		const focused = i.options.getFocused();
-
 		const fetchNames = await getRoleNames(focused, {
 			take: 5,
 		});
