@@ -1,5 +1,5 @@
 import { prisma } from 'index';
-import { sql } from '.';
+import { sql } from '@models/database';
 import { z } from 'zod';
 
 type RoleNameQuery = {
