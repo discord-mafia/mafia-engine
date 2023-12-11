@@ -1,6 +1,11 @@
 import { prisma } from 'index';
 
-export async function getAllRoleNames() {
+type RoleNameQuery = {
+	forceLowercase: boolean;
+};
+export async function getAllRoleNames(query: RoleNameQuery) {
+	const forceLowerCase = query.forceLowercase ?? true;
+
 	try {
 		const roleNames = (
 			await prisma.role.findMany({
@@ -8,7 +13,7 @@ export async function getAllRoleNames() {
 					name: true,
 				},
 			})
-		).map((r) => r.name.toLowerCase());
+		).map((r) => (forceLowerCase ? r.name.toLowerCase() : r.name));
 		return roleNames;
 	} catch (err) {
 		return null;
