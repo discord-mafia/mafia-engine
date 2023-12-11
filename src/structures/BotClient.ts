@@ -2,8 +2,8 @@ import { Client, Events, GatewayIntentBits, Partials, REST, Routes } from 'disco
 import * as path from 'path';
 import * as fs from 'fs';
 import { type Button, type Modal, type SelectMenu } from './interactions';
-import OnClientReady from '../interactions/events/clientReady';
-import OnInteraction from '../interactions/events/onInteraction';
+import OnClientReady from '../events/discordEvents/clientReady';
+import OnInteraction from '../events/discordEvents/onInteraction';
 import { type ContextMenuCommandBuilder } from 'discord.js';
 import { ServerType, type SlashCommand, getSlashCommands } from './interactions/SlashCommand';
 
