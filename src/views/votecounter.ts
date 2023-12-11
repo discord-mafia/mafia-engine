@@ -27,44 +27,6 @@ export function genCreateVoteCountEmbed(): BaseMessageOptions {
 	};
 }
 
-export function generateManagePlayersEmbed(vc?: FullVoteCount): BaseMessageOptions {
-	if (!vc) return genCreateVoteCountEmbed();
-
-	const embed = new EmbedBuilder();
-	embed.setTitle('Manage Players');
-	embed.setDescription(`Manage players within a vote count`);
-	embed.setColor('White');
-
-	const row = new ActionRowBuilder<ButtonBuilder>();
-
-	return {
-		embeds: [embed],
-		components: [row],
-	};
-}
-
-export function generateManageVCEmbed(vc?: FullVoteCount): BaseMessageOptions {
-	if (!vc) return genCreateVoteCountEmbed();
-
-	const embed = new EmbedBuilder();
-	embed.setTitle('Manage VC');
-	embed.setDescription(`Manage the vote count`);
-	embed.setColor('White');
-
-	const row = new ActionRowBuilder<ButtonBuilder>();
-	// const button = CustomButton.getButtonOrThrow(ToggleSettingsButton.customId);
-	const managePlayersButton = CustomButton.getButtonOrThrow(ManagePlayersButton.customId);
-	const manageStateButton = CustomButton.getButtonOrThrow(GotoStateButton.customId);
-	const manageTogglesButton = CustomButton.getButtonOrThrow(GotoTogglesMenu.customId);
-
-	row.addComponents(managePlayersButton.generateButton(), manageTogglesButton.generateButton(), manageStateButton.generateButton());
-
-	return {
-		embeds: [embed],
-		components: [row],
-	};
-}
-
 export function genVoteCountEmbed(vc: FullVoteCount): BaseMessageOptions {
 	const embed = new EmbedBuilder();
 	embed.setTitle('Manage Vote Counter');
