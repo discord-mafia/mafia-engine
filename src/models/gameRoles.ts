@@ -1,6 +1,5 @@
 import { prisma } from 'index';
-import { rawQuery } from '.';
-import { sql } from 'drizzle-orm';
+import { sql } from '.';
 import { z } from 'zod';
 
 type RoleNameQuery = {
@@ -51,12 +50,12 @@ const roleNameResponseValidator = z.array(
 export async function getRoleNames(name: string, options?: RoleNameQueryOptions) {
 	const take = options?.take ?? 1;
 	try {
-		const data = await rawQuery(sql`
+		const data = await sql`
 			SELECT name
 			FROM "Role"
 			ORDER BY similarity(name, ${name}) DESC
 			LIMIT ${take};
-		`);
+		`;
 
 		const validated = roleNameResponseValidator.parse(data);
 		return validated;
@@ -87,12 +86,12 @@ export type Role = z.infer<typeof roleValidator>;
 
 export async function getRoleByName(name: string) {
 	try {
-		const data = await rawQuery(sql`
+		const data = await sql`
 			SELECT *
 			FROM "Role"
 			ORDER BY similarity(name, ${name}) DESC
 			LIMIT ${1};
-		`);
+		`;
 
 		const validatedResponse = roleListValidator.parse(data);
 		if (validatedResponse.length === 0) return null;

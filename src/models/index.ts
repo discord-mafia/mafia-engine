@@ -1,11 +1,19 @@
 import config from '@root/config';
-import { type SQLWrapper } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+import { Client } from 'pg';
 
-const queryClient = postgres(config.DATABASE_URL);
-export const db = drizzle(queryClient);
+const pgClient = new Client({
+	connectionString: config.DATABASE_URL,
+});
 
-export function rawQuery(query: SQLWrapper) {
-	return db.execute(query);
+pgClient.connect();
+
+export async function sql(template: TemplateStringsArray, ...substitutions: unknown[]) {
+	try {
+		const str = template.map((word, index) => (index !== template.length - 1 ? `${word}$${index + 1}` : word)).join(' ');
+		const response = await pgClient.query(str, substitutions);
+		return response.rows;
+	} catch (err) {
+		console.log(err);
+		return null;
+	}
 }
