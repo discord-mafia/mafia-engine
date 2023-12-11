@@ -1,22 +1,11 @@
-import {
-	type ChatInputCommandInteraction,
-	Client,
-	Collection,
-	Events,
-	GatewayIntentBits,
-	Partials,
-	REST,
-	Routes,
-	type SlashCommandBuilder,
-	type AutocompleteInteraction,
-} from 'discord.js';
+import { Client, Events, GatewayIntentBits, Partials, REST, Routes } from 'discord.js';
 import * as path from 'path';
 import * as fs from 'fs';
 import { type Button, type Modal, type SelectMenu } from './interactions';
 import OnClientReady from '../interactions/events/clientReady';
 import OnInteraction from '../interactions/events/onInteraction';
 import { type ContextMenuCommandBuilder } from 'discord.js';
-import type { UnknownResponse } from '../util/types';
+import { ServerType, type SlashCommand, getSlashCommands } from './interactions/SlashCommand';
 
 export const DEFAULT_INTENTS = {
 	intents: [
@@ -29,31 +18,6 @@ export const DEFAULT_INTENTS = {
 	],
 	partials: [Partials.User],
 };
-
-export const slashCommands: Collection<string, SlashCommand> = new Collection();
-export enum ServerType {
-	MAIN = 'MAIN',
-	PLAYERCHAT = 'PLAYERCHAT',
-	TURBO = 'TURBO',
-	ALL = 'ALL',
-	NONE = 'NONE',
-}
-export interface SlashCommand {
-	data: SlashCommandBuilder;
-	serverType?: ServerType | ServerType[];
-	execute: (i: ChatInputCommandInteraction) => UnknownResponse;
-	autocomplete?: (i: AutocompleteInteraction) => void | Promise<void>;
-}
-
-export async function newSlashCommand(cmd: SlashCommand) {
-	try {
-		slashCommands.set(cmd.data.name, cmd);
-		console.log(`Loaded [${cmd.data.name}]`);
-		return cmd;
-	} catch (err) {
-		console.error(`Failed to load [${cmd.data.name}]`);
-	}
-}
 
 export class BotClient extends Client {
 	public rest: REST;
@@ -132,7 +96,7 @@ export class BotClient extends Client {
 				TURBO: [],
 			};
 
-			slashCommands.forEach((val) => {
+			getSlashCommands().forEach((val) => {
 				return commandList[ServerType.ALL].push(val);
 				// else if (Array.isArray(val.serverType)) {
 				// 	val.serverType.forEach((type) => {

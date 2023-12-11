@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { ServerType, newSlashCommand } from '../../structures/BotClient';
+import { newSlashCommand, ServerType } from '@structures/interactions/SlashCommand';
 import { prisma } from '../..';
 import { getCitizenship } from '@models/citizenship';
 

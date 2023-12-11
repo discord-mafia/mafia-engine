@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder, type ColorResolvable } from 'discord.js';
-import { newSlashCommand } from '../../structures/BotClient';
-import { prisma } from '../../';
+import { newSlashCommand } from '@structures/interactions/SlashCommand';
+import { prisma } from '../..';
 import stringSimilarity from 'string-similarity';
 import { getAllRoleNames } from '@models/gameRoles';
 

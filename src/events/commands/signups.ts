@@ -1,5 +1,5 @@
 import { type ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { ServerType, newSlashCommand } from '../../structures/BotClient';
+import { newSlashCommand, ServerType } from '@structures/interactions/SlashCommand';
 import { getOrCreateUser } from '@models/users';
 import { prisma } from '../..';
 import { getSignup } from '@models/signups';

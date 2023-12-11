@@ -1,5 +1,5 @@
 import { type ColorResolvable, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { newSlashCommand } from '../../structures/BotClient';
+import { newSlashCommand } from '@structures/interactions/SlashCommand';
 import { addHiddenOption } from '../../util/commands';
 import { getAllRoleNames, getRole } from '@models/gameRoles';
 import stringSimilarity from 'string-similarity';
