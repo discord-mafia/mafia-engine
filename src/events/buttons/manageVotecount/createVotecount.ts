@@ -3,7 +3,7 @@ import { CustomButton } from '../../../structures/interactions/Button';
 import { getVoteCounter } from '@models/votecounter';
 import { prisma } from '../../..';
 import { InteractionError } from '../../../structures/interactions';
-import { manageVoteCountEmbeds } from './goHome';
+import { generateManageVCEmbed } from '@views/votecounter';
 
 export default class CreateVotecountButton extends CustomButton {
 	static customId = 'manage-vc-create';
@@ -16,7 +16,7 @@ export default class CreateVotecountButton extends CustomButton {
 
 		await prisma.voteCounter.create({ data: { channelId: i.channelId } });
 		const vc = await getVoteCounter({ channelId: i.channelId });
-		const payload = manageVoteCountEmbeds.main(vc ?? undefined);
+		const payload = generateManageVCEmbed(vc ?? undefined);
 		i.update(payload);
 	}
 

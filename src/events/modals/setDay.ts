@@ -9,9 +9,8 @@ import {
 import { Modal } from '../../structures/interactions/Modal';
 import { InteractionError } from '../../structures/interactions';
 import { prisma } from '../..';
-import { generateManageStateEmbed } from '../buttons/manageVotecount/gotoStateMenu';
-import { manageVoteCountEmbeds } from '../buttons/manageVotecount/goHome';
 import { getVoteCounter } from '@models/votecounter';
+import { genCreateVoteCountEmbed, genStateEmbed } from '@views/votecounter';
 
 export default class SetDayModal extends Modal {
 	static customId = 'manage-vc-players-set-day';
@@ -49,8 +48,8 @@ export default class SetDayModal extends Modal {
 		});
 
 		const newVC = await getVoteCounter({ channelId: i.channel.id });
-		if (!newVC) return i.reply({ ...manageVoteCountEmbeds.create(), ephemeral: true });
-		const stateMenuPayload = generateManageStateEmbed(newVC);
+		if (!newVC) return i.reply({ ...genCreateVoteCountEmbed(), ephemeral: true });
+		const stateMenuPayload = genStateEmbed(newVC);
 		await i.reply({ ...stateMenuPayload, ephemeral: true });
 	}
 

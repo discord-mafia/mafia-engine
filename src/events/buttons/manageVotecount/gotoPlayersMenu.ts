@@ -1,11 +1,7 @@
-import { type ButtonInteraction, type CacheType, type ButtonBuilder, type BaseMessageOptions, EmbedBuilder, ActionRowBuilder } from 'discord.js';
-import { manageVoteCountEmbeds } from './goHome';
+import { type ButtonInteraction, type CacheType, type ButtonBuilder } from 'discord.js';
 import { CustomButton } from '../../../structures/interactions/Button';
-import { getVoteCounter, type FullVoteCount } from '@models/votecounter';
-import AddPlayersButton from './players/addPlayers';
-import GoHomeButton, { generateBaseVcMenu } from './goHome';
-import RemovePlayersButton from './players/removePlayers';
-import ReplacePlayersButton from './players/replacePlayer';
+import { getVoteCounter } from '@models/votecounter';
+import { genCreateVoteCountEmbed, genPlayersEmbed } from '@views/votecounter';
 
 export default class ManagePlayersButton extends CustomButton {
 	static customId = 'manage-vc-players-tab';
@@ -15,55 +11,12 @@ export default class ManagePlayersButton extends CustomButton {
 
 	async onExecute(i: ButtonInteraction<CacheType>) {
 		const vc = await getVoteCounter({ channelId: i.channelId });
-		if (!vc) return i.update(manageVoteCountEmbeds.create());
-		const payload = generateManagePlayersEmbed(vc);
+		if (!vc) return i.update(genCreateVoteCountEmbed());
+		const payload = genPlayersEmbed(vc);
 		i.update(payload);
 	}
 
 	generateButton(): ButtonBuilder {
 		return super.generateButton().setLabel('Manage Players');
 	}
-}
-
-export function generateManagePlayersEmbed(vc: FullVoteCount): BaseMessageOptions {
-	if (!vc) return manageVoteCountEmbeds.create();
-	const { embeds } = generateBaseVcMenu(vc);
-
-	const row = new ActionRowBuilder<ButtonBuilder>();
-
-	const homeButton = CustomButton.getButtonOrThrow(GoHomeButton.customId);
-	const addPlayersButton = CustomButton.getButtonOrThrow(AddPlayersButton.customId);
-	const removePlayersButton = CustomButton.getButtonOrThrow(RemovePlayersButton.customId);
-	const replacePlayerButton = CustomButton.getButtonOrThrow(ReplacePlayersButton.customId);
-
-	row.addComponents(
-		homeButton.generateButton(),
-		addPlayersButton.generateButton(),
-		removePlayersButton.generateButton(),
-		replacePlayerButton.generateButton()
-	);
-
-	return {
-		embeds,
-		components: [row],
-	};
-}
-
-export function generatePlaceholder(vc?: FullVoteCount): BaseMessageOptions {
-	if (!vc) return manageVoteCountEmbeds.create();
-
-	const embed = new EmbedBuilder();
-	embed.setTitle('PLACEHOLDER');
-	embed.setDescription(`This menu has not been created yet`);
-	embed.setColor('Yellow');
-
-	const row = new ActionRowBuilder<ButtonBuilder>();
-
-	const homeButton = CustomButton.getButtonOrThrow(GoHomeButton.customId);
-	row.addComponents(homeButton.generateButton());
-
-	return {
-		embeds: [embed],
-		components: [row],
-	};
 }

@@ -1,10 +1,9 @@
 import { ActionRowBuilder, type UserSelectMenuBuilder, type ButtonBuilder, type ButtonInteraction, type CacheType } from 'discord.js';
 import { CustomButton } from '../../../../structures/interactions/Button';
 import { getVoteCounter } from '@models/votecounter';
-import { generateManagePlayersEmbed } from '../gotoPlayersMenu';
-import { manageVoteCountEmbeds } from '../goHome';
 import { UserSelectMenu } from '../../../../structures/interactions/UserSelectMenu';
 import ReplacePlayersMenu from '../../../selectMenus/manageVotecount/replacePlayer';
+import { genCreateVoteCountEmbed, genPlayersEmbed } from '@views/votecounter';
 
 export default class ReplacePlayersButton extends CustomButton {
 	static customId = 'manage-vc-players-replace';
@@ -14,8 +13,8 @@ export default class ReplacePlayersButton extends CustomButton {
 
 	async onExecute(i: ButtonInteraction<CacheType>) {
 		const vc = await getVoteCounter({ channelId: i.channelId });
-		if (!vc) return manageVoteCountEmbeds.create();
-		const payload = generateManagePlayersEmbed(vc);
+		if (!vc) return genCreateVoteCountEmbed();
+		const payload = genPlayersEmbed(vc);
 
 		const row = new ActionRowBuilder<UserSelectMenuBuilder>();
 

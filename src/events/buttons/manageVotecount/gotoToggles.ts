@@ -1,8 +1,9 @@
 import { type ButtonInteraction, type CacheType, ButtonBuilder, type BaseMessageOptions, ActionRowBuilder, ButtonStyle } from 'discord.js';
 import { CustomButton } from '../../../structures/interactions/Button';
 import ToggleSettingsButton, { VCSettings } from './toggles/toggleSettings';
-import GoHomeButton, { generateBaseVcMenu, generateCreateVCEmbed } from './goHome';
 import { getVoteCounter, type FullVoteCount } from '@models/votecounter';
+import { genCreateVoteCountEmbed, genVoteCountEmbed } from '@views/votecounter';
+import GoHomeButton from './goHome';
 
 export default class GotoTogglesMenu extends CustomButton {
 	static customId = 'manage-vc-toggles-menu';
@@ -12,7 +13,7 @@ export default class GotoTogglesMenu extends CustomButton {
 
 	async onExecute(i: ButtonInteraction<CacheType>) {
 		const vc = await getVoteCounter({ channelId: i.channelId });
-		if (!vc) return i.update(generateCreateVCEmbed());
+		if (!vc) return i.update(genCreateVoteCountEmbed());
 		const payload = genTogglesMenu(vc);
 		i.update(payload);
 	}
@@ -23,7 +24,7 @@ export default class GotoTogglesMenu extends CustomButton {
 }
 
 export function genTogglesMenu(vc: FullVoteCount): BaseMessageOptions {
-	const { embeds } = generateBaseVcMenu(vc);
+	const { embeds } = genVoteCountEmbed(vc);
 
 	const row = new ActionRowBuilder<ButtonBuilder>();
 	const button = CustomButton.getButtonOrThrow(ToggleSettingsButton.customId);

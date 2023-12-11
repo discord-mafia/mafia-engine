@@ -1,7 +1,7 @@
 import { type ButtonBuilder, type ButtonInteraction, type CacheType } from 'discord.js';
 import { CustomButton } from '../../../../structures/interactions/Button';
 import { getVoteCounter } from '@models/votecounter';
-import { generatePlaceholder } from '../gotoPlayersMenu';
+import { genPlaceholderEmbed } from '@views/votecounter';
 
 export default class SyncRolePlayersButton extends CustomButton {
 	static customId = 'manage-vc-players-sync-role';
@@ -11,7 +11,7 @@ export default class SyncRolePlayersButton extends CustomButton {
 
 	async onExecute(i: ButtonInteraction<CacheType>) {
 		const vc = await getVoteCounter({ channelId: i.channelId });
-		const payload = generatePlaceholder(vc ?? undefined);
+		const payload = genPlaceholderEmbed(vc ?? undefined);
 		i.update(payload);
 	}
 
