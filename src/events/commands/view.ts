@@ -3,6 +3,7 @@ import { newSlashCommand } from '@structures/interactions/OldSlashCommand';
 import { getRoleByName, getRoleNames } from '@models/gameRoles';
 import { genRoleEmbed } from '@views/roles';
 import { capitalize } from '@utils/string';
+
 const data = new SlashCommandBuilder().setName('view').setDescription('View something');
 
 data.addSubcommand((sub) =>

@@ -1,7 +1,7 @@
-import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { newSlashCommand } from '@structures/interactions/OldSlashCommand';
+import { EmbedBuilder } from 'discord.js';
 import { getAllWithRole } from '../../util/discordRole';
 import config from '../../config';
+import { SlashCommand } from '@structures/interactions/SlashCommand';
 
 const StaffRoles: string[] = [
 	'648664560936550400', // Co-Owners
@@ -16,10 +16,10 @@ const CommunityContributorRoles: string[] = [
 	'1174433972718157924', // Wiki Editor
 ];
 
-const data = new SlashCommandBuilder().setName('staff').setDescription('See who the current staff are');
-export default newSlashCommand({
-	data,
-	execute: async (i) => {
+export default new SlashCommand('staff')
+	.setDescription('See who the current staff are')
+	.setRequiresCitizenship(false)
+	.onExecute(async (i, _ctx) => {
 		if (!i.guild) return;
 		await i.deferReply();
 
@@ -110,5 +110,4 @@ export default newSlashCommand({
 			console.log(err);
 			await i.editReply('An error has occurred');
 		}
-	},
-});
+	});
