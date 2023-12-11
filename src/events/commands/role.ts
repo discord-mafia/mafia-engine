@@ -48,8 +48,6 @@ export default newSlashCommand({
 		});
 		if (!fetchNames) return i.respond([]);
 
-		console.log(fetchNames);
-
 		return i.respond(fetchNames.map((m) => ({ name: capitalize(m.name), value: m.name })));
 	},
 });
