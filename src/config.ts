@@ -12,13 +12,12 @@ const envSchema = z.object({
 	MAIN_SERVER_ID: z.string(),
 	PLAYERCHAT_SERVER_ID: z.string(),
 	TURBO_SERVER_ID: z.string(),
-	LOG_WEBHOOK_URL: z.string().url().nullish(),
-	IMAGE_CDN_WEBHOOK_URL: z.string().url().nullish(),
 
 	VITE_REACT_APP_CLERK_PUBLISHABLE_KEY: z.string().optional(),
 	DISCORD_OAUTH_REDIRECT_URI: z.string(),
 
-	ERROR_LOG_WEBHOOK: z.string().url().optional(),
+	GENERAL_LOG_WEBHOOK: z.string().url().optional(),
+	SIGNUP_LOG_WEBHOOK: z.string().url().nullish(),
 });
 
 export function fetchConfig() {

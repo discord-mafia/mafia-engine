@@ -26,7 +26,7 @@ export default class SignupCategoryButton extends CustomButton {
 		if (!i.guild) return new InteractionError('This button cannot be used outside of a server');
 		if (!cache) return new InteractionError('This button is invalid as it has no valid cache attached');
 
-		const logger = new Logger(config.LOG_WEBHOOK_URL ?? undefined);
+		const logger = new Logger(config.SIGNUP_LOG_WEBHOOK ?? config.GENERAL_LOG_WEBHOOK ?? undefined);
 
 		await i.deferReply({ ephemeral: true });
 

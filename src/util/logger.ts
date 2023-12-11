@@ -17,7 +17,7 @@ export class Logger {
 	constructor(webhookUrl?: string) {
 		this.cuid = genCUID();
 		if (webhookUrl) this.webhookUrl = webhookUrl;
-		else this.webhookUrl = config.LOG_WEBHOOK_URL ?? undefined;
+		else this.webhookUrl = config.GENERAL_LOG_WEBHOOK ?? undefined;
 	}
 
 	public log(type: LogType, message: string, color?: ColorResolvable) {
