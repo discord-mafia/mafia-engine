@@ -3,8 +3,8 @@ import { prisma } from 'index';
 type RoleNameQuery = {
 	forceLowercase: boolean;
 };
-export async function getAllRoleNames(query: RoleNameQuery) {
-	const forceLowerCase = query.forceLowercase ?? true;
+export async function getAllRoleNames(query?: RoleNameQuery) {
+	const forceLowerCase = query?.forceLowercase ?? true;
 
 	try {
 		const roleNames = (
