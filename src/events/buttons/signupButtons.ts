@@ -1,4 +1,6 @@
 import { getSignup } from '@models/signups';
+import config from '@root/config';
+import { LogType, Logger } from '@utils/logger';
 import { formatSignupEmbed } from '@views/signups';
 import {
 	ActionRowBuilder,
@@ -13,7 +15,6 @@ import SignupRemovePlayerMenu from 'events/selectMenus/removeUserFromSignup';
 import { prisma } from 'index';
 import { InteractionError } from 'structures/interactions';
 import { CustomButton } from 'structures/interactions/Button';
-import { sendInfoLog } from '@utils/logger';
 
 export default class SignupCategoryButton extends CustomButton {
 	static customId = 'button-category';
@@ -24,6 +25,8 @@ export default class SignupCategoryButton extends CustomButton {
 	async onExecute(i: ButtonInteraction, cache: string) {
 		if (!i.guild) return new InteractionError('This button cannot be used outside of a server');
 		if (!cache) return new InteractionError('This button is invalid as it has no valid cache attached');
+
+		const logger = new Logger(config.LOG_WEBHOOK_URL ?? undefined);
 
 		await i.deferReply({ ephemeral: true });
 
@@ -65,7 +68,7 @@ export default class SignupCategoryButton extends CustomButton {
 						const hasRole = member.roles.cache.has(role);
 						if (hasRole) member.roles.remove(role);
 					} catch (err) {
-						await sendInfoLog('Failed to remove role', `Failed to remove role <@&${role}> from user ${member.user.username}`, Colors.Red);
+						logger.log(LogType.Error, `Failed to remove role <@&${role}> from user ${member.user.username}`);
 					}
 				}
 
@@ -106,12 +109,8 @@ export default class SignupCategoryButton extends CustomButton {
 		if (cache == 'leave') {
 			for (const category of signup.categories) {
 				const count = await removeFromCategory(category.id, i.user.id);
-				if (count > 0)
-					sendInfoLog(
-						`Leaving Signup: ${category.name} in <#${signup.channelId}>`,
-						`User ${i.user.username} has left ${category.name} in signup ${signup.id} (<#${signup.channelId}>)`,
-						Colors.Red
-					);
+
+				if (count > 0) logger.log(LogType.Info, `User ${i.user.username} has left ${category.name} in signup ${signup.id}`, Colors.Red);
 			}
 		} else if (cache == 'settings') {
 			if (!member.permissions.has('ManageChannels')) return i.editReply({ content: 'You do not have permission to edit this signup' });
@@ -180,19 +179,15 @@ export default class SignupCategoryButton extends CustomButton {
 								addRoles.push(role);
 							} catch (err) {
 								console.log(err);
-								await sendInfoLog(
-									'Failed to add role',
+								logger.log(
+									LogType.Error,
 									`Failed to add role <@&${category.attachedRoleId}> to user ${member.user.username}`,
 									Colors.Red
 								);
 							}
 						}
 
-						sendInfoLog(
-							`Joining Signup: ${category.name} in <#${signup.channelId}>`,
-							`User ${i.user.username} has joined ${category.name} in signup ${signup.id} (<#${signup.channelId}>)`,
-							category.isFocused ? Colors.Green : Colors.Yellow
-						);
+						logger.log(LogType.Info, `User ${i.user.username} has joined ${category.name} in signup ${signup.id}`, Colors.Green);
 					}
 				}
 			}

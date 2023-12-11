@@ -1,6 +1,5 @@
 import { type ColorResolvable, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { newSlashCommand } from '@structures/interactions/SlashCommand';
-import { addHiddenOption } from '../../util/commands';
 import { getAllRoleNames, getRole } from '@models/gameRoles';
 import stringSimilarity from 'string-similarity';
 const data = new SlashCommandBuilder().setName('view').setDescription('View something');
@@ -10,7 +9,7 @@ data.addSubcommand((sub) =>
 		.setName('role')
 		.setDescription('View a role')
 		.addStringOption((option) => option.setName('name').setDescription('The name of the role').setRequired(true).setAutocomplete(true))
-		.addBooleanOption(addHiddenOption)
+		.addBooleanOption((opt) => opt.setName('hidden').setDescription('Whether to show hidden roles').setRequired(false))
 );
 
 export default newSlashCommand({

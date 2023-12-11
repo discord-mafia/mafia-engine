@@ -1,4 +1,7 @@
 import { genCUID } from '@utils/random';
+import { type ColorResolvable, WebhookClient } from 'discord.js';
+import config from '@root/config';
+import { genLoggerEmbed } from '@views/logger';
 
 export enum LogType {
 	Error = 'Error',
@@ -10,11 +13,23 @@ export enum LogType {
 
 export class Logger {
 	private cuid: string;
-	constructor() {
+	private webhookUrl: string | undefined;
+	constructor(webhookUrl?: string) {
 		this.cuid = genCUID();
+		if (webhookUrl) this.webhookUrl = webhookUrl;
+		else this.webhookUrl = config.LOG_WEBHOOK_URL ?? undefined;
 	}
 
-	public log(type: LogType, message: string) {
-		console.log(`[${type}] [${this.cuid}] ${message}`);
+	public log(type: LogType, message: string, color?: ColorResolvable) {
+		if (!this.webhookUrl) return console.log(`[${type}] [${this.cuid}] ${message}`);
+
+		try {
+			const webhook = new WebhookClient({ url: this.webhookUrl });
+			const embed = genLoggerEmbed(this.cuid, type, message, color);
+			return webhook.send({ embeds: [embed] });
+		} catch (err) {
+			console.log(`[${type}] [${this.cuid}] ${message}`);
+			return null;
+		}
 	}
 }
