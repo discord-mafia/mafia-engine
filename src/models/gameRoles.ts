@@ -83,6 +83,8 @@ const roleValidator = z.object({
 
 const roleListValidator = z.array(roleValidator);
 
+export type Role = z.infer<typeof roleValidator>;
+
 export async function getRoleByName(name: string) {
 	try {
 		const data = await rawQuery(sql`
