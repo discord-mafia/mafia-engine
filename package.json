@@ -4,9 +4,11 @@
 		"build:prisma": "npx prisma format && npx prisma generate && npx prisma db push",
 		"build": "tsc && tsc-alias",
 		"start:local": "pm2 start ./build/index.js --name betrayal-bot",
-		"lint": "eslint . --ext .ts",
 		"dev": "nodemon src/index.ts",
-		"typecheck": "tsc --noEmit"
+		"lint": "eslint . --ext .ts",
+		"typecheck": "tsc --noEmit",
+		"fullcheck": "npm run lint && npm run typecheck",
+		"fullcheck:watch": "nodemon --watch 'src/**/*.ts' --exec 'npm run fullcheck'"
 	},
 	"dependencies": {
 		"@prisma/client": "^5.0.0",
