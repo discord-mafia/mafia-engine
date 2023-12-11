@@ -2,10 +2,9 @@ import { type UserSelectMenuInteraction, type CacheType } from 'discord.js';
 import { UserSelectMenu } from '../../../structures/interactions/UserSelectMenu';
 import { InteractionError } from '../../../structures/interactions';
 import { prisma } from '../../..';
-import { generateManagePlayersEmbed } from '../../buttons/manageVotecount/gotoPlayersMenu';
-import { manageVoteCountEmbeds } from '../../buttons/manageVotecount/goHome';
 import { getOrCreateUser } from '@models/users';
 import { getVoteCounter, getPlayer } from '@models/votecounter';
+import { genCreateVoteCountEmbed, genPlayersEmbed } from '@views/votecounter';
 export default class AddPlayersMenu extends UserSelectMenu {
 	static customId = 'manage-vc-players-add';
 	constructor() {
@@ -20,7 +19,7 @@ export default class AddPlayersMenu extends UserSelectMenu {
 		if (!values) throw new InteractionError('No users were provided');
 
 		const vc = await getVoteCounter({ channelId: i.channelId });
-		if (!vc) return i.update(manageVoteCountEmbeds.create());
+		if (!vc) return i.update(genCreateVoteCountEmbed());
 
 		const players = vc.players;
 
@@ -75,8 +74,8 @@ export default class AddPlayersMenu extends UserSelectMenu {
 		}
 
 		const newVC = await getVoteCounter({ channelId: i.channelId });
-		if (!newVC) return i.update(manageVoteCountEmbeds.create());
-		const playerMenuPayload = generateManagePlayersEmbed(newVC);
+		if (!newVC) return i.update(genCreateVoteCountEmbed());
+		const playerMenuPayload = genPlayersEmbed(newVC);
 		await i.update(playerMenuPayload);
 	}
 

@@ -1,5 +1,5 @@
+import { newSlashCommand } from '@structures/interactions/SlashCommand';
 import { SlashCommandBuilder } from 'discord.js';
-import { newSlashCommand } from '../../structures/BotClient';
 
 const data = new SlashCommandBuilder().setName('invite').setDescription('See the invite links for our servers');
 data.addStringOption((title) =>

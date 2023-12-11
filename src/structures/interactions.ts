@@ -11,7 +11,7 @@ import {
 	type MessagePayload,
 	type BaseInteraction,
 } from 'discord.js';
-import type { UnknownResponse } from '../util/types';
+import type { UnknownResponse } from '../types/response';
 import fs from 'fs';
 import path from 'path';
 type CustomID = string;

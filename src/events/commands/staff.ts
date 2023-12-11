@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
-import { newSlashCommand } from '../../structures/BotClient';
+import { newSlashCommand } from '@structures/interactions/SlashCommand';
 import { getAllWithRole } from '../../util/discordRole';
 import config from '../../config';
 

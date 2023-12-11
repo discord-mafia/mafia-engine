@@ -1,49 +1,40 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { ServerType, newSlashCommand } from '../../../structures/BotClient';
+import { ServerType, newSlashCommand } from '@structures/interactions/SlashCommand';
 import { prisma } from '../../..';
 import { calculateVoteCount, formatVoteCount } from '../../../util/votecount';
 import { CustomError } from '../../../util/errors';
-import { getVoteCounterOrThrow, getVoteCounterPlayerOrThrow, getPlayer, getVoteCounter } from '@models/votecounter';
+import { getVoteCounterOrThrow, getVoteCounterPlayerOrThrow, getVoteCounter } from '@models/votecounter';
 
-const data = new SlashCommandBuilder().setName('vote').setDescription('[GAME] Vote for a player');
-data.addUserOption((option) => option.setName('player').setDescription('The player you are voting for').setRequired(true));
-
+const data = new SlashCommandBuilder().setName('unvote').setDescription('[GAME] Remove your vote');
 export default newSlashCommand({
 	data,
 	serverType: ServerType.MAIN,
 	execute: async (i) => {
 		if (!i.guild) return;
-		const votedPlayerUser = i.options.getUser('player', true);
 
 		try {
-			const voteCount = await getVoteCounterOrThrow({ channelId: i.channelId });
-			const player = await getVoteCounterPlayerOrThrow(voteCount.id, i.user.id);
+			const voteCounter = await getVoteCounterOrThrow({ channelId: i.channelId });
+			const player = await getVoteCounterPlayerOrThrow(voteCounter.id, i.user.id);
 
-			if (voteCount.lockVotes && voteCount.votes.reduce((acc, curr) => acc + (curr.voterId == player.id ? 1 : 0), 0) > 0)
+			if (voteCounter.lockVotes && voteCounter.votes.reduce((acc, curr) => acc + (curr.voterId == player.id ? 1 : 0), 0) > 0)
 				return i.reply({ content: 'You have already locked in your vote', ephemeral: true });
 
-			const preCalculated = calculateVoteCount(voteCount);
+			const preCalculated = calculateVoteCount(voteCounter);
 			if (preCalculated.majorityReached) return i.reply({ content: 'Majority has already been reached', ephemeral: true });
-
-			const votedMember = await i.guild.members.fetch(votedPlayerUser.id);
-			if (!votedMember) return i.reply({ content: 'The player you are voting for is not in the server', ephemeral: true });
-			const votingPlayer = await getPlayer(voteCount.id, votedPlayerUser.id);
-			if (!votingPlayer) return i.reply({ content: 'Unable to fetch the player', ephemeral: true });
-
-			const focusPlayerId = votingPlayer.id;
-			const focusPlayerDiscordId = votingPlayer.discordId;
 
 			const vote = await prisma.vote.create({
 				data: {
-					voteCounterId: voteCount.id,
+					voteCounterId: voteCounter.id,
 					voterId: player.id,
-					votedTargetId: focusPlayerId,
+					votedTargetId: undefined,
+					isNoLynch: undefined,
 				},
 			});
 
-			if (!vote) return i.reply({ content: 'An error occurred while voting', ephemeral: true });
+			if (!vote) return i.reply({ content: 'An error occurred while unvoting', ephemeral: true });
+
 			await i.reply({
-				content: `<@${i.user.id}> has voted for <@${focusPlayerDiscordId}>`,
+				content: `<@${i.user.id}> has removed their vote`,
 				allowedMentions: {
 					users: [],
 				},

@@ -21,6 +21,8 @@
 		"paths": {
 			"@utils/*": ["util/*"],
 			"@models/*": ["models/*"],
+			"@views/*": ["views/*"],
+			"@structures/*": ["structures/*"],
 			"@root/*": ["./*"]
 		}
 	},

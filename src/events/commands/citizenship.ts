@@ -1,5 +1,5 @@
 import { type ColorResolvable, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { newSlashCommand } from '../../structures/BotClient';
+import { newSlashCommand } from '@structures/interactions/SlashCommand';
 import { getAverageColor } from 'fast-average-color-node';
 import { getOrCreateUser } from '@models/users';
 

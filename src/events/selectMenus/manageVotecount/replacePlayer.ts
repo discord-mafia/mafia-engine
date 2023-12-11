@@ -1,11 +1,10 @@
 import { type UserSelectMenuInteraction, type CacheType } from 'discord.js';
 import { UserSelectMenu } from '../../../structures/interactions/UserSelectMenu';
 import { InteractionError } from '../../../structures/interactions';
-import { generateManagePlayersEmbed } from '../../buttons/manageVotecount/gotoPlayersMenu';
 import { prisma } from '../../..';
-import { manageVoteCountEmbeds } from '../../buttons/manageVotecount/goHome';
 import { getOrCreateUser } from '@models/users';
 import { getVoteCounter, type FullPlayer, getPlayer } from '@models/votecounter';
+import { genCreateVoteCountEmbed, genPlayersEmbed } from '@views/votecounter';
 
 export default class ReplacePlayersMenu extends UserSelectMenu {
 	static customId = 'manage-vc-players-replace';
@@ -21,7 +20,7 @@ export default class ReplacePlayersMenu extends UserSelectMenu {
 		if (values.length !== 2) throw new InteractionError('Exactly 2 users must be provided');
 
 		const vc = await getVoteCounter({ channelId: i.channelId });
-		if (!vc) return i.update(manageVoteCountEmbeds.create());
+		if (!vc) return i.update(genCreateVoteCountEmbed());
 
 		let oldSlot: FullPlayer | undefined = undefined;
 		let newSlot: string | undefined = undefined;
@@ -58,8 +57,8 @@ export default class ReplacePlayersMenu extends UserSelectMenu {
 		});
 
 		const newVC = await getVoteCounter({ channelId: i.channelId });
-		if (!newVC) return i.update(manageVoteCountEmbeds.create());
-		const playerMenuPayload = generateManagePlayersEmbed(newVC);
+		if (!newVC) return i.update(genCreateVoteCountEmbed());
+		const playerMenuPayload = genPlayersEmbed(newVC);
 		await i.update(playerMenuPayload);
 	}
 

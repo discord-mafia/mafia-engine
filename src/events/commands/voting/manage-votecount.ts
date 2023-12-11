@@ -1,8 +1,8 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { ServerType, newSlashCommand } from '../../../structures/BotClient';
 import { CustomError } from '../../../util/errors';
-import { generateBaseVcMenu, manageVoteCountEmbeds } from '../../../events/buttons/manageVotecount/goHome';
 import { getVoteCounter } from '@models/votecounter';
+import { genCreateVoteCountEmbed, genVoteCountEmbed } from '@views/votecounter';
+import { ServerType, newSlashCommand } from '@structures/interactions/SlashCommand';
 
 const data = new SlashCommandBuilder().setName('manage-votecount').setDescription('Commands surrounding vote counts');
 
@@ -14,8 +14,8 @@ export default newSlashCommand({
 
 		try {
 			const vc = (await getVoteCounter({ channelId: i.channelId })) ?? undefined;
-			if (!vc) return i.reply({ ...manageVoteCountEmbeds.create(), ephemeral: true });
-			const payload = generateBaseVcMenu(vc);
+			if (!vc) return i.reply({ ...genCreateVoteCountEmbed(), ephemeral: true });
+			const payload = genVoteCountEmbed(vc);
 			return i.reply({ ...payload, ephemeral: true });
 		} catch (err) {
 			if (err instanceof CustomError) await err.respond(i).catch((err) => console.log(err));

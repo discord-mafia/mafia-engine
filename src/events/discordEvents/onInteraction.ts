@@ -1,13 +1,13 @@
 import type { ChatInputCommandInteraction, Interaction } from 'discord.js';
-import { slashCommands } from '../../structures/BotClient';
 import { Button, Modal, SelectMenu } from '../../structures/interactions';
 import { CustomButton } from '../../structures/interactions/Button';
 import { UserSelectMenu } from '../../structures/interactions/UserSelectMenu';
 import { Modal as NewModal } from '../../structures/interactions/Modal';
+import { getSlashCommand } from '@structures/interactions/SlashCommand';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function onInteraction(i: Interaction<any>) {
 	if (i.isAutocomplete()) {
-		const command = slashCommands.get(i.commandName);
+		const command = getSlashCommand(i.commandName);
 		if (!command) return console.error(`No command matching ${i.commandName} was found.`);
 		if (!command.autocomplete) return;
 		try {
@@ -16,7 +16,7 @@ export default async function onInteraction(i: Interaction<any>) {
 			console.log(err);
 		}
 	} else if (i.isChatInputCommand()) {
-		const command = slashCommands.get(i.commandName);
+		const command = getSlashCommand(i.commandName);
 		if (!command) return console.error(`No command matching ${i.commandName} was found.`);
 		try {
 			command.execute(i as ChatInputCommandInteraction);

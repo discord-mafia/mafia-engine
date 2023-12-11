@@ -97,6 +97,6 @@ export async function getVoteCounterOrThrow(query: VoteCountQuery) {
 
 export async function getVoteCounterPlayerOrThrow(vcId: number, discordId: string) {
 	const player = await getPlayer(vcId, discordId);
-	if (!player) throw new CustomError('Player not found');
+	if (!player) throw new CustomError('Player not found in this votecount');
 	return player;
 }

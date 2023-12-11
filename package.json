@@ -4,15 +4,17 @@
 		"build:prisma": "npx prisma format && npx prisma generate && npx prisma db push",
 		"build": "tsc && tsc-alias",
 		"start:local": "pm2 start ./build/index.js --name betrayal-bot",
-		"lint": "eslint . --ext .ts",
 		"dev": "nodemon src/index.ts",
-		"typecheck": "tsc --noEmit"
+		"lint": "eslint . --ext .ts",
+		"typecheck": "tsc --noEmit",
+		"fullcheck": "npm run lint && npm run typecheck",
+		"fullcheck:watch": "nodemon --watch 'src/**/*.ts' --exec 'npm run fullcheck'",
+		"test:db": "nodemon src/tests/database.ts"
 	},
 	"dependencies": {
 		"@prisma/client": "^5.0.0",
 		"discord.js": "^14.11.0",
 		"dotenv": "^16.3.1",
-		"drizzle-orm": "^0.28.6",
 		"fast-average-color-node": "^2.6.0",
 		"pg": "^8.11.3",
 		"prisma": "^5.0.0",
@@ -26,7 +28,6 @@
 		"@types/string-similarity": "^4.0.0",
 		"@typescript-eslint/eslint-plugin": "^6.4.1",
 		"@typescript-eslint/parser": "^6.4.1",
-		"drizzle-kit": "^0.19.13",
 		"eslint": "^8.48.0",
 		"ts-node": "^10.9.1",
 		"tsc-alias": "^1.8.8",

@@ -1,11 +1,11 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { ServerType, newSlashCommand } from '../../../structures/BotClient';
+import { ServerType, newSlashCommand } from '@structures/interactions/SlashCommand';
 import { prisma } from '../../..';
 import { calculateVoteCount, formatVoteCount } from '../../../util/votecount';
 import { CustomError } from '../../../util/errors';
 import { getVoteCounterOrThrow, getVoteCounterPlayerOrThrow, getVoteCounter } from '@models/votecounter';
 
-const data = new SlashCommandBuilder().setName('unvote').setDescription('[GAME] Remove your vote');
+const data = new SlashCommandBuilder().setName('skip').setDescription('[GAME] Vote to skip todays lynch (no-lynch)');
 export default newSlashCommand({
 	data,
 	serverType: ServerType.MAIN,
@@ -27,14 +27,13 @@ export default newSlashCommand({
 					voteCounterId: voteCounter.id,
 					voterId: player.id,
 					votedTargetId: undefined,
-					isNoLynch: undefined,
+					isNoLynch: true,
 				},
 			});
 
 			if (!vote) return i.reply({ content: 'An error occurred while unvoting', ephemeral: true });
-
 			await i.reply({
-				content: `<@${i.user.id}> has removed their vote`,
+				content: `<@${i.user.id}> has voted to skip.`,
 				allowedMentions: {
 					users: [],
 				},
