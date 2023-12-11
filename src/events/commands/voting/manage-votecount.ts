@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from 'discord.js';
 import { CustomError } from '../../../util/errors';
 import { getVoteCounter } from '@models/votecounter';
 import { genCreateVoteCountEmbed, genVoteCountEmbed } from '@views/votecounter';
-import { ServerType, newSlashCommand } from '@structures/interactions/SlashCommand';
+import { ServerType, newSlashCommand } from '@structures/interactions/OldSlashCommand';
 
 const data = new SlashCommandBuilder().setName('manage-votecount').setDescription('Commands surrounding vote counts');
 

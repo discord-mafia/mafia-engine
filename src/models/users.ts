@@ -1,6 +1,7 @@
 import type { GuildMember, Snowflake } from 'discord.js';
 import { prisma } from 'index';
 
+export type User = NonNullable<Awaited<ReturnType<typeof getUserOrThrow>>>;
 export async function getUserOrThrow(discordId: Snowflake) {
 	try {
 		const user = await prisma.user.findUnique({

@@ -1,5 +1,5 @@
 import { type CategoryChannel, type Channel, ChannelType, SlashCommandBuilder } from 'discord.js';
-import { newSlashCommand, ServerType } from '@structures/interactions/SlashCommand';
+import { newSlashCommand, ServerType } from '@structures/interactions/OldSlashCommand';
 
 const data = new SlashCommandBuilder().setName('nuke').setDescription('Delete all channels underneath a category');
 data.addChannelOption((x) =>

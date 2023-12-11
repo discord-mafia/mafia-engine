@@ -1,5 +1,5 @@
 import { ChannelType, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
-import { newSlashCommand } from '@structures/interactions/SlashCommand';
+import { newSlashCommand } from '@structures/interactions/OldSlashCommand';
 import { InteractionError } from '@structures/interactions';
 
 const data = new SlashCommandBuilder().setName('unlock').setDescription('Allow a role to speak in a channel again');

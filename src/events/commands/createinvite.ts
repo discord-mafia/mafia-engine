@@ -1,5 +1,5 @@
 import { ChannelType, SlashCommandBuilder, type TextChannel } from 'discord.js';
-import { newSlashCommand } from '@structures/interactions/SlashCommand';
+import { newSlashCommand } from '@structures/interactions/OldSlashCommand';
 
 const data = new SlashCommandBuilder().setName('createinvite').setDescription('See the invite links for our servers');
 data.addChannelOption((x) => x.setName('channel').setDescription('Channel to create the invite for').addChannelTypes(ChannelType.GuildText));

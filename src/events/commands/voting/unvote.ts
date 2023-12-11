@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { ServerType, newSlashCommand } from '@structures/interactions/SlashCommand';
+import { ServerType, newSlashCommand } from '@structures/interactions/OldSlashCommand';
 import { prisma } from '../../..';
 import { calculateVoteCount, formatVoteCount } from '../../../util/votecount';
 import { CustomError } from '../../../util/errors';

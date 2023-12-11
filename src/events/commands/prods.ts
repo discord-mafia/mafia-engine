@@ -1,5 +1,5 @@
 import { ChannelType, Colors, EmbedBuilder, type Message, SlashCommandBuilder, type TextChannel } from 'discord.js';
-import { newSlashCommand, ServerType } from '@structures/interactions/SlashCommand';
+import { newSlashCommand, ServerType } from '@structures/interactions/OldSlashCommand';
 const data = new SlashCommandBuilder().setName('prods').setDescription('Generate prods');
 data.addRoleOption((role) => role.setName('aliveline').setDescription('Role which all living players have').setRequired(true));
 data.addChannelOption((channel) =>

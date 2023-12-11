@@ -4,7 +4,8 @@ import * as fs from 'fs';
 import { Interaction } from './interactions';
 import OnClientReady from '../events/discordEvents/clientReady';
 import OnInteraction from '../events/discordEvents/onInteraction';
-import { ServerType, type SlashCommand, getSlashCommands } from './interactions/SlashCommand';
+import { ServerType, type SlashCommand, getSlashCommands } from './interactions/OldSlashCommand';
+import { SlashCommand as NewSlashCommand } from './interactions/SlashCommand';
 
 export const DEFAULT_INTENTS = {
 	intents: [
@@ -93,17 +94,14 @@ export class BotClient extends Client {
 				TURBO: [],
 			};
 
+			const newCommandList: NewSlashCommand[] = [];
+
 			getSlashCommands().forEach((val) => {
 				return commandList[ServerType.ALL].push(val);
-				// else if (Array.isArray(val.serverType)) {
-				// 	val.serverType.forEach((type) => {
-				// 		commandList[type].push(val);
-				// 	});
-				// } else if (val.serverType) {
-				// 	commandList[val.serverType].push(val);
-				// } else {
-				// 	commandList[ServerType.NONE].push(val);
-				// }
+			});
+
+			NewSlashCommand.slashCommands.forEach((val) => {
+				return newCommandList.push(val);
 			});
 
 			// Go through each and register them
@@ -112,6 +110,8 @@ export class BotClient extends Client {
 			const list: unknown[] = commandList.ALL.map((cmd) => {
 				return cmd.data;
 			});
+
+			list.push(...newCommandList.map((cmd) => cmd.getBuilder()));
 
 			const registeredCommands = (await this.rest.put(Routes.applicationCommands(this.clientID), {
 				body: list,

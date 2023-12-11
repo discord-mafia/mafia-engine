@@ -1,36 +1,74 @@
-import { type UnknownResponse } from '@root/types/response';
-import { Collection, type SlashCommandBuilder, type ChatInputCommandInteraction, type AutocompleteInteraction } from 'discord.js';
+import { SlashCommandBuilder, type ChatInputCommandInteraction } from 'discord.js';
+import { LogType, Logger } from '@utils/logger';
+import { type User, getUserById } from '@models/users';
 
-const slashCommands: Collection<string, SlashCommand> = new Collection();
+export type Unauthorized = {
+	citizenship: null;
+};
+export type Authorized = {
+	citizenship: User;
+};
 
-export function getSlashCommand(name: string) {
-	return slashCommands.get(name);
-}
+export type SlashCommandContext = {
+	logger: Logger;
+} & (Unauthorized | Authorized);
 
-export function getSlashCommands() {
-	return slashCommands;
-}
+export type SlashCommandExecute = (i: ChatInputCommandInteraction, ctx: SlashCommandContext) => unknown | Promise<unknown>;
+const defaultSlashCommandExecute: SlashCommandExecute = async (i, _ctx) => {
+	await i.reply({ content: 'This slash command has not been implemented yet.', ephemeral: true });
+};
 
-export enum ServerType {
-	MAIN = 'MAIN',
-	PLAYERCHAT = 'PLAYERCHAT',
-	TURBO = 'TURBO',
-	ALL = 'ALL',
-	NONE = 'NONE',
-}
-export interface SlashCommand {
-	data: SlashCommandBuilder;
-	serverType?: ServerType | ServerType[];
-	execute: (i: ChatInputCommandInteraction) => UnknownResponse;
-	autocomplete?: (i: AutocompleteInteraction) => void | Promise<void>;
-}
+export class SlashCommand {
+	public static slashCommands = new Map<string, SlashCommand>();
+	private builder: SlashCommandBuilder;
+	private executeFunction: SlashCommandExecute = defaultSlashCommandExecute;
+	private requiresCitizenship: boolean = false;
 
-export async function newSlashCommand(cmd: SlashCommand) {
-	try {
-		slashCommands.set(cmd.data.name, cmd);
-		console.log(`Loaded [${cmd.data.name}]`);
-		return cmd;
-	} catch (err) {
-		console.error(`Failed to load [${cmd.data.name}]`);
+	constructor(name: string) {
+		if (SlashCommand.slashCommands.has(name)) throw new Error(`Slash command ${name} already exists.`);
+		SlashCommand.slashCommands.set(name, this);
+		this.builder = new SlashCommandBuilder().setName(name).setDescription('No description provided.');
+	}
+
+	public setDescription(description: string) {
+		this.builder.setDescription(description);
+		return this;
+	}
+
+	public setRequiresCitizenship(requiresCitizenship: boolean = true) {
+		this.requiresCitizenship = requiresCitizenship;
+		return this;
+	}
+
+	public set(setBuilder: (builder: SlashCommandBuilder) => void) {
+		setBuilder(this.builder);
+		return this;
+	}
+
+	public onExecute(executeFunction: SlashCommandExecute) {
+		this.executeFunction = executeFunction;
+		return this;
+	}
+
+	public async run(inter: ChatInputCommandInteraction) {
+		const logger = new Logger();
+		const user = await getUserById(inter.user.id);
+
+		const ctx: SlashCommandContext = {
+			logger,
+			citizenship: user,
+		};
+
+		try {
+			await this.executeFunction(inter, ctx);
+		} catch (err) {
+			logger.log(LogType.Error, `Failed to run slash command ${this.builder.name}`);
+			console.log(err);
+			await inter.reply({ content: 'An error occurred while executing this command.', ephemeral: true });
+		}
+	}
+
+	public getBuilder() {
+		return this.builder;
 	}
 }

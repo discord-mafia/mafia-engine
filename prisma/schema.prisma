@@ -44,6 +44,8 @@ model User {
   signupBalancers  SignupBalancerJunc[]
   createdAt        DateTime                   @default(now())
   updatedAt        DateTime                   @updatedAt
+
+  @@index([discordId])
 }
 
 model Signup {

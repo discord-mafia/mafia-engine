@@ -1,5 +1,5 @@
 import { ChannelType, type OverwriteResolvable, SlashCommandBuilder, type User } from 'discord.js';
-import { newSlashCommand, ServerType } from '@structures/interactions/SlashCommand';
+import { newSlashCommand, ServerType } from '@structures/interactions/OldSlashCommand';
 import { getSignup } from '@models/signups';
 
 const data = new SlashCommandBuilder().setName('playerchats').setDescription('Create a category as associated channels for a signup');

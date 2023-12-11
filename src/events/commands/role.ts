@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js';
-import { newSlashCommand } from '@structures/interactions/SlashCommand';
+import { newSlashCommand } from '@structures/interactions/OldSlashCommand';
 import { capitalize } from '@utils/string';
 import { getRoleByName, getRoleNames } from '@models/gameRoles';
 import { genRoleEmbed } from '@views/roles';

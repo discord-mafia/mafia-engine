@@ -3,7 +3,8 @@ import { Button, Modal, SelectMenu } from '../../structures/interactions';
 import { CustomButton } from '../../structures/interactions/Button';
 import { UserSelectMenu } from '../../structures/interactions/UserSelectMenu';
 import { Modal as NewModal } from '../../structures/interactions/Modal';
-import { getSlashCommand } from '@structures/interactions/SlashCommand';
+import { getSlashCommand } from '@structures/interactions/OldSlashCommand';
+import { SlashCommand } from '@structures/interactions/SlashCommand';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function onInteraction(i: Interaction<any>) {
 	if (i.isAutocomplete()) {
@@ -16,12 +17,21 @@ export default async function onInteraction(i: Interaction<any>) {
 			console.log(err);
 		}
 	} else if (i.isChatInputCommand()) {
-		const command = getSlashCommand(i.commandName);
-		if (!command) return console.error(`No command matching ${i.commandName} was found.`);
-		try {
-			command.execute(i as ChatInputCommandInteraction);
-		} catch (err) {
-			console.log(err);
+		const newCmd = SlashCommand.slashCommands.get(i.commandName);
+		if (newCmd) {
+			try {
+				await newCmd.run(i as ChatInputCommandInteraction);
+			} catch (err) {
+				console.log(err);
+			}
+		} else {
+			const command = getSlashCommand(i.commandName);
+			if (!command) return console.error(`No command matching ${i.commandName} was found.`);
+			try {
+				command.execute(i as ChatInputCommandInteraction);
+			} catch (err) {
+				console.log(err);
+			}
 		}
 	} else if (i.isButton()) {
 		// Check new Buttons first

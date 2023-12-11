@@ -1,4 +1,4 @@
-import { newSlashCommand } from '@structures/interactions/SlashCommand';
+import { newSlashCommand } from '@structures/interactions/OldSlashCommand';
 import { SlashCommandBuilder } from 'discord.js';
 
 const data = new SlashCommandBuilder().setName('invite').setDescription('See the invite links for our servers');

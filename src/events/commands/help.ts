@@ -1,5 +1,5 @@
 import { type APIApplicationCommandOptionChoice, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { newSlashCommand } from '@structures/interactions/SlashCommand';
+import { newSlashCommand } from '@structures/interactions/OldSlashCommand';
 
 const options: Record<string, string> = {
 	'Wiki Main Page': 'https://discord-mafia-role-cards.fandom.com/wiki/Discord_Mafia_Role_cards_Wiki',

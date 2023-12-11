@@ -1,5 +1,5 @@
 import { type ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { ServerType, newSlashCommand } from '@structures/interactions/SlashCommand';
+import { ServerType, newSlashCommand } from '@structures/interactions/OldSlashCommand';
 import { calculateVoteCount, formatVoteCount } from '../../../util/votecount';
 import { getVoteCounter } from '@models/votecounter';
 
