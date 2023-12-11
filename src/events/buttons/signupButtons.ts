@@ -68,7 +68,7 @@ export default class SignupCategoryButton extends CustomButton {
 						const hasRole = member.roles.cache.has(role);
 						if (hasRole) member.roles.remove(role);
 					} catch (err) {
-						logger.log(LogType.Error, `Failed to remove role <@&${role}> from user ${member.user.username}`);
+						logger.log(LogType.Error, `Failed to remove role <@&${role}> from user ${member.user.username} <#${signup.channelId}>`);
 					}
 				}
 
@@ -110,7 +110,7 @@ export default class SignupCategoryButton extends CustomButton {
 			for (const category of signup.categories) {
 				const count = await removeFromCategory(category.id, i.user.id);
 
-				if (count > 0) logger.log(LogType.Info, `User ${i.user.username} has left ${category.name} in signup ${signup.id}`, Colors.Red);
+				if (count > 0) logger.log(LogType.Info, `User ${i.user.username} has left ${category.name} in <#${signup.channelId}>`, Colors.Red);
 			}
 		} else if (cache == 'settings') {
 			if (!member.permissions.has('ManageChannels')) return i.editReply({ content: 'You do not have permission to edit this signup' });
@@ -178,16 +178,19 @@ export default class SignupCategoryButton extends CustomButton {
 
 								addRoles.push(role);
 							} catch (err) {
-								console.log(err);
 								logger.log(
 									LogType.Error,
-									`Failed to add role <@&${category.attachedRoleId}> to user ${member.user.username}`,
+									`Failed to add role <@&${category.attachedRoleId}> to user ${member.user.username} in <#${signup.channelId}>`,
 									Colors.Red
 								);
 							}
 						}
 
-						logger.log(LogType.Info, `User ${i.user.username} has joined ${category.name} in signup ${signup.id}`, Colors.Green);
+						logger.log(
+							LogType.Info,
+							`User ${i.user.username} has joined ${category.name} in <#${signup.channelId}>`,
+							category.isFocused ? Colors.Green : Colors.Yellow
+						);
 					}
 				}
 			}

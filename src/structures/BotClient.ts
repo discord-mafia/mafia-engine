@@ -1,10 +1,9 @@
 import { Client, Events, GatewayIntentBits, Partials, REST, Routes } from 'discord.js';
 import * as path from 'path';
 import * as fs from 'fs';
-import { type Button, type Modal, type SelectMenu } from './interactions';
+import { Interaction } from './interactions';
 import OnClientReady from '../events/discordEvents/clientReady';
 import OnInteraction from '../events/discordEvents/onInteraction';
-import { type ContextMenuCommandBuilder } from 'discord.js';
 import { ServerType, type SlashCommand, getSlashCommands } from './interactions/SlashCommand';
 
 export const DEFAULT_INTENTS = {
@@ -25,7 +24,7 @@ export class BotClient extends Client {
 	private discordToken: string;
 	public clientID: string;
 
-	public interactionsPath = path.join(__dirname, '..', 'interactions');
+	public interactionsPath = path.join(__dirname, '..', 'events');
 
 	constructor(clientID: string, discordToken: string, registerCallback: (client: BotClient) => void = () => {}) {
 		super(DEFAULT_INTENTS);
@@ -33,15 +32,13 @@ export class BotClient extends Client {
 		this.clientID = clientID;
 		this.rest = new REST({ version: '10' }).setToken(this.discordToken);
 
-		this.loadInteractions<Event>('events');
-		this.loadInteractions<SlashCommand>('commands');
-		this.loadInteractions<Button>('buttons');
-		this.loadInteractions<SelectMenu>('selectmenu');
-		this.loadInteractions<Modal>('modals');
-		this.loadInteractions<ContextMenuCommandBuilder>('context');
+		this.load().then(() => registerCallback(this));
+	}
 
-		this.assignEvents();
-		this.registerCommands().then(() => registerCallback(this));
+	private async load() {
+		await this.assignEvents();
+		await Interaction.loadInteractions(this.interactionsPath);
+		await this.registerCommands();
 	}
 
 	private async assignEvents() {
@@ -57,8 +54,8 @@ export class BotClient extends Client {
 		this.login(this.discordToken);
 	};
 
-	public async loadInteractions<T>(newPath: string, recursive: boolean = true) {
-		const commandPath = path.join(this.interactionsPath, newPath);
+	public async loadInteractions<T>(recursive: boolean = true) {
+		const commandPath = path.join(this.interactionsPath);
 
 		const loadFiles = async (dirPath: string) => {
 			try {
@@ -79,7 +76,7 @@ export class BotClient extends Client {
 					}
 				}
 			} catch (err) {
-				console.log(`\x1B[31mFailed to load directory: \x1B[34m${newPath}\x1B[0m`);
+				console.log(`\x1B[31mFailed to load directory: \x1B[34m${commandPath}\x1B[0m`);
 			}
 		};
 
