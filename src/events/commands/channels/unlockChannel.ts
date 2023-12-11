@@ -1,4 +1,4 @@
-import { ChannelType, OverwriteType, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
+import { ChannelType, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
 import { newSlashCommand } from '@structures/interactions/SlashCommand';
 import { InteractionError } from '@structures/interactions';
 
@@ -20,13 +20,9 @@ export default newSlashCommand({
 		const channel = await i.guild.channels.fetch(channelId);
 		if (!channel || channel.type != ChannelType.GuildText) throw new InteractionError('Invalid channel');
 
-		await channel.permissionOverwrites.set([
-			{
-				id: role.id,
-				type: OverwriteType.Role,
-				allow: PermissionFlagsBits.SendMessages,
-			},
-		]);
+		await channel.permissionOverwrites.edit(role.id, {
+			SendMessages: true,
+		});
 
 		return await i.reply({
 			content: `<@&${role.id}> can now speak in <#${channel.id}> (unless other perms override this)`,
