@@ -8,7 +8,8 @@
 		"lint": "eslint . --ext .ts",
 		"typecheck": "tsc --noEmit",
 		"fullcheck": "npm run lint && npm run typecheck",
-		"fullcheck:watch": "nodemon --watch 'src/**/*.ts' --exec 'npm run fullcheck'"
+		"fullcheck:watch": "nodemon --watch 'src/**/*.ts' --exec 'npm run fullcheck'",
+		"test:db": "nodemon src/tests/database.ts"
 	},
 	"dependencies": {
 		"@prisma/client": "^5.0.0",
@@ -16,7 +17,7 @@
 		"dotenv": "^16.3.1",
 		"drizzle-orm": "^0.28.6",
 		"fast-average-color-node": "^2.6.0",
-		"pg": "^8.11.3",
+		"postgres": "^3.4.3",
 		"prisma": "^5.0.0",
 		"string-similarity": "^4.0.4",
 		"zod": "^3.22.1"

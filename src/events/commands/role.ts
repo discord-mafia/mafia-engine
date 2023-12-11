@@ -1,8 +1,8 @@
 import { SlashCommandBuilder, EmbedBuilder, type ColorResolvable } from 'discord.js';
 import { newSlashCommand } from '@structures/interactions/SlashCommand';
 import { prisma } from '../..';
-import stringSimilarity from 'string-similarity';
-import { getAllRoleNames } from '@models/gameRoles';
+import { capitalize } from '@utils/string';
+import { getRoleNames } from '@models/gameRoles';
 
 const data = new SlashCommandBuilder().setName('role').setDescription('View a role');
 data.addStringOption((option) => option.setName('name').setDescription('The name of the role').setRequired(true).setAutocomplete(true));
@@ -13,20 +13,16 @@ export default newSlashCommand({
 		if (!i.guild) return;
 		const name = i.options.getString('name', true);
 
-		const allRoleNames = (
-			await prisma.role.findMany({
-				select: {
-					name: true,
-				},
-			})
-		).map((r) => r.name.toLowerCase());
+		const fetchedRoleNames = await getRoleNames(name, { take: 1 });
+		if (!fetchedRoleNames) return await i.reply({ content: 'Role not found', ephemeral: true });
 
-		const bestMatch = stringSimilarity.findBestMatch(name.toLowerCase(), allRoleNames).bestMatch;
+		const bestMatch = fetchedRoleNames[0]?.name;
+		if (!bestMatch) return await i.reply({ content: 'Role not found', ephemeral: true });
 
 		const role = await prisma.role.findFirst({
 			where: {
 				name: {
-					equals: bestMatch.target,
+					equals: bestMatch,
 					mode: 'insensitive',
 				},
 			},
@@ -65,20 +61,13 @@ export default newSlashCommand({
 	autocomplete: async (i) => {
 		const focused = i.options.getFocused();
 
-		const roleNames = (await getAllRoleNames()) ?? [];
+		const fetchNames = await getRoleNames(focused, {
+			take: 5,
+		});
+		if (!fetchNames) return i.respond([]);
 
-		const getClosestMatches = (str: string, arr: string[], total: number = 1) => {
-			const matches = stringSimilarity.findBestMatch(str.toLowerCase(), arr).ratings;
-			const sorted = matches.sort((a, b) => b.rating - a.rating);
-			return sorted.slice(0, total);
-		};
+		console.log(fetchNames);
 
-		// Find the closest 5 matches
-		const matches = getClosestMatches(focused, roleNames, 5);
-		const capitalize = (str: string) => {
-			return str.charAt(0).toUpperCase() + str.slice(1);
-		};
-
-		return i.respond(matches.map((m) => ({ name: capitalize(m.target), value: m.target })));
+		return i.respond(fetchNames.map((m) => ({ name: capitalize(m.name), value: m.name })));
 	},
 });
