@@ -1,5 +1,5 @@
 import { getSignup } from '@models/signups';
-import { formatSignupEmbed } from '@utils/embeds';
+import { formatSignupEmbed } from '@views/signups';
 import {
 	ActionRowBuilder,
 	Colors,

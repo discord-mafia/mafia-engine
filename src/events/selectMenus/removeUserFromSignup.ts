@@ -1,9 +1,9 @@
 import { type UserSelectMenuInteraction, type CacheType } from 'discord.js';
 import { getSignup } from '@models/signups';
-import { formatSignupEmbed } from '@utils/embeds';
 import { prisma } from 'index';
 import { UserSelectMenu } from 'structures/interactions/UserSelectMenu';
 import { InteractionError } from 'structures/interactions';
+import { formatSignupEmbed } from '@views/signups';
 
 export default class SignupRemovePlayerMenu extends UserSelectMenu {
 	static customId = 'remove-user-from-signup';
