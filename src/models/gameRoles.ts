@@ -65,3 +65,39 @@ export async function getRoleNames(name: string, options?: RoleNameQueryOptions)
 		return null;
 	}
 }
+
+const roleValidator = z.object({
+	id: z.number().int(),
+	name: z.string(),
+	alignment: z.string(),
+	subAlignment: z.string(),
+	abilities: z.string(),
+	winCondition: z.string(),
+	iconUrl: z.string().url().nullable(),
+	roleColour: z.string(),
+	flavourText: z.string().nullable(),
+	wikiUrl: z.string().url().nullable(),
+	isRetired: z.boolean(),
+	otherNames: z.string().nullable(),
+});
+
+const roleListValidator = z.array(roleValidator);
+
+export async function getRoleByName(name: string) {
+	try {
+		const data = await rawQuery(sql`
+			SELECT *
+			FROM "Role"
+			ORDER BY similarity(name, ${name}) DESC
+			LIMIT ${1};
+		`);
+
+		const validatedResponse = roleListValidator.parse(data);
+		if (validatedResponse.length === 0) return null;
+		const validated = validatedResponse[0];
+
+		return validated;
+	} catch (err) {
+		return null;
+	}
+}
