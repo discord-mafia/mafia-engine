@@ -28,7 +28,7 @@ export default newSlashCommand({
 			const votedMember = await i.guild.members.fetch(votedPlayerUser.id);
 			if (!votedMember) return i.reply({ content: 'The player you are voting for is not in the server', ephemeral: true });
 			const votingPlayer = await getPlayer(voteCount.id, votedPlayerUser.id);
-			if (!votingPlayer) return i.reply({ content: 'Unable to fetch the player', ephemeral: true });
+			if (!votingPlayer) return i.reply({ content: 'You are not registered as a player for this votecount', ephemeral: true });
 
 			const focusPlayerId = votingPlayer.id;
 			const focusPlayerDiscordId = votingPlayer.discordId;
