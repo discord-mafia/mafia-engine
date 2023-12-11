@@ -1,4 +1,4 @@
-import { type UnknownResponse } from '@utils/types';
+import { type UnknownResponse } from '@root/types/response';
 import { Collection, type SlashCommandBuilder, type ChatInputCommandInteraction, type AutocompleteInteraction } from 'discord.js';
 
 const slashCommands: Collection<string, SlashCommand> = new Collection();
