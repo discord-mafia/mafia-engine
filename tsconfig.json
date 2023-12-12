@@ -23,6 +23,7 @@
 			"@models/*": ["models/*"],
 			"@views/*": ["views/*"],
 			"@structures/*": ["structures/*"],
+			"@routers/*": ["routers/*"],
 			"@root/*": ["./*"]
 		}
 	},
