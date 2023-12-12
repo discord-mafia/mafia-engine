@@ -3,8 +3,8 @@ import RegisterCitizenshipModal from '../modals/registerCitizenship';
 
 export default new SlashCommand('test').setRequiresCitizenship(true).onExecute(async (i, ctx) => {
 	if (!ctx.citizenship) {
-		const modal = RegisterCitizenshipModal.getModalOrThrow(RegisterCitizenshipModal.customId);
-		return await i.showModal(modal.generateModal());
+		const modal = RegisterCitizenshipModal.getModalBuilder();
+		return await i.showModal(modal);
 	}
-	await i.reply({ content: 'You are a citizen', ephemeral: true });
+	return await i.reply({ content: 'You already have citizenship', ephemeral: true });
 });

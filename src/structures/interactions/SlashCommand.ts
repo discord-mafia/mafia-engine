@@ -64,6 +64,10 @@ export class SlashCommand {
 		const logger = new Logger();
 		const user = await getUserById(inter.user.id);
 
+		if (!user && this.requiresCitizenship) {
+			// SHOW MODAL?
+		}
+
 		const ctx: SlashCommandContext = {
 			logger,
 			citizenship: user,
