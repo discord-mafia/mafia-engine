@@ -1,6 +1,6 @@
 import { type UserSelectMenuInteraction, type CacheType } from 'discord.js';
 import { UserSelectMenu } from '../../../structures/interactions/UserSelectMenu';
-import { InteractionError } from '../../../structures/interactions';
+import { InteractionError } from '../../../structures/interactions/_Interaction';
 import { deletePlayerAndVotes, getVoteCounter } from '@models/votecounter';
 import { genCreateVoteCountEmbed, genPlayersEmbed } from '@views/votecounter';
 

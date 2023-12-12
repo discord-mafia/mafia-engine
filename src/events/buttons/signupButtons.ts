@@ -13,7 +13,7 @@ import {
 } from 'discord.js';
 import SignupRemovePlayerMenu from 'events/selectMenus/removeUserFromSignup';
 import { prisma } from 'index';
-import { InteractionError } from 'structures/interactions';
+import { InteractionError } from '@structures/interactions/_Interaction';
 import { CustomButton } from 'structures/interactions/Button';
 
 export default class SignupCategoryButton extends CustomButton {

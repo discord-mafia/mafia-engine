@@ -1,5 +1,5 @@
 import { UserSelectMenuBuilder, type UserSelectMenuInteraction } from 'discord.js';
-import { Interaction } from '../interactions';
+import { Interaction } from './_Interaction';
 
 export class UserSelectMenu extends Interaction {
 	public static userSelectMenus = new Map<string, UserSelectMenu>();

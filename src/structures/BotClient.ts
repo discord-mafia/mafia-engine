@@ -1,7 +1,7 @@
 import { Client, Events, GatewayIntentBits, Partials, REST, Routes, type SlashCommandBuilder } from 'discord.js';
 import * as path from 'path';
 import * as fs from 'fs';
-import { Interaction } from './interactions';
+import { loadInteractions } from './interactions/_Interaction';
 import OnClientReady from '../events/discordEvents/clientReady';
 import { SlashCommand } from './interactions/SlashCommand';
 import onInteraction from '../events/discordEvents/onInteraction';
@@ -37,7 +37,7 @@ export class BotClient extends Client {
 
 	private async load() {
 		await this.assignEvents();
-		await Interaction.loadInteractions(this.interactionsPath);
+		await loadInteractions(this.interactionsPath);
 		await this.registerCommands();
 	}
 

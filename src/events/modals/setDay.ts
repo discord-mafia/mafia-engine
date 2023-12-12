@@ -7,7 +7,7 @@ import {
 	TextInputStyle,
 } from 'discord.js';
 import { Modal } from '../../structures/interactions/Modal';
-import { InteractionError } from '../../structures/interactions';
+import { InteractionError } from '../../structures/interactions/_Interaction';
 import { prisma } from '../..';
 import { getVoteCounter } from '@models/votecounter';
 import { genCreateVoteCountEmbed, genStateEmbed } from '@views/votecounter';

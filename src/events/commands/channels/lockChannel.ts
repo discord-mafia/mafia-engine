@@ -1,5 +1,5 @@
 import { ChannelType, PermissionFlagsBits } from 'discord.js';
-import { InteractionError } from '@structures/interactions';
+import { InteractionError } from '@structures/interactions/_Interaction';
 import { SlashCommand } from '@structures/interactions/SlashCommand';
 
 export default new SlashCommand('lock')

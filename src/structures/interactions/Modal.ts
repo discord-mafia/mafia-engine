@@ -1,5 +1,5 @@
 import { ModalBuilder, type ModalSubmitInteraction } from 'discord.js';
-import { Interaction } from '../interactions';
+import { Interaction } from './_Interaction';
 
 type ModalExecute = (i: ModalSubmitInteraction, cache?: string) => unknown | Promise<unknown>;
 const defaultModalExecute: ModalExecute = async (i, _cache) => {
