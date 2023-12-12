@@ -1,5 +1,5 @@
 import type { Interaction } from 'discord.js';
-import { Button, SelectMenu } from '../../structures/interactions';
+import { SelectMenu } from '../../structures/interactions';
 import { CustomButton } from '../../structures/interactions/Button';
 import { UserSelectMenu } from '../../structures/interactions/UserSelectMenu';
 import { SlashCommand } from '@structures/interactions/SlashCommand';
@@ -24,22 +24,17 @@ export default async function onInteraction(i: Interaction<any>) {
 			console.log(err);
 		}
 	} else if (i.isButton()) {
-		// Check new Buttons first
 		const [customId, data] = CustomButton.getDataFromCustomID(i.customId);
 		if (!customId) return;
 
 		const customButton = CustomButton.buttons.get(customId);
-		if (customButton)
-			try {
-				customButton.onExecute(i, data).catch((err) => {
-					customButton.onError(i, err);
-				});
-			} catch (err) {
+		if (!customButton) return i.reply({ content: 'This button does not exist', ephemeral: true });
+		try {
+			customButton.onExecute(i, data).catch((err) => {
 				customButton.onError(i, err);
-			}
-		else {
-			const buttonInteraction = Button.buttons.get(customId);
-			if (buttonInteraction) buttonInteraction.execute(i, data);
+			});
+		} catch (err) {
+			customButton.onError(i, err);
 		}
 	} else if (i.isUserSelectMenu()) {
 		const [customId, data] = UserSelectMenu.getDataFromCustomID(i.customId);
