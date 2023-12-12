@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, type ChatInputCommandInteraction, type AutocompleteInteraction } from 'discord.js';
 import { LogType, Logger } from '@utils/logger';
 import { type User, getUserById } from '@models/users';
+import registerCitizenship from '@root/events/modals/registerCitizenship';
 
 export type Unauthorized = {
 	citizenship: null;
@@ -65,7 +66,8 @@ export class SlashCommand {
 		const user = await getUserById(inter.user.id);
 
 		if (!user && this.requiresCitizenship) {
-			// SHOW MODAL?
+			const registerModal = registerCitizenship.getModalBuilder();
+			return await inter.showModal(registerModal);
 		}
 
 		const ctx: SlashCommandContext = {
