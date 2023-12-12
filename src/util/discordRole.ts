@@ -4,7 +4,7 @@ type AllWithRole = {
 	role: Role;
 	members: GuildMember[];
 };
-export async function getAllWithRole(guild: Guild, roleID: string): Promise<AllWithRole | null> {
+export async function getMembersWithDiscordRole(guild: Guild, roleID: string): Promise<AllWithRole | null> {
 	const role = await guild.roles.fetch(roleID);
 	if (!role) return null;
 

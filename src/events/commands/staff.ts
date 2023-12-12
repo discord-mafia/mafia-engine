@@ -1,5 +1,5 @@
 import { EmbedBuilder } from 'discord.js';
-import { getAllWithRole } from '../../util/discordRole';
+import { getMembersWithDiscordRole } from '../../util/discordRole';
 import config from '../../config';
 import { SlashCommand } from '@structures/interactions/SlashCommand';
 
@@ -33,7 +33,7 @@ export default new SlashCommand('staff')
 			for (let j = 0; j < StaffRoles.length; j++) {
 				const staffRoleID = StaffRoles[j];
 				if (!staffRoleID) continue;
-				const data = await getAllWithRole(mainGuild, staffRoleID);
+				const data = await getMembersWithDiscordRole(mainGuild, staffRoleID);
 				if (!data) continue;
 				const { role, members } = data;
 				const uniqueMembers: string[] = [];
@@ -54,7 +54,7 @@ export default new SlashCommand('staff')
 			for (let j = 0; j < CommunityContributorRoles.length; j++) {
 				const staffRoleID = CommunityContributorRoles[j];
 				if (!staffRoleID) continue;
-				const data = await getAllWithRole(mainGuild, staffRoleID);
+				const data = await getMembersWithDiscordRole(mainGuild, staffRoleID);
 				if (!data) continue;
 				const { role, members } = data;
 				const uniqueMembers: string[] = [];
