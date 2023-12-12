@@ -2,6 +2,7 @@ import { SlashCommandBuilder, type ChatInputCommandInteraction, type Autocomplet
 import { LogType, Logger } from '@utils/logger';
 import { type User, getUserById } from '@models/users';
 import registerCitizenship from '@root/events/modals/registerCitizenship';
+import { Interaction } from './_Interaction';
 
 export type Unauthorized = {
 	citizenship: null;
@@ -21,7 +22,7 @@ const defaultSlashCommandExecute: SlashCommandExecute = async (i, _ctx) => {
 
 export type SlashCommandAutocomplete = (i: AutocompleteInteraction) => unknown | Promise<unknown>;
 
-export class SlashCommand {
+export class SlashCommand extends Interaction {
 	public static slashCommands = new Map<string, SlashCommand>();
 	private builder: SlashCommandBuilder;
 	private executeFunction: SlashCommandExecute = defaultSlashCommandExecute;
@@ -29,11 +30,10 @@ export class SlashCommand {
 	private requiresCitizenship: boolean = false;
 
 	constructor(name: string) {
+		super(name);
 		if (SlashCommand.slashCommands.has(name)) throw new Error(`Slash command ${name} already exists.`);
 		SlashCommand.slashCommands.set(name, this);
 		this.builder = new SlashCommandBuilder().setName(name).setDescription('No description provided.');
-
-		console.log(`Created slash command ${name}`);
 	}
 
 	public setDescription(description: string) {
