@@ -1,5 +1,4 @@
 import type { Interaction } from 'discord.js';
-import { SelectMenu } from '../../structures/interactions';
 import { CustomButton } from '../../structures/interactions/Button';
 import { UserSelectMenu } from '../../structures/interactions/UserSelectMenu';
 import { SlashCommand } from '@structures/interactions/SlashCommand';
@@ -40,23 +39,16 @@ export default async function onInteraction(i: Interaction<any>) {
 		const [customId, data] = UserSelectMenu.getDataFromCustomID(i.customId);
 		if (!customId) return;
 		const selectInteraction = UserSelectMenu.userSelectMenus.get(customId);
-		if (selectInteraction)
-			try {
-				selectInteraction.onExecute(i, data).catch((err) => {
-					selectInteraction.onError(i, err);
-				});
-			} catch (err) {
+		if (!selectInteraction) return i.reply({ content: 'This select menu does not exist', ephemeral: true });
+		try {
+			selectInteraction.onExecute(i, data).catch((err) => {
 				selectInteraction.onError(i, err);
-			}
-		else {
-			const newSelct = SelectMenu.selectMenus.get(customId);
-			if (newSelct) newSelct.execute(i, data);
+			});
+		} catch (err) {
+			selectInteraction.onError(i, err);
 		}
 	} else if (i.isAnySelectMenu()) {
-		const [customId, data] = SelectMenu.getDataFromCustomID(i.customId);
-		if (!customId) return;
-		const selectInteraction = SelectMenu.selectMenus.get(customId);
-		if (selectInteraction) selectInteraction.execute(i, data);
+		return i.reply({ content: 'This select menu does not exist', ephemeral: true });
 	} else if (i.isModalSubmit()) {
 		const [customId, data] = Modal.getDataFromCustomID(i.customId);
 		if (!customId) return;

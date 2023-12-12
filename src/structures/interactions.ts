@@ -1,11 +1,4 @@
-import {
-	type AnySelectMenuInteraction,
-	Collection,
-	type Interaction as CoreInteraction,
-	type MessagePayload,
-	type BaseInteraction,
-} from 'discord.js';
-import type { UnknownResponse } from '../types/response';
+import { type Interaction as CoreInteraction, type MessagePayload, type BaseInteraction } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
 type CustomID = string;
@@ -114,25 +107,6 @@ export class Interaction {
 				console.error('Failed to send error message:', err);
 			}
 		}
-	}
-}
-
-export class SelectMenu extends Interaction {
-	static selectMenus: Collection<CustomID, SelectMenu> = new Collection();
-	private func: undefined | ((i: AnySelectMenuInteraction, cache: string | undefined) => UnknownResponse);
-	constructor(customId: CustomID) {
-		super(customId);
-		SelectMenu.selectMenus.set(customId, this);
-	}
-
-	public onExecute(func: (i: AnySelectMenuInteraction, cache: string | undefined) => UnknownResponse) {
-		this.func = func;
-		return this;
-	}
-
-	public execute(i: AnySelectMenuInteraction, cacheHandle: string | undefined) {
-		if (!i.isAnySelectMenu()) return;
-		if (this.func) this.func(i, cacheHandle);
 	}
 }
 
