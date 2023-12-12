@@ -1,9 +1,9 @@
 import type { Interaction } from 'discord.js';
-import { Button, Modal, SelectMenu } from '../../structures/interactions';
+import { Button, SelectMenu } from '../../structures/interactions';
 import { CustomButton } from '../../structures/interactions/Button';
 import { UserSelectMenu } from '../../structures/interactions/UserSelectMenu';
-import { Modal as NewModal } from '../../structures/interactions/Modal';
 import { SlashCommand } from '@structures/interactions/SlashCommand';
+import { Modal } from '@structures/interactions/Modal';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function onInteraction(i: Interaction<any>) {
@@ -66,18 +66,12 @@ export default async function onInteraction(i: Interaction<any>) {
 		const [customId, data] = Modal.getDataFromCustomID(i.customId);
 		if (!customId) return;
 
-		const modal = NewModal.modals.get(customId);
-		if (!modal) {
-			const modalInteraction = Modal.modals.get(customId);
-			if (modalInteraction) modalInteraction.execute(i, data);
-		} else {
-			try {
-				modal.onExecute(i, data).catch((err) => {
-					modal.onError(i, err);
-				});
-			} catch (err) {
-				modal.onError(i, err);
-			}
+		const modal = Modal.modals.get(customId);
+		if (!modal) return i.reply({ content: 'This modal does not exist', ephemeral: true });
+		try {
+			await modal.run(i, data);
+		} catch (err) {
+			await modal.onError(i, err);
 		}
 	}
 }

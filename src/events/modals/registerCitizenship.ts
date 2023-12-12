@@ -8,17 +8,9 @@ import {
 } from 'discord.js';
 import { Modal } from '../../structures/interactions/Modal';
 
-export default class RegisterCitizenshipModal extends Modal {
-	static customId = 'register-citizenship';
-	constructor() {
-		super(RegisterCitizenshipModal.customId);
-	}
-
-	async onExecute(i: ModalSubmitInteraction<CacheType>) {
-		await i.reply({ content: 'Register Citizenship', ephemeral: true });
-	}
-	generateModal() {
-		const modal = super.generateModal().setTitle('Register Citizenship');
+export default new Modal('register-citizenship')
+	.set((modal) => {
+		modal.setTitle('Register Citizenship');
 		const row = new ActionRowBuilder<ModalActionRowComponentBuilder>();
 		row.addComponents(
 			new TextInputBuilder()
@@ -29,6 +21,7 @@ export default class RegisterCitizenshipModal extends Modal {
 				.setRequired(true)
 		);
 		modal.addComponents(row);
-		return modal;
-	}
-}
+	})
+	.onExecute(async (i: ModalSubmitInteraction<CacheType>) => {
+		await i.reply({ content: 'Register Citizenship', ephemeral: true });
+	});

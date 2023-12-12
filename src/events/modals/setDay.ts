@@ -12,13 +12,14 @@ import { prisma } from '../..';
 import { getVoteCounter } from '@models/votecounter';
 import { genCreateVoteCountEmbed, genStateEmbed } from '@views/votecounter';
 
-export default class SetDayModal extends Modal {
-	static customId = 'manage-vc-players-set-day';
-	constructor() {
-		super(SetDayModal.customId);
-	}
-
-	async onExecute(i: ModalSubmitInteraction<CacheType>) {
+export default new Modal('manage-vc-players-set-day')
+	.set((modal) => {
+		modal.setTitle('Set Day');
+		const row = new ActionRowBuilder<ModalActionRowComponentBuilder>();
+		row.addComponents(new TextInputBuilder().setCustomId('day-number').setLabel('Day Number').setStyle(TextInputStyle.Short).setRequired(true));
+		modal.addComponents(row);
+	})
+	.onExecute(async (i: ModalSubmitInteraction<CacheType>) => {
 		console.log('set day modal');
 		if (!i.guild) throw new InteractionError('This command can only be used in a server');
 		if (!i.channel) throw new InteractionError('This command can only be used in a channel');
@@ -51,13 +52,4 @@ export default class SetDayModal extends Modal {
 		if (!newVC) return i.reply({ ...genCreateVoteCountEmbed(), ephemeral: true });
 		const stateMenuPayload = genStateEmbed(newVC);
 		await i.reply({ ...stateMenuPayload, ephemeral: true });
-	}
-
-	generateModal() {
-		const modal = super.generateModal().setTitle('Set Day');
-		const row = new ActionRowBuilder<ModalActionRowComponentBuilder>();
-		row.addComponents(new TextInputBuilder().setCustomId('day-number').setLabel('Day Number').setStyle(TextInputStyle.Short).setRequired(true));
-		modal.addComponents(row);
-		return modal;
-	}
-}
+	});
