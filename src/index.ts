@@ -2,10 +2,12 @@ import { BotClient } from './structures/BotClient';
 import { PrismaClient } from '@prisma/client';
 import config from './config';
 import { type Guild } from 'discord.js';
+import { startServer } from './api';
 
 export const prisma = new PrismaClient();
 export const client = new BotClient(config.DISCORD_CLIENT_ID, config.DISCORD_TOKEN, async (c) => {
 	start(c);
+	startServer();
 });
 
 async function start(c: BotClient) {

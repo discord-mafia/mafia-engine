@@ -2,19 +2,25 @@
 	"scripts": {
 		"start": "node ./build/index.js",
 		"build:prisma": "npx prisma format && npx prisma generate && npx prisma db push",
-		"build": "tsc && tsc-alias",
+		"build": "tsc && tsc-alias && npm run web:build",
 		"start:local": "pm2 start ./build/index.js --name betrayal-bot",
 		"dev": "nodemon src/index.ts",
 		"lint": "eslint . --ext .ts",
 		"typecheck": "tsc --noEmit",
 		"fullcheck": "npm run lint && npm run typecheck",
 		"fullcheck:watch": "nodemon --watch 'src/**/*.ts' --exec 'npm run fullcheck'",
-		"test:db": "nodemon src/tests/database.ts"
+		"test:db": "nodemon src/tests/database.ts",
+		"web:build": "cd web && npm run build",
+		"web:dev": "cd web && npm run dev",
+		"web:lint": "cd web && npm run lint",
+		"web:preview": "cd web && npm run preview"
 	},
 	"dependencies": {
 		"@prisma/client": "^5.0.0",
+		"cors": "^2.8.5",
 		"discord.js": "^14.11.0",
 		"dotenv": "^16.3.1",
+		"express": "^4.18.2",
 		"fast-average-color-node": "^2.6.0",
 		"pg": "^8.11.3",
 		"prisma": "^5.0.0",
@@ -23,6 +29,7 @@
 	},
 	"devDependencies": {
 		"@faker-js/faker": "^8.1.0",
+		"@types/express": "^4.17.21",
 		"@types/node": "^20.4.2",
 		"@types/pg": "^8.10.5",
 		"@types/string-similarity": "^4.0.0",
