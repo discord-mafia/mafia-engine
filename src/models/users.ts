@@ -13,7 +13,6 @@ export async function getUserOrThrow(discordId: Snowflake) {
 		if (!user) throw new Error('Failed to get user');
 		return user;
 	} catch (err) {
-		console.log(err);
 		throw new Error('Failed to get user');
 	}
 }
@@ -22,7 +21,6 @@ export async function getUserById(discordId: Snowflake) {
 	try {
 		return await getUserOrThrow(discordId);
 	} catch (err) {
-		console.log(err);
 		return null;
 	}
 }

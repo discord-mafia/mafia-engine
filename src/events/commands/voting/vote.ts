@@ -1,17 +1,15 @@
-import { SlashCommandBuilder } from 'discord.js';
-import { ServerType, newSlashCommand } from '@structures/interactions/OldSlashCommand';
 import { prisma } from '../../..';
 import { calculateVoteCount, formatVoteCount } from '../../../util/votecount';
 import { CustomError } from '../../../util/errors';
 import { getVoteCounterOrThrow, getVoteCounterPlayerOrThrow, getPlayer, getVoteCounter } from '@models/votecounter';
+import { SlashCommand } from '@structures/interactions/SlashCommand';
 
-const data = new SlashCommandBuilder().setName('vote').setDescription('[GAME] Vote for a player');
-data.addUserOption((option) => option.setName('player').setDescription('The player you are voting for').setRequired(true));
-
-export default newSlashCommand({
-	data,
-	serverType: ServerType.MAIN,
-	execute: async (i) => {
+export default new SlashCommand('vote')
+	.setDescription('[GAME] Vote for a player')
+	.set((cmd) => {
+		cmd.addUserOption((option) => option.setName('player').setDescription('The player you are voting for').setRequired(true));
+	})
+	.onExecute(async (i) => {
 		if (!i.guild) return;
 		const votedPlayerUser = i.options.getUser('player', true);
 
@@ -75,5 +73,4 @@ export default newSlashCommand({
 			else if (i.isRepliable()) return i.reply({ content: 'An unknown error occurred', ephemeral: true }).catch((err) => console.log(err));
 			else console.log(err);
 		}
-	},
-});
+	});

@@ -1,15 +1,16 @@
-import { type CategoryChannel, type Channel, ChannelType, SlashCommandBuilder } from 'discord.js';
-import { newSlashCommand, ServerType } from '@structures/interactions/OldSlashCommand';
+import { type CategoryChannel, type Channel, ChannelType, PermissionFlagsBits } from 'discord.js';
+import { SlashCommand } from '@structures/interactions/SlashCommand';
 
-const data = new SlashCommandBuilder().setName('nuke').setDescription('Delete all channels underneath a category');
-data.addChannelOption((x) =>
-	x.setName('category').setDescription('Category to delete all channels under').setRequired(true).addChannelTypes(ChannelType.GuildCategory)
-);
+export default new SlashCommand('nuke')
+	.setDescription('Delete all channels underneath a category')
+	.set((cmd) => {
+		cmd.addChannelOption((x) =>
+			x.setName('category').setDescription('Category to delete all channels under').setRequired(true).addChannelTypes(ChannelType.GuildCategory)
+		);
 
-export default newSlashCommand({
-	data,
-	serverType: [ServerType.PLAYERCHAT, ServerType.TURBO],
-	execute: async (i) => {
+		cmd.setDefaultMemberPermissions(PermissionFlagsBits.Administrator);
+	})
+	.onExecute(async (i) => {
 		await i.deferReply();
 		const category = i.options.getChannel('category', true) as CategoryChannel;
 		const channels: Channel[] = [];
@@ -20,5 +21,4 @@ export default newSlashCommand({
 		}
 		await category.delete();
 		await i.editReply('Done');
-	},
-});
+	});

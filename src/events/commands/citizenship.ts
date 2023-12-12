@@ -1,24 +1,17 @@
 import { type ColorResolvable, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { newSlashCommand } from '@structures/interactions/OldSlashCommand';
 import { getAverageColor } from 'fast-average-color-node';
-import { getOrCreateUser } from '@models/users';
+import { SlashCommand } from '@structures/interactions/SlashCommand';
 
-const data = new SlashCommandBuilder().setName('citizenship').setDescription('View a members citizenship card');
-data.addUserOption((x) => x.setName('user').setDescription('The user to view the citizenship card of').setRequired(true));
-data.addBooleanOption((opt) => opt.setName('hidden').setDescription('To make this for only you to see').setRequired(false));
-
-export default newSlashCommand({
-	data,
-	execute: async (i) => {
+export default new SlashCommand('citizenship')
+	.setDescription('View a members citizenship card')
+	.setRequiresCitizenship(false)
+	.onExecute(async (i, ctx) => {
 		if (!i.guild) return;
+		if (!ctx.citizenship) return i.reply({ content: 'This user does not have a citizenship card', ephemeral: true });
 
 		const user = i.options.getUser('user', true);
 		const hidden = i.options.getBoolean('hidden', false) ?? false;
 		const member = await i.guild.members.fetch(user.id);
-
-		const citizenship = await getOrCreateUser(member);
-
-		if (!citizenship) return i.reply({ content: 'This user does not have a citizenship card', ephemeral: true });
 
 		const displayName = member.displayName;
 		const avatarURL = member.avatarURL() ?? member.displayAvatarURL();
@@ -29,38 +22,15 @@ export default newSlashCommand({
 			.setThumbnail(user.displayAvatarURL())
 			.setColor(averageColour as ColorResolvable);
 
-		// embed.addFields({
-		// 	name: 'Biography',
-		// 	value: '> This is my epilogue\n> My Soliliquy\n> Take this broken melody, straight to the grave',
-		// });
-
 		embed.addFields({
 			name: 'Official Name',
-			value: citizenship.username,
+			value: ctx.citizenship.username,
 			inline: true,
 		});
-
-		embed.addFields({
-			name: 'Winrate (26 games)',
-			value: '75.52%',
-			inline: true,
-		});
-
-		embed.setAuthor({
-			name: 'Staff',
-			iconURL: 'https://media.discordapp.net/attachments/978980333968052254/1136743501447565464/Staff.png?width=438&height=460',
-		});
-
-		// if (citizenship.mvpStatus != 'None') {
-		// 	const crownURL =
-		// 		'https://media.discordapp.net/attachments/1119025192946110464/1136734900351934464/pngtree-beutifull-gold-crown-clipart-vector-art-png-image_6566757.png?width=720&height=720';
-		// 	const crownType = citizenship.mvpStatus;
-		// 	embed.setFooter({
-		// 		text: `${crownType} MVP`,
-		// 		iconURL: crownURL,
-		// 	});
-		// }
 
 		return i.reply({ embeds: [embed], ephemeral: hidden });
-	},
-});
+	});
+
+const data = new SlashCommandBuilder().setName('citizenship').setDescription('View a members citizenship card');
+data.addUserOption((x) => x.setName('user').setDescription('The user to view the citizenship card of').setRequired(true));
+data.addBooleanOption((opt) => opt.setName('hidden').setDescription('To make this for only you to see').setRequired(false));

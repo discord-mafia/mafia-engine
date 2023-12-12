@@ -1,15 +1,14 @@
-import { SlashCommandBuilder } from 'discord.js';
-import { newSlashCommand } from '@structures/interactions/OldSlashCommand';
 import { capitalize } from '@utils/string';
 import { getRoleByName, getRoleNames } from '@models/gameRoles';
 import { genRoleEmbed } from '@views/roles';
+import { SlashCommand } from '@structures/interactions/SlashCommand';
 
-const data = new SlashCommandBuilder().setName('role').setDescription('View a role');
-data.addStringOption((option) => option.setName('name').setDescription('The name of the role').setRequired(true).setAutocomplete(true));
-
-export default newSlashCommand({
-	data,
-	execute: async (i) => {
+export default new SlashCommand('role')
+	.setDescription('View a role')
+	.set((cmd) => {
+		cmd.addStringOption((option) => option.setName('name').setDescription('The name of the role').setRequired(true).setAutocomplete(true));
+	})
+	.onExecute(async (i, _ctx) => {
 		if (!i.guild) return;
 		const name = i.options.getString('name', true);
 
@@ -18,9 +17,8 @@ export default newSlashCommand({
 
 		const embed = genRoleEmbed(role);
 		await i.reply({ embeds: [embed], ephemeral: false });
-	},
-
-	autocomplete: async (i) => {
+	})
+	.onAutoComplete(async (i) => {
 		const focused = i.options.getFocused();
 		const fetchNames = await getRoleNames(focused, {
 			take: 5,
@@ -28,5 +26,4 @@ export default newSlashCommand({
 		if (!fetchNames) return i.respond([]);
 
 		return i.respond(fetchNames.map((m) => ({ name: capitalize(m.name), value: m.name })));
-	},
-});
+	});

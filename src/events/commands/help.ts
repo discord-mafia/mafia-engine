@@ -1,5 +1,5 @@
-import { type APIApplicationCommandOptionChoice, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { newSlashCommand } from '@structures/interactions/OldSlashCommand';
+import { type APIApplicationCommandOptionChoice, EmbedBuilder } from 'discord.js';
+import { SlashCommand } from '@structures/interactions/SlashCommand';
 
 const options: Record<string, string> = {
 	'Wiki Main Page': 'https://discord-mafia-role-cards.fandom.com/wiki/Discord_Mafia_Role_cards_Wiki',
@@ -23,19 +23,19 @@ const parseOptions = (): APIApplicationCommandOptionChoice<string>[] => {
 	return result;
 };
 
-const data = new SlashCommandBuilder().setName('help').setDescription('Access various helpful information for Discord Mafia');
-
-data.addStringOption((x) =>
-	x
-		.setName('options')
-		.setDescription('What type of help would you like?')
-		.setRequired(true)
-		.addChoices(...parseOptions())
-);
-
-export default newSlashCommand({
-	data,
-	execute: async (i) => {
+export default new SlashCommand('help')
+	.setDescription('Access various helpful information for Discord Mafia')
+	.set((cmd) =>
+		cmd.addStringOption((x) =>
+			x
+				.setName('options')
+				.setDescription('What type of help would you like?')
+				.setRequired(true)
+				.addChoices(...parseOptions())
+		)
+	)
+	.setRequiresCitizenship(false)
+	.onExecute(async (i, _ctx) => {
 		if (!i.guild) return;
 		const selectedOption = i.options.getString('options', true);
 
@@ -49,5 +49,4 @@ export default newSlashCommand({
 			.setDescription('Click on the link to access the wiki page')
 			.setColor('White');
 		await i.reply({ embeds: [embed] });
-	},
-});
+	});

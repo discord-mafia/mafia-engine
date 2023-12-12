@@ -1,20 +1,18 @@
-import { SlashCommandBuilder } from 'discord.js';
-import { newSlashCommand, ServerType } from '@structures/interactions/OldSlashCommand';
 import { prisma } from '../..';
 import { getCitizenship } from '@models/citizenship';
+import { SlashCommand } from '@structures/interactions/SlashCommand';
 
-const data = new SlashCommandBuilder().setName('enroll').setDescription('Enroll a member into our citizenship');
-data.addStringOption((opt) => opt.setName('name').setDescription('The name to register this member under').setRequired(true));
-data.addUserOption((opt) => opt.setName('member').setDescription('The member to enroll').setRequired(false));
-data.addStringOption((opt) =>
-	opt.setName('discordid').setDescription('The Discord ID to use for enrollment. Use the member option if you can').setRequired(false)
-);
-data.addBooleanOption((opt) => opt.setName('renaming').setDescription('Force a name change if the member already exists').setRequired(false));
-
-export default newSlashCommand({
-	data,
-	serverType: [ServerType.MAIN],
-	execute: async (i) => {
+export default new SlashCommand('enroll')
+	.setDescription('Enroll a member into our citizenship')
+	.set((cmd) => {
+		cmd.addStringOption((opt) => opt.setName('name').setDescription('The name to register this member under').setRequired(true));
+		cmd.addUserOption((opt) => opt.setName('member').setDescription('The member to enroll').setRequired(false));
+		cmd.addStringOption((opt) =>
+			opt.setName('discordid').setDescription('The Discord ID to use for enrollment. Use the member option if you can').setRequired(false)
+		);
+		cmd.addBooleanOption((opt) => opt.setName('renaming').setDescription('Force a name change if the member already exists').setRequired(false));
+	})
+	.onExecute(async (i, _ctx) => {
 		if (!i.guild) return;
 
 		const focusedMember = await i.guild.members.fetch(i.user.id);
@@ -61,5 +59,4 @@ export default newSlashCommand({
 			console.log(err);
 			return i.reply({ content: 'Something went wrong', ephemeral: true });
 		}
-	},
-});
+	});

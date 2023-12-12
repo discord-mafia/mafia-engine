@@ -1,11 +1,10 @@
-import { Client, Events, GatewayIntentBits, Partials, REST, Routes } from 'discord.js';
+import { Client, Events, GatewayIntentBits, Partials, REST, Routes, type SlashCommandBuilder } from 'discord.js';
 import * as path from 'path';
 import * as fs from 'fs';
 import { Interaction } from './interactions';
 import OnClientReady from '../events/discordEvents/clientReady';
-import OnInteraction from '../events/discordEvents/onInteraction';
-import { ServerType, type SlashCommand, getSlashCommands } from './interactions/OldSlashCommand';
-import { SlashCommand as NewSlashCommand } from './interactions/SlashCommand';
+import { SlashCommand } from './interactions/SlashCommand';
+import onInteraction from '../events/discordEvents/onInteraction';
 
 export const DEFAULT_INTENTS = {
 	intents: [
@@ -44,7 +43,9 @@ export class BotClient extends Client {
 
 	private async assignEvents() {
 		this.on(Events.ClientReady, OnClientReady);
-		this.on(Events.InteractionCreate, OnInteraction);
+		this.on(Events.InteractionCreate, (i) => {
+			onInteraction(i);
+		});
 		this.on(Events.Error, (err) => {
 			console.error(err);
 		});
@@ -86,40 +87,20 @@ export class BotClient extends Client {
 
 	public async registerCommands() {
 		try {
-			const commandList: Record<ServerType, SlashCommand[]> = {
-				MAIN: [],
-				PLAYERCHAT: [],
-				ALL: [],
-				NONE: [],
-				TURBO: [],
-			};
-
-			const newCommandList: NewSlashCommand[] = [];
-
-			getSlashCommands().forEach((val) => {
-				return commandList[ServerType.ALL].push(val);
+			const commandList: SlashCommandBuilder[] = [];
+			SlashCommand.slashCommands.forEach((val) => {
+				return commandList.push(val.getBuilder());
 			});
-
-			NewSlashCommand.slashCommands.forEach((val) => {
-				return newCommandList.push(val);
-			});
-
-			// Go through each and register them
 
 			console.log(`\x1b[33mRegistering all application (/) commands...\x1b[0m`);
-			const list: unknown[] = commandList.ALL.map((cmd) => {
-				return cmd.data;
-			});
-
-			list.push(...newCommandList.map((cmd) => cmd.getBuilder()));
 
 			const registeredCommands = (await this.rest.put(Routes.applicationCommands(this.clientID), {
-				body: list,
+				body: commandList,
 			})) as unknown;
 
 			if (Array.isArray(registeredCommands)) {
-				if (registeredCommands.length != list.length) {
-					console.log(`\x1B[31mFailed to load ${list.length - registeredCommands.length} commands`);
+				if (registeredCommands.length != commandList.length) {
+					console.log(`\x1B[31mFailed to load ${commandList.length - registeredCommands.length} commands`);
 				}
 			}
 			console.log(`\x1b[32mSuccessfully registered [unknown] commands\x1b[0m`);

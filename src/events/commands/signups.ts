@@ -1,39 +1,36 @@
-import { type ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { newSlashCommand, ServerType } from '@structures/interactions/OldSlashCommand';
 import { getOrCreateUser } from '@models/users';
 import { prisma } from '../..';
 import { getSignup } from '@models/signups';
 import { formatSignupEmbed } from '@views/signups';
-
-const data = new SlashCommandBuilder().setName('signups').setDescription('Create a signup post');
-data.addStringOption((title) => title.setName('title').setDescription('Title for the signup').setRequired(false));
-data.addIntegerOption((limit) => limit.setName('limit').setDescription('Limit the number of signups').setRequired(false));
+import { SlashCommand } from '@structures/interactions/SlashCommand';
 
 const signupTemplates: string[] = ['Basic', 'Mentors'];
-data.addStringOption((template) =>
-	template
-		.setName('template')
-		.setDescription('The template to use, default = basic')
-		.addChoices(
-			...signupTemplates.map((v) => {
-				return {
-					name: v,
-					value: v,
-				};
-			})
-		)
-);
 
-data.addUserOption((user) => user.setName('host').setDescription('Game host #1').setRequired(false));
-data.addUserOption((user) => user.setName('host2').setDescription('Game host #2').setRequired(false));
-data.addUserOption((user) => user.setName('moderator').setDescription('Game moderator').setRequired(false));
-data.addUserOption((user) => user.setName('balancer').setDescription('Game balancer').setRequired(false));
-data.addUserOption((user) => user.setName('balancer2').setDescription('Game balancer #2').setRequired(false));
-
-export default newSlashCommand({
-	data,
-	serverType: ServerType.MAIN,
-	execute: async (i: ChatInputCommandInteraction) => {
+export default new SlashCommand('signups')
+	.setDescription('Create a signup post')
+	.set((cmd) => {
+		cmd.addStringOption((title) => title.setName('title').setDescription('Title for the signup').setRequired(false));
+		cmd.addIntegerOption((limit) => limit.setName('limit').setDescription('Limit the number of signups').setRequired(false));
+		cmd.addStringOption((template) =>
+			template
+				.setName('template')
+				.setDescription('The template to use, default = basic')
+				.addChoices(
+					...signupTemplates.map((v) => {
+						return {
+							name: v,
+							value: v,
+						};
+					})
+				)
+		);
+		cmd.addUserOption((user) => user.setName('host').setDescription('Game host #1').setRequired(false));
+		cmd.addUserOption((user) => user.setName('host2').setDescription('Game host #2').setRequired(false));
+		cmd.addUserOption((user) => user.setName('moderator').setDescription('Game moderator').setRequired(false));
+		cmd.addUserOption((user) => user.setName('balancer').setDescription('Game balancer').setRequired(false));
+		cmd.addUserOption((user) => user.setName('balancer2').setDescription('Game balancer #2').setRequired(false));
+	})
+	.onExecute(async (i, _ctx) => {
 		const title = i.options.getString('title') ?? 'Game Signups';
 		const limit = i.options.getInteger('limit') ?? undefined;
 		const template = i.options.getString('template') ?? signupTemplates[0];
@@ -165,5 +162,4 @@ export default newSlashCommand({
 		}
 
 		await i.editReply({ content: '', embeds: [embed], components: row.components.length > 0 ? [row] : undefined });
-	},
-});
+	});
