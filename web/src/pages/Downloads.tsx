@@ -20,8 +20,8 @@ export default function Downloads() {
 						name="Linux"
 						// link="https://docs.google.com/uc?export=download&id=1zWsnYp12cja9U5RjbClMywH1qN2ke2xF"
 					/>
-					<DownloadPanel name="MacOS" link="https://docs.google.com/uc?export=download&id=1zWsnYp12cja9U5RjbClMywH1qN2ke2xF" />
 					<DownloadPanel name="Windows" link="https://docs.google.com/uc?export=download&id=12JjgehAMvwEIu0MCvBr-3gfh76GmsDk_" />
+					<DownloadPanel name="MacOS" link="https://docs.google.com/uc?export=download&id=1zWsnYp12cja9U5RjbClMywH1qN2ke2xF" />{' '}
 				</div>
 			</main>
 		</>
