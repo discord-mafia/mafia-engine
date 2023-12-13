@@ -38,7 +38,7 @@ export default function MenuBar({ attached }: MenuBarProps) {
 	return (
 		<>
 			<div
-				className={`hidden w-full flex-row text-white items-center justify-start border-b border-b-white bg-black bg-opacity-30 p-2 align-middle sm:flex ${
+				className={`hidden w-full flex-row items-center justify-start border-b text-white border-b-white bg-black bg-opacity-30 p-2 align-middle sm:flex ${
 					attached ? '' : 'absolute left-0 top-0'
 				}`}
 			>
@@ -139,13 +139,13 @@ type MenuBarPageProps = {
 	onExit: () => void;
 };
 function MenuBarPage({ pageActive, onExit }: MenuBarPageProps) {
-	// const location = useLocation();
+	// const router = useRouter();
 	if (!pageActive) return null;
 
 	return (
-		<div className="absolute top-0 z-20 flex h-full w-full flex-col items-center justify-center bg-zinc-700 text-center">
+		<div className="absolute top-0 z-20 flex h-full w-full flex-col items-center justify-center bg-zinc-700 text-center text-white">
 			<div className="absolute right-0 top-0 m-4 flex flex-row items-center justify-end text-center">
-				<div onClick={onExit}>
+				<div className="exit" onClick={onExit}>
 					<FontAwesomeIcon icon={'circle-xmark'} size="2x" />
 				</div>
 			</div>

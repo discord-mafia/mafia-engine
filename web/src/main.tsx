@@ -8,6 +8,12 @@ import Home from './pages/Home';
 import Downloads from './pages/Downloads';
 import Layout from './pages/Layout';
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { fab } from '@fortawesome/free-brands-svg-icons';
+import { faCheckSquare, faCoffee, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
+
+library.add(fab, faCheckSquare, faCoffee, faCircleXmark);
+
 export function RootApp() {
 	return (
 		<BrowserRouter>
