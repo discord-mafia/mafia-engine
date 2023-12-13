@@ -63,7 +63,6 @@ export default function MenuBar({ attached }: MenuBarProps) {
 											location.pathname == path ? 'underline decoration-red-400 decoration-2 underline-offset-4' : ''
 										}`}
 									>
-										{/* <FontAwesomeIcon icon={faHome} /> */}
 										<span className="pl-1">{name}</span>
 										{external && <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="scale-75 pl-1" />}
 									</div>
