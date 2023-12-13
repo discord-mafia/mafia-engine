@@ -46,23 +46,21 @@ export class Interaction {
 		else errorMessage = 'An unknown error occurred';
 
 		if (i.isMessageComponent()) {
-			{
-				try {
-					if (i.deferred || i.replied) {
-						await i.editReply({
-							content: errorMessage,
-						});
-					} else if (i.isRepliable()) {
-						await i.reply({
-							content: errorMessage,
-							ephemeral: true,
-						});
-					} else {
-						throw new Error(errorMessage);
-					}
-				} catch (error) {
-					console.error('Failed to send error message:', error);
+			try {
+				if (i.deferred || i.replied) {
+					await i.editReply({
+						content: errorMessage,
+					});
+				} else if (i.isRepliable()) {
+					await i.reply({
+						content: errorMessage,
+						ephemeral: true,
+					});
+				} else {
+					throw new Error(errorMessage);
 				}
+			} catch (error) {
+				console.error('Failed to send error message:', error);
 			}
 		} else {
 			if (i.isRepliable()) {
