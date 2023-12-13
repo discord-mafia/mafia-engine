@@ -1,3 +1,4 @@
+import { AbsoluteCopyright } from '../components/Copyright';
 import InfoPanel from '../components/InfoPanel';
 
 function App() {
@@ -9,6 +10,8 @@ function App() {
 					backgroundImage: 'url(/chalkboard.jpg)',
 				}}
 			>
+				<AbsoluteCopyright />
+
 				<h1 className="mb-2 mt-4 text-center text-6xl font-extrabold">
 					<span className="text-red-400">Mafia</span> Engine
 				</h1>
