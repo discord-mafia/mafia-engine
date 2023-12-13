@@ -50,7 +50,11 @@ export default new Modal('register-citizenship')
 				});
 			}
 
-			return i.reply({ content: 'You have successfully registered!', ephemeral: true });
+			return i.reply({
+				content:
+					'You have successfully registered! If you were trying to interact with the bot, please try again now that you are registered.',
+				ephemeral: true,
+			});
 		} catch (err) {
 			console.error(err);
 			return i.reply({ content: 'An error occurred when registering!', ephemeral: true });

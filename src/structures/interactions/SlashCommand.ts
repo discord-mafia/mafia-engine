@@ -64,8 +64,7 @@ export class SlashCommand extends Interaction {
 	public async run(inter: ChatInputCommandInteraction) {
 		const logger = new Logger();
 		const user = await getUserById(inter.user.id);
-
-		if (!user && this.requiresCitizenship) {
+		if ((!user || !user.isRegistered) && this.requiresCitizenship) {
 			const registerModal = registerCitizenship.getModalBuilder();
 			return await inter.showModal(registerModal);
 		}
