@@ -6,7 +6,7 @@ import { getOrCreateUser } from '@models/users';
 import { getVoteCounter, getPlayer } from '@models/votecounter';
 import { genCreateVoteCountEmbed, genPlayersEmbed } from '@views/votecounter';
 export default class AddPlayersMenu extends UserSelectMenu {
-	static customId = 'manage-vc-players-add';
+	static customId = 'manage-vc-select-players-add';
 	constructor() {
 		super(AddPlayersMenu.customId);
 	}

@@ -7,7 +7,7 @@ import { getVoteCounter, type FullPlayer, getPlayer } from '@models/votecounter'
 import { genCreateVoteCountEmbed, genPlayersEmbed } from '@views/votecounter';
 
 export default class ReplacePlayersMenu extends UserSelectMenu {
-	static customId = 'manage-vc-players-replace';
+	static customId = 'manage-vc-select-players-replace';
 	constructor() {
 		super(ReplacePlayersMenu.customId);
 	}

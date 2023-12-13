@@ -5,7 +5,7 @@ import { deletePlayerAndVotes, getVoteCounter } from '@models/votecounter';
 import { genCreateVoteCountEmbed, genPlayersEmbed } from '@views/votecounter';
 
 export default class RemovePlayersMenu extends UserSelectMenu {
-	static customId = 'manage-vc-players-remove';
+	static customId = 'manage-vc-select-players-remove';
 	constructor() {
 		super(RemovePlayersMenu.customId);
 	}

@@ -34,7 +34,6 @@ export default new SlashCommand('help')
 				.addChoices(...parseOptions())
 		)
 	)
-	.setRequiresCitizenship(false)
 	.onExecute(async (i, _ctx) => {
 		if (!i.guild) return;
 		const selectedOption = i.options.getString('options', true);
