@@ -5,15 +5,16 @@ import './styles/tailwind.css';
 
 import NotFound from './pages/NotFound';
 import Home from './pages/Home';
-// import Layout from './pages/Layout';
+import Downloads from './pages/Downloads';
+import Layout from './pages/Layout';
 
 export function RootApp() {
 	return (
 		<BrowserRouter>
 			<Routes>
-				{/* <Route path="/" element={<Layout />}> */}
-				<Route path="/">
+				<Route path="/" element={<Layout />}>
 					<Route index element={<Home />} />
+					<Route path="/downloads" element={<Downloads />} />
 					<Route path="*" element={<NotFound />} />
 				</Route>
 			</Routes>

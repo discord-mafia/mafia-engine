@@ -1,16 +1,10 @@
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
+import MenuBar from '../components/MenuBar';
 
 const Layout = () => {
 	return (
 		<>
-			<nav className="flex-shrink">
-				<ul>
-					<li>
-						<Link to="/">Home</Link>
-					</li>
-				</ul>
-			</nav>
-
+			<MenuBar />
 			<Outlet />
 		</>
 	);
