@@ -9,9 +9,11 @@ export default new SlashCommand('citizenship')
 		if (!i.guild) return;
 		if (!ctx.citizenship) return i.reply({ content: 'This user does not have a citizenship card', ephemeral: true });
 
-		const user = i.options.getUser('user', true);
+		const user = i.options.getUser('user', false);
 		const hidden = i.options.getBoolean('hidden', false) ?? false;
-		const member = await i.guild.members.fetch(user.id);
+		const member = await i.guild.members.fetch(user?.id ?? i.user.id);
+
+		if (!member) return i.reply({ content: 'This user is not in the server', ephemeral: true });
 
 		const displayName = member.displayName;
 		const avatarURL = member.avatarURL() ?? member.displayAvatarURL();
@@ -19,7 +21,7 @@ export default new SlashCommand('citizenship')
 
 		const embed = new EmbedBuilder()
 			.setTitle(`${displayName}'s Citizenship Card`)
-			.setThumbnail(user.displayAvatarURL())
+			.setThumbnail(member.displayAvatarURL())
 			.setColor(averageColour as ColorResolvable);
 
 		embed.addFields({
