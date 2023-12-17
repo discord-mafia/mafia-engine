@@ -1,5 +1,5 @@
 import { ButtonBuilder, type ButtonInteraction, ButtonStyle } from 'discord.js';
-import { Interaction } from '../interactions';
+import { Interaction } from './_Interaction';
 
 export class CustomButton extends Interaction {
 	public static buttons: Map<string, CustomButton> = new Map();

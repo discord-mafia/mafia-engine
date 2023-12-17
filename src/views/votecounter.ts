@@ -7,6 +7,7 @@ import GotoTogglesMenu from '@root/events/buttons/manageVotecount/gotoToggles';
 import AddPlayersButton from '@root/events/buttons/manageVotecount/players/addPlayers';
 import RemovePlayersButton from '@root/events/buttons/manageVotecount/players/removePlayers';
 import ReplacePlayersButton from '@root/events/buttons/manageVotecount/players/replacePlayer';
+import ManageVoteWeight from '@root/events/buttons/manageVotecount/state/changeVoteWeight';
 import JumpToDayButton from '@root/events/buttons/manageVotecount/state/jumpToDay';
 import { CustomButton } from '@root/structures/interactions/Button';
 import { type BaseMessageOptions, EmbedBuilder, ActionRowBuilder, type ButtonBuilder } from 'discord.js';
@@ -50,7 +51,7 @@ export function genVoteCountEmbed(vc: FullVoteCount): BaseMessageOptions {
 		inline: true,
 	});
 
-	const players = vc.players.length > 0 ? vc.players.map((p, i) => `${i + 1}. ${p.user.username}`).join('\n') : '> None';
+	const players = vc.players.length > 0 ? vc.players.map((p, i) => `${i + 1}. ${p.user.username} ${p.voteWeight == 1 ? '' : `[x${p.voteWeight}]`}`).join('\n') : '> None';
 	embed.addFields({
 		name: 'Players',
 		value: players,
@@ -77,8 +78,9 @@ export function genStateEmbed(vc: FullVoteCount): BaseMessageOptions {
 	const row = new ActionRowBuilder<ButtonBuilder>();
 	const homeButton = CustomButton.getButtonOrThrow(GoHomeButton.customId);
 	const jumpToDay = CustomButton.getButtonOrThrow(JumpToDayButton.customId);
+	const setVoteWeight = CustomButton.getButtonOrThrow(ManageVoteWeight.customId);
 
-	row.addComponents(homeButton.generateButton(), jumpToDay.generateButton());
+	row.addComponents(homeButton.generateButton(), jumpToDay.generateButton(), setVoteWeight.generateButton());
 
 	return {
 		embeds,
@@ -96,12 +98,7 @@ export function genPlayersEmbed(vc: FullVoteCount): BaseMessageOptions {
 	const removePlayersButton = CustomButton.getButtonOrThrow(RemovePlayersButton.customId);
 	const replacePlayerButton = CustomButton.getButtonOrThrow(ReplacePlayersButton.customId);
 
-	row.addComponents(
-		homeButton.generateButton(),
-		addPlayersButton.generateButton(),
-		removePlayersButton.generateButton(),
-		replacePlayerButton.generateButton()
-	);
+	row.addComponents(homeButton.generateButton(), addPlayersButton.generateButton(), removePlayersButton.generateButton(), replacePlayerButton.generateButton());
 
 	return {
 		embeds,

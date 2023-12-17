@@ -1,21 +1,20 @@
-import { SlashCommandBuilder } from 'discord.js';
-import { newSlashCommand } from '@structures/interactions/SlashCommand';
 import { getRoleByName, getRoleNames } from '@models/gameRoles';
 import { genRoleEmbed } from '@views/roles';
 import { capitalize } from '@utils/string';
-const data = new SlashCommandBuilder().setName('view').setDescription('View something');
+import { SlashCommand } from '@structures/interactions/SlashCommand';
 
-data.addSubcommand((sub) =>
-	sub
-		.setName('role')
-		.setDescription('View a role')
-		.addStringOption((option) => option.setName('name').setDescription('The name of the role').setRequired(true).setAutocomplete(true))
-		.addBooleanOption((opt) => opt.setName('hidden').setDescription('Whether to show hidden roles').setRequired(false))
-);
-
-export default newSlashCommand({
-	data,
-	execute: async (i) => {
+export default new SlashCommand('view')
+	.setDescription('View something')
+	.set((cmd) => {
+		cmd.addSubcommand((sub) =>
+			sub
+				.setName('role')
+				.setDescription('View a role')
+				.addStringOption((option) => option.setName('name').setDescription('The name of the role').setRequired(true).setAutocomplete(true))
+				.addBooleanOption((opt) => opt.setName('hidden').setDescription('Whether to show hidden roles').setRequired(false))
+		);
+	})
+	.onExecute(async (i, _ctx) => {
 		if (!i.guild) return;
 
 		const subcommand = i.options.getSubcommand(true);
@@ -30,8 +29,8 @@ export default newSlashCommand({
 			default:
 				return i.reply({ content: 'Invalid subcommand', ephemeral: true });
 		}
-	},
-	autocomplete: async (i) => {
+	})
+	.onAutoComplete(async (i) => {
 		const focused = i.options.getFocused();
 		const subcommand = i.options.getSubcommand(true);
 
@@ -43,5 +42,4 @@ export default newSlashCommand({
 			default:
 				return i.respond([]);
 		}
-	},
-});
+	});

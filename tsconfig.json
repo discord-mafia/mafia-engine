@@ -23,8 +23,9 @@
 			"@models/*": ["models/*"],
 			"@views/*": ["views/*"],
 			"@structures/*": ["structures/*"],
+			"@routers/*": ["routers/*"],
 			"@root/*": ["./*"]
 		}
 	},
-	"exclude": ["node_modules", "build", "client"]
+	"exclude": ["node_modules", "build", "client", "web"]
 }

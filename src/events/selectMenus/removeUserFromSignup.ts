@@ -2,7 +2,7 @@ import { type UserSelectMenuInteraction, type CacheType } from 'discord.js';
 import { getSignup } from '@models/signups';
 import { prisma } from 'index';
 import { UserSelectMenu } from 'structures/interactions/UserSelectMenu';
-import { InteractionError } from 'structures/interactions';
+import { InteractionError } from '@structures/interactions/_Interaction';
 import { formatSignupEmbed } from '@views/signups';
 
 export default class SignupRemovePlayerMenu extends UserSelectMenu {

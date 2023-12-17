@@ -2,7 +2,7 @@ import type { ButtonBuilder, ButtonInteraction, CacheType } from 'discord.js';
 import { CustomButton } from '../../../structures/interactions/Button';
 import { getVoteCounter } from '@models/votecounter';
 import { prisma } from '../../..';
-import { InteractionError } from '../../../structures/interactions';
+import { InteractionError } from '../../../structures/interactions/_Interaction';
 import { genCreateVoteCountEmbed, genVoteCountEmbed } from '@views/votecounter';
 
 export default class CreateVotecountButton extends CustomButton {

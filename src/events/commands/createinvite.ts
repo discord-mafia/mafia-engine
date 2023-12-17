@@ -1,11 +1,12 @@
-import { ChannelType, SlashCommandBuilder, type TextChannel } from 'discord.js';
-import { newSlashCommand } from '@structures/interactions/SlashCommand';
+import { ChannelType, type TextChannel } from 'discord.js';
+import { SlashCommand } from '@structures/interactions/SlashCommand';
 
-const data = new SlashCommandBuilder().setName('createinvite').setDescription('See the invite links for our servers');
-data.addChannelOption((x) => x.setName('channel').setDescription('Channel to create the invite for').addChannelTypes(ChannelType.GuildText));
-export default newSlashCommand({
-	data,
-	execute: async (i) => {
+export default new SlashCommand('createinvite')
+	.setDescription('See the invite links for our servers')
+	.set((cmd) =>
+		cmd.addChannelOption((x) => x.setName('channel').setDescription('Channel to create the invite for').addChannelTypes(ChannelType.GuildText))
+	)
+	.onExecute(async (i) => {
 		const channel = i.options.getChannel('channel', true) as TextChannel;
 
 		const invite = await channel.createInvite({
@@ -14,5 +15,4 @@ export default newSlashCommand({
 		});
 
 		i.reply(`discord.gg/${invite.code}`);
-	},
-});
+	});

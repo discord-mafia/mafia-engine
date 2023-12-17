@@ -1,83 +1,64 @@
-import type { ChatInputCommandInteraction, Interaction } from 'discord.js';
-import { Button, Modal, SelectMenu } from '../../structures/interactions';
+import type { Interaction } from 'discord.js';
 import { CustomButton } from '../../structures/interactions/Button';
 import { UserSelectMenu } from '../../structures/interactions/UserSelectMenu';
-import { Modal as NewModal } from '../../structures/interactions/Modal';
-import { getSlashCommand } from '@structures/interactions/SlashCommand';
+import { SlashCommand } from '@structures/interactions/SlashCommand';
+import { Modal } from '@structures/interactions/Modal';
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function onInteraction(i: Interaction<any>) {
 	if (i.isAutocomplete()) {
-		const command = getSlashCommand(i.commandName);
-		if (!command) return console.error(`No command matching ${i.commandName} was found.`);
-		if (!command.autocomplete) return;
+		const newCmd = SlashCommand.slashCommands.get(i.commandName);
+		if (!newCmd) return i.respond([]);
 		try {
-			return command.autocomplete(i);
+			return newCmd.runAutoComplete(i);
 		} catch (err) {
 			console.log(err);
 		}
 	} else if (i.isChatInputCommand()) {
-		const command = getSlashCommand(i.commandName);
-		if (!command) return console.error(`No command matching ${i.commandName} was found.`);
+		const slashCommand = SlashCommand.slashCommands.get(i.commandName);
+		if (!slashCommand) return i.reply({ content: 'This command does not exist', ephemeral: true });
 		try {
-			command.execute(i as ChatInputCommandInteraction);
+			await slashCommand.run(i);
 		} catch (err) {
 			console.log(err);
 		}
 	} else if (i.isButton()) {
-		// Check new Buttons first
 		const [customId, data] = CustomButton.getDataFromCustomID(i.customId);
 		if (!customId) return;
 
 		const customButton = CustomButton.buttons.get(customId);
-		if (customButton)
-			try {
-				customButton.onExecute(i, data).catch((err) => {
-					customButton.onError(i, err);
-				});
-			} catch (err) {
+		if (!customButton) return i.reply({ content: 'This button does not exist', ephemeral: true });
+		try {
+			customButton.onExecute(i, data).catch((err) => {
 				customButton.onError(i, err);
-			}
-		else {
-			const buttonInteraction = Button.buttons.get(customId);
-			if (buttonInteraction) buttonInteraction.execute(i, data);
+			});
+		} catch (err) {
+			customButton.onError(i, err);
 		}
 	} else if (i.isUserSelectMenu()) {
 		const [customId, data] = UserSelectMenu.getDataFromCustomID(i.customId);
 		if (!customId) return;
 		const selectInteraction = UserSelectMenu.userSelectMenus.get(customId);
-		if (selectInteraction)
-			try {
-				selectInteraction.onExecute(i, data).catch((err) => {
-					selectInteraction.onError(i, err);
-				});
-			} catch (err) {
+		if (!selectInteraction) return i.reply({ content: 'This select menu does not exist', ephemeral: true });
+		try {
+			selectInteraction.onExecute(i, data).catch((err) => {
 				selectInteraction.onError(i, err);
-			}
-		else {
-			const newSelct = SelectMenu.selectMenus.get(customId);
-			if (newSelct) newSelct.execute(i, data);
+			});
+		} catch (err) {
+			selectInteraction.onError(i, err);
 		}
 	} else if (i.isAnySelectMenu()) {
-		const [customId, data] = SelectMenu.getDataFromCustomID(i.customId);
-		if (!customId) return;
-		const selectInteraction = SelectMenu.selectMenus.get(customId);
-		if (selectInteraction) selectInteraction.execute(i, data);
+		return i.reply({ content: 'This select menu does not exist', ephemeral: true });
 	} else if (i.isModalSubmit()) {
 		const [customId, data] = Modal.getDataFromCustomID(i.customId);
 		if (!customId) return;
 
-		const modal = NewModal.modals.get(customId);
-		if (!modal) {
-			const modalInteraction = Modal.modals.get(customId);
-			if (modalInteraction) modalInteraction.execute(i, data);
-		} else {
-			try {
-				modal.onExecute(i, data).catch((err) => {
-					modal.onError(i, err);
-				});
-			} catch (err) {
-				modal.onError(i, err);
-			}
+		const modal = Modal.modals.get(customId);
+		if (!modal) return i.reply({ content: 'This modal does not exist', ephemeral: true });
+		try {
+			await modal.run(i, data);
+		} catch (err) {
+			await modal.onError(i, err);
 		}
 	}
 }

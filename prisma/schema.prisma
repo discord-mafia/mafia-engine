@@ -42,8 +42,13 @@ model User {
   signupHosts      SignupHostJunc[]
   signupMods       SignupModJunc[]
   signupBalancers  SignupBalancerJunc[]
-  createdAt        DateTime                   @default(now())
-  updatedAt        DateTime                   @updatedAt
+
+  isRegistered Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([discordId])
 }
 
 model Signup {

@@ -1,25 +1,26 @@
-import { newSlashCommand } from '@structures/interactions/SlashCommand';
-import { SlashCommandBuilder } from 'discord.js';
+import { SlashCommand } from '@structures/interactions/SlashCommand';
 
-const data = new SlashCommandBuilder().setName('invite').setDescription('See the invite links for our servers');
-data.addStringOption((title) =>
-	title.setName('server').setDescription('Server you want the invite link for.').setRequired(true).setChoices(
-		{
-			name: 'Discord Mafia',
-			value: 'https://discord.gg/v4e6rrhXJG',
-		},
-		{
-			name: 'Discord Mafia Playerchats',
-			value: 'https://discord.gg/4ygmH7b',
-		}
-	)
-);
+export default new SlashCommand('invite')
+	.setDescription('See the invite links for our servers')
+	.set((cmd) => {
+		cmd.addStringOption((title) =>
+			title.setName('server').setDescription('Server you want the invite link for.').setRequired(true).setChoices(
+				{
+					name: 'Discord Mafia',
+					value: 'https://discord.gg/v4e6rrhXJG',
+				},
+				{
+					name: 'Discord Mafia Playerchats',
+					value: 'https://discord.gg/4ygmH7b',
+				}
+			)
+		);
 
-data.addBooleanOption((pub) => pub.setName('reveal').setDescription('Send this publicly (ignore or FALSE for just yourself)').setRequired(false));
-
-export default newSlashCommand({
-	data,
-	execute: async (i) => {
+		cmd.addBooleanOption((pub) =>
+			pub.setName('reveal').setDescription('Send this publicly (ignore or FALSE for just yourself)').setRequired(false)
+		);
+	})
+	.onExecute(async (i) => {
 		const link = i.options.getString('server', true);
 		const ephemeral = !(i.options.getBoolean('reveal', false) ?? false);
 
@@ -27,5 +28,4 @@ export default newSlashCommand({
 			content: link,
 			ephemeral,
 		});
-	},
-});
+	});

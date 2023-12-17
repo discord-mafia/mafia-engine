@@ -1,17 +1,19 @@
-import { ChannelType, Colors, EmbedBuilder, type Message, SlashCommandBuilder, type TextChannel } from 'discord.js';
-import { newSlashCommand, ServerType } from '@structures/interactions/SlashCommand';
-const data = new SlashCommandBuilder().setName('prods').setDescription('Generate prods');
-data.addRoleOption((role) => role.setName('aliveline').setDescription('Role which all living players have').setRequired(true));
-data.addChannelOption((channel) =>
-	channel.setName('channel').setDescription('Channel to check prods within').addChannelTypes(ChannelType.GuildText).setRequired(true)
-);
-data.addIntegerOption((str) => str.setName('ago').setDescription('How many hours to check back').setRequired(true));
-data.addIntegerOption((str) => str.setName('requirement').setDescription('How many posts do you want them to have to pass.').setRequired(true));
+import { ChannelType, Colors, EmbedBuilder, type Message, type TextChannel } from 'discord.js';
+import { SlashCommand } from '@structures/interactions/SlashCommand';
 
-export default newSlashCommand({
-	data,
-	serverType: ServerType.MAIN,
-	execute: async (i) => {
+export default new SlashCommand('prods')
+	.setDescription('Generate prods')
+	.set((cmd) => {
+		cmd.addRoleOption((role) => role.setName('aliveline').setDescription('Role which all living players have').setRequired(true));
+		cmd.addChannelOption((channel) =>
+			channel.setName('channel').setDescription('Channel to check prods within').addChannelTypes(ChannelType.GuildText).setRequired(true)
+		);
+		cmd.addIntegerOption((str) => str.setName('ago').setDescription('How many hours to check back').setRequired(true));
+		cmd.addIntegerOption((str) =>
+			str.setName('requirement').setDescription('How many posts do you want them to have to pass.').setRequired(true)
+		);
+	})
+	.onExecute(async (i) => {
 		const aliveLine = i.options.getRole('aliveline', true);
 		const channel = i.options.getChannel('channel', true) as TextChannel;
 		const req = i.options.getInteger('requirement', true);
@@ -91,10 +93,11 @@ export default newSlashCommand({
 				await i.editReply({ embeds: [formatContent()] });
 			}
 
+			console.log('Completed Prods');
+
 			await i.editReply({ embeds: [formatContent(true)] });
 		} catch (err) {
 			console.log(err);
 			await i.editReply('An error has occurred');
 		}
-	},
-});
+	});

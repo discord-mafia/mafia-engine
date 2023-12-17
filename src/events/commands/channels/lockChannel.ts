@@ -1,16 +1,15 @@
-import { ChannelType, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
-import { newSlashCommand } from '@structures/interactions/SlashCommand';
-import { InteractionError } from '@structures/interactions';
+import { ChannelType, PermissionFlagsBits } from 'discord.js';
+import { InteractionError } from '@structures/interactions/_Interaction';
+import { SlashCommand } from '@structures/interactions/SlashCommand';
 
-const data = new SlashCommandBuilder().setName('lock').setDescription('Lock a role from being able to send messages in a channel');
-data.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels);
-
-data.addRoleOption((x) => x.setName('role').setDescription('The role to lock').setRequired(true));
-data.addChannelOption((x) => x.setName('channel').setDescription('The channel to lock the role from').setRequired(false));
-
-export default newSlashCommand({
-	data,
-	execute: async (i) => {
+export default new SlashCommand('lock')
+	.setDescription('Lock a role from being able to send messages in a channel')
+	.set((cmd) => {
+		cmd.addRoleOption((x) => x.setName('role').setDescription('The role to lock').setRequired(true));
+		cmd.addChannelOption((x) => x.setName('channel').setDescription('The channel to lock the role from').setRequired(false));
+		cmd.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels);
+	})
+	.onExecute(async (i) => {
 		if (!i.guild) throw new InteractionError('This command can only be used in a server');
 
 		const role = i.options.getRole('role', true);
@@ -28,5 +27,4 @@ export default newSlashCommand({
 			content: `<@&${role.id}> can no longer speak in <#${channel.id}> (unless other perms override this)`,
 			ephemeral: true,
 		});
-	},
-});
+	});
