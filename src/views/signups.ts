@@ -1,13 +1,14 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, type Snowflake } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, type UserSelectMenuBuilder, type Snowflake } from 'discord.js';
 import { type FullSignup } from '@models/signups';
+import SignupRemovePlayerMenu from 'events/selectMenus/removeUserFromSignup';
 
 export function formatSignupEmbed(signup: FullSignup) {
 	const embed = new EmbedBuilder();
 	embed.setTitle(signup.name ?? 'Game Signups');
 	embed.setDescription('Click the appropriate buttons to join a category');
 	embed.setColor('Blurple');
-	const row = new ActionRowBuilder<ButtonBuilder>();
 
+	const row = new ActionRowBuilder<ButtonBuilder>();
 	const totalUsers: Snowflake[] = [];
 
 	const hostList = signup.hosts.map((host) => host.user.username);
@@ -78,17 +79,52 @@ export function formatSignupEmbed(signup: FullSignup) {
 	row.addComponents(new ButtonBuilder().setCustomId('button-category_leave').setEmoji('❌').setStyle(ButtonStyle.Secondary));
 	row.addComponents(new ButtonBuilder().setCustomId('button-category_settings').setEmoji('⚙').setStyle(ButtonStyle.Secondary));
 
-	if (signup.isTurbo) {
-		if (totalUsers.length <= 0 || !signup.isActive) {
-			embed.setFields([]);
-			embed.setDescription('This turbo lobby has been closed.');
-			embed.setTimestamp(new Date());
-			embed.setColor('Red');
-			for (const button of row.components) {
-				button.setDisabled(true);
-			}
+	return { embed, row };
+}
+
+export function genSignupSettingsEmbed(signup: FullSignup) {
+	const embed = new EmbedBuilder();
+	embed.setColor('White');
+	embed.setTitle('Signup Management');
+	embed.setDescription('This is your hub to manage the signup. Only designated hosts and admins can access this.');
+
+	for (const category of signup.categories) {
+		if (category.users.length == 0) continue;
+		const name = category.name;
+		const users = category.users;
+
+		let userStr = '```';
+		for (const user of users) {
+			userStr += `<@${user.user.discordId}>\n`;
 		}
+		userStr += '```';
+
+		embed.addFields({
+			name: name,
+			value: userStr,
+			inline: true,
+		});
 	}
 
-	return { embed, row };
+	embed.addFields(
+		{
+			name: 'Signup Index',
+			value: '> ' + signup.id.toString(),
+			inline: true,
+		},
+		{
+			name: 'Category Index List',
+			value: signup.categories.length > 0 ? signup.categories.map((x) => `> ${x.name} - ${x.id}`).join('\n') : '> None',
+			inline: true,
+		}
+	);
+
+	return embed;
+}
+
+export function genSignupSettingsComponents(signup: FullSignup) {
+	const row = new ActionRowBuilder<UserSelectMenuBuilder>();
+	const selectMenu = SignupRemovePlayerMenu.getUserSelectMenuOrThrow(SignupRemovePlayerMenu.customId);
+	row.addComponents(selectMenu.generateUserSelectMenu(signup.messageId));
+	return row;
 }

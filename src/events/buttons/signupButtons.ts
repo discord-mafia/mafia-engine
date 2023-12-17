@@ -1,17 +1,8 @@
 import { getSignup } from '@models/signups';
 import config from '@root/config';
 import { LogType, Logger } from '@utils/logger';
-import { formatSignupEmbed } from '@views/signups';
-import {
-	ActionRowBuilder,
-	Colors,
-	EmbedBuilder,
-	type Role,
-	type UserSelectMenuBuilder,
-	type ButtonBuilder,
-	type ButtonInteraction,
-} from 'discord.js';
-import SignupRemovePlayerMenu from 'events/selectMenus/removeUserFromSignup';
+import { formatSignupEmbed, genSignupSettingsComponents, genSignupSettingsEmbed } from '@views/signups';
+import { Colors, type Role, type ButtonBuilder, type ButtonInteraction } from 'discord.js';
 import { prisma } from 'index';
 import { InteractionError } from '@structures/interactions/_Interaction';
 import { CustomButton } from 'structures/interactions/Button';
@@ -115,45 +106,8 @@ export default class SignupCategoryButton extends CustomButton {
 		} else if (cache == 'settings') {
 			if (!member.permissions.has('ManageChannels')) return i.editReply({ content: 'You do not have permission to edit this signup' });
 
-			const embed = new EmbedBuilder();
-			embed.setColor('White');
-			embed.setTitle('Signup Management');
-			embed.setDescription('This is your hub to manage the signup. Only designated hosts and admins can access this.');
-
-			for (const category of signup.categories) {
-				if (category.users.length == 0) continue;
-				const name = category.name;
-				const users = category.users;
-
-				let userStr = '```';
-				for (const user of users) {
-					userStr += `<@${user.user.discordId}>\n`;
-				}
-				userStr += '```';
-
-				embed.addFields({
-					name: name,
-					value: userStr,
-					inline: true,
-				});
-			}
-
-			embed.addFields(
-				{
-					name: 'Signup Index',
-					value: '> ' + signup.id.toString(),
-					inline: true,
-				},
-				{
-					name: 'Category Index List',
-					value: signup.categories.length > 0 ? signup.categories.map((x) => `> ${x.name} - ${x.id}`).join('\n') : '> None',
-					inline: true,
-				}
-			);
-
-			const row = new ActionRowBuilder<UserSelectMenuBuilder>();
-			const selectMenu = SignupRemovePlayerMenu.getUserSelectMenuOrThrow(SignupRemovePlayerMenu.customId);
-			row.addComponents(selectMenu.generateUserSelectMenu(i.message.id));
+			const embed = genSignupSettingsEmbed(signup);
+			const row = genSignupSettingsComponents(signup);
 
 			return i.editReply({ embeds: [embed], components: [row] });
 		} else {
@@ -178,19 +132,11 @@ export default class SignupCategoryButton extends CustomButton {
 
 								addRoles.push(role);
 							} catch (err) {
-								logger.log(
-									LogType.Error,
-									`Failed to add role <@&${category.attachedRoleId}> to user ${member.user.username} in <#${signup.channelId}>`,
-									Colors.Red
-								);
+								logger.log(LogType.Error, `Failed to add role <@&${category.attachedRoleId}> to user ${member.user.username} in <#${signup.channelId}>`, Colors.Red);
 							}
 						}
 
-						logger.log(
-							LogType.Info,
-							`User ${i.user.username} has joined ${category.name} in <#${signup.channelId}>`,
-							category.isFocused ? Colors.Green : Colors.Yellow
-						);
+						logger.log(LogType.Info, `User ${i.user.username} has joined ${category.name} in <#${signup.channelId}>`, category.isFocused ? Colors.Green : Colors.Yellow);
 					}
 				}
 			}
