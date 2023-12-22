@@ -12,10 +12,7 @@ export function calculateVoteCount(vc: FullVoteCount) {
 
 	vc.votes.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 	const checkMajorityReached = () => {
-		return (
-			Math.max(...Array.from(wagons.values()).map((val) => val.reduce((acc, cur) => acc + (weights.get(cur) ?? 1), 0))) >=
-			Math.floor(vc.players.length / 2 + 1)
-		);
+		return Math.max(...Array.from(wagons.values()).map((val) => val.reduce((acc, cur) => acc + (weights.get(cur) ?? 1), 0))) >= Math.floor(vc.players.length / 2 + 1);
 	};
 
 	for (const player of vc.players) {
