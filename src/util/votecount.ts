@@ -93,7 +93,7 @@ export function formatVoteCount(calculated: CalculatedVoteCount) {
 			const voteArray = wagon.map((id) => {
 				const player = players.get(id) ?? `<@${id}>`;
 				const playerVoteWeight = calculated.weights.get(id);
-				return `${player} ${playerVoteWeight && playerVoteWeight > 1 ? `(x${playerVoteWeight})` : ''}`;
+				return `${player} ${playerVoteWeight && playerVoteWeight > 1 ? `[x${playerVoteWeight}]` : ''}`;
 			});
 
 			rawWagons.push({
