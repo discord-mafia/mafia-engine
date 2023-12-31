@@ -1,6 +1,7 @@
 import { ChannelType, PermissionFlagsBits } from 'discord.js';
 import { InteractionError } from '@structures/interactions/_Interaction';
 import { SlashCommand } from '@structures/interactions/SlashCommand';
+import { editChannelPermission } from '@controllers/channelController';
 
 export default new SlashCommand('lock')
 	.setDescription('Lock a role from being able to send messages in a channel')
@@ -19,9 +20,7 @@ export default new SlashCommand('lock')
 		const channel = await i.guild.channels.fetch(channelId);
 		if (!channel || channel.type != ChannelType.GuildText) throw new InteractionError('Invalid channel');
 
-		await channel.permissionOverwrites.edit(role.id, {
-			SendMessages: false,
-		});
+		await editChannelPermission(channel, role.id, { SendMessages: false });
 
 		return await i.reply({
 			content: `<@&${role.id}> can no longer speak in <#${channel.id}> (unless other perms override this)`,
