@@ -1,7 +1,7 @@
 import { ChannelType, PermissionFlagsBits } from 'discord.js';
 import { InteractionError } from '@structures/interactions/_Interaction';
 import { SlashCommand } from '@structures/interactions/SlashCommand';
-import { editChannelPermission } from '@controllers/channelController';
+import { editChannelPermission } from '@utils/discordChannels';
 
 export default new SlashCommand('lock')
 	.setDescription('Lock a role from being able to send messages in a channel')
