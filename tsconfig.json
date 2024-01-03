@@ -24,6 +24,7 @@
 			"@views/*": ["views/*"],
 			"@structures/*": ["structures/*"],
 			"@routers/*": ["routers/*"],
+			"@controllers/*": ["controllers/*"],
 			"@root/*": ["./*"]
 		}
 	},

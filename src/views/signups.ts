@@ -1,6 +1,7 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, type UserSelectMenuBuilder, type Snowflake } from 'discord.js';
 import { type FullSignup } from '@models/signups';
-import SignupRemovePlayerMenu from 'events/selectMenus/removeUserFromSignup';
+import RemovePlayerFromSignupsButton from '@root/events/buttons/manageSignups/removePlayer';
+import SignupRemovePlayerMenu from '@root/events/selectMenus/removeUserFromSignup';
 
 export function formatSignupEmbed(signup: FullSignup) {
 	const embed = new EmbedBuilder();
@@ -123,6 +124,17 @@ export function genSignupSettingsEmbed(signup: FullSignup) {
 }
 
 export function genSignupSettingsComponents(signup: FullSignup) {
+	const row = new ActionRowBuilder<ButtonBuilder>();
+
+	const removePlayerButtn = RemovePlayerFromSignupsButton.getButtonOrThrow(RemovePlayerFromSignupsButton.customId);
+	const customID = removePlayerButtn.createCustomID(signup.messageId);
+	const btn = removePlayerButtn.generateButton().setCustomId(customID);
+	row.addComponents(btn);
+
+	return row;
+}
+
+export function genSignupRemovePlayersComponents(signup: FullSignup) {
 	const row = new ActionRowBuilder<UserSelectMenuBuilder>();
 	const selectMenu = SignupRemovePlayerMenu.getUserSelectMenuOrThrow(SignupRemovePlayerMenu.customId);
 	row.addComponents(selectMenu.generateUserSelectMenu(signup.messageId));

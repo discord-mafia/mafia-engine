@@ -1,6 +1,7 @@
 import { ChannelType, PermissionFlagsBits } from 'discord.js';
 import { InteractionError } from '@structures/interactions/_Interaction';
 import { SlashCommand } from '@structures/interactions/SlashCommand';
+import { editChannelPermission } from '@utils/discordChannels';
 
 export default new SlashCommand('unlock')
 	.setDescription('Allow a role to speak in a channel again')
@@ -19,9 +20,7 @@ export default new SlashCommand('unlock')
 		const channel = await i.guild.channels.fetch(channelId);
 		if (!channel || channel.type != ChannelType.GuildText) throw new InteractionError('Invalid channel');
 
-		await channel.permissionOverwrites.edit(role.id, {
-			SendMessages: true,
-		});
+		await editChannelPermission(channel, role.id, { SendMessages: true });
 
 		return await i.reply({
 			content: `<@&${role.id}> can now speak in <#${channel.id}> (unless other perms override this)`,

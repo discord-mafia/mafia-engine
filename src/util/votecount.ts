@@ -12,10 +12,7 @@ export function calculateVoteCount(vc: FullVoteCount) {
 
 	vc.votes.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 	const checkMajorityReached = () => {
-		return (
-			Math.max(...Array.from(wagons.values()).map((val) => val.reduce((acc, cur) => acc + (weights.get(cur) ?? 1), 0))) >=
-			Math.floor(vc.players.length / 2 + 1)
-		);
+		return Math.max(...Array.from(wagons.values()).map((val) => val.reduce((acc, cur) => acc + (weights.get(cur) ?? 1), 0))) >= Math.floor(vc.players.length / 2 + 1);
 	};
 
 	for (const player of vc.players) {
@@ -88,14 +85,22 @@ export function formatVoteCount(calculated: CalculatedVoteCount) {
 	};
 	const rawWagons: Wagon[] = [];
 
-	// Name: [padded value] XX - List of players
-
 	wagons.forEach((wagon, key) => {
 		if (wagon.length > 0) {
 			const wagonVoteWeight = wagon.reduce((acc, cur) => acc + (calculated.weights.get(cur) ?? 1), 0);
 			const name = `${players.get(key) ?? `<@${key}>`}: `;
-			const value = wagon.length > 0 ? wagon.map((id) => players.get(id) ?? `<@${id}>`).join(', ') : 'None';
-			rawWagons.push({ name, size: wagonVoteWeight, value });
+
+			const voteArray = wagon.map((id) => {
+				const player = players.get(id) ?? `<@${id}>`;
+				const playerVoteWeight = calculated.weights.get(id);
+				return `${player} ${playerVoteWeight && playerVoteWeight > 1 ? `[x${playerVoteWeight}]` : ''}`;
+			});
+
+			rawWagons.push({
+				name,
+				size: wagonVoteWeight,
+				value: voteArray.length > 0 ? voteArray.join(', ') : 'None',
+			});
 		}
 	});
 

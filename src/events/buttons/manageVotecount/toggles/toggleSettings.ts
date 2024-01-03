@@ -24,8 +24,7 @@ export default class ToggleSettingsButton extends CustomButton {
 		const toggleMajority = cache === VCSettings.MAJORITY;
 		const toggleNoLynch = cache === VCSettings.NO_LYNCH;
 
-		if (!toggleLockVotes && !toggleMajority && !toggleNoLynch)
-			return i.reply({ content: `The button you clicked was invalid [ERR_02]`, ephemeral: true });
+		if (!toggleLockVotes && !toggleMajority && !toggleNoLynch) return i.reply({ content: `The button you clicked was invalid [ERR_02]`, ephemeral: true });
 
 		const voteCounter = await getVoteCounter({ channelId: i.channelId });
 		if (!voteCounter) return i.reply({ content: `This is not a vote channel`, ephemeral: true });
