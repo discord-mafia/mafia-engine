@@ -184,3 +184,13 @@ model Role {
   wikiUrl      String?
   isRetired    Boolean  @default(false)
 }
+
+// Auto Locker
+model AutoLocker {
+  id        Int      @id @default(autoincrement())
+  guildId   String
+  channelId String
+  roleId    String
+  lockAt    DateTime
+  createdAt DateTime @default(now())
+}

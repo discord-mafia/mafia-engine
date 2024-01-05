@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import config from './config';
 import { type Guild } from 'discord.js';
 import { startServer } from './api';
+import { autoLockLoop } from '@controllers/autolockController';
 
 export const prisma = new PrismaClient();
 export const client = new BotClient(config.DISCORD_CLIENT_ID, config.DISCORD_TOKEN, async (c) => {
@@ -17,6 +18,7 @@ async function start(c: BotClient) {
 	if (!guild) return client.destroy();
 
 	tick(client, guild);
+	autoLockLoop();
 }
 
 async function tick(client: BotClient, guild: Guild) {
