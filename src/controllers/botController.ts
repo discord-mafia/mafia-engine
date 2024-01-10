@@ -40,6 +40,7 @@ export async function loadInteractions() {
 	};
 
 	await loadFiles(commandPath);
+	console.log('[BOT] Loaded interactions');
 }
 
 export async function registerCommands() {
@@ -48,8 +49,6 @@ export async function registerCommands() {
 		SlashCommand.slashCommands.forEach((val) => {
 			return commandList.push(val.getBuilder());
 		});
-
-		console.log(`\x1b[33mRegistering all application (/) commands...\x1b[0m`);
 
 		const registeredCommands = (await clientREST.put(Routes.applicationCommands(config.DISCORD_CLIENT_ID), {
 			body: commandList,
@@ -60,7 +59,8 @@ export async function registerCommands() {
 				console.log(`\x1B[31mFailed to load ${commandList.length - registeredCommands.length} commands`);
 			}
 		}
-		console.log(`\x1b[32mSuccessfully registered [unknown] commands\x1b[0m`);
+
+		console.log('[BOT] Registered commands');
 	} catch (err) {
 		console.error(err);
 	}
@@ -76,9 +76,8 @@ export async function startDiscordBot() {
 	});
 
 	await loadInteractions();
-	await registerCommands();
-
 	await client.login(config.DISCORD_TOKEN);
+	await registerCommands();
 }
 
 export async function getGuilds(ignoreCache: boolean = true) {

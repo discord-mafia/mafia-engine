@@ -16,7 +16,6 @@ export class Interaction {
 
 	constructor(customId: CustomID) {
 		this.customId = customId;
-		console.log(`Loaded [${this.customId}]`);
 	}
 
 	public getCustomID() {
