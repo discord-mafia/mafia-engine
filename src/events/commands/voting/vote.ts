@@ -1,5 +1,5 @@
 import { prisma } from '../../..';
-import { calculateVoteCount, formatVoteCount } from '../../../util/votecount';
+import { calculateVoteCount, formatVoteCount } from '@views/votecounter';
 import { CustomError } from '../../../util/errors';
 import { getVoteCounterOrThrow, getVoteCounterPlayerOrThrow, getPlayer, getVoteCounter } from '@models/votecounter';
 import { SlashCommand } from '@structures/interactions/SlashCommand';
@@ -17,8 +17,7 @@ export default new SlashCommand('vote')
 			const voteCount = await getVoteCounterOrThrow({ channelId: i.channelId });
 			const player = await getVoteCounterPlayerOrThrow(voteCount.id, i.user.id);
 
-			if (voteCount.lockVotes && voteCount.votes.reduce((acc, curr) => acc + (curr.voterId == player.id ? 1 : 0), 0) > 0)
-				return i.reply({ content: 'You have already locked in your vote', ephemeral: true });
+			if (voteCount.lockVotes && voteCount.votes.reduce((acc, curr) => acc + (curr.voterId == player.id ? 1 : 0), 0) > 0) return i.reply({ content: 'You have already locked in your vote', ephemeral: true });
 
 			const preCalculated = calculateVoteCount(voteCount);
 			if (preCalculated.majorityReached) return i.reply({ content: 'Majority has already been reached', ephemeral: true });
