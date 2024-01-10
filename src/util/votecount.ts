@@ -113,7 +113,14 @@ export function formatVoteCount(calculated: CalculatedVoteCount) {
 
 	if (calculated.nonVoters.length > 0) {
 		const name = `Abstaining: `;
-		const value = calculated.nonVoters.map((id) => players.get(id) ?? `<@${id}>`).join(', ');
+		const value = calculated.nonVoters
+			.map((id) => {
+				const player = players.get(id) ?? `<@${id}>`;
+				const playerVoteWeight = calculated.weights.get(id);
+				return `${player} ${playerVoteWeight && playerVoteWeight > 1 ? `[x${playerVoteWeight}]` : ''}`;
+			})
+			.join(', ');
+
 		rawWagons.push({ name, size: calculated.nonVoters.length, value });
 	}
 
