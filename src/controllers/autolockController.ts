@@ -1,17 +1,18 @@
 import { type AutoLocker } from '@prisma/client';
-import { client, prisma } from '..';
+import { prisma } from '..';
 import { ChannelType } from 'discord.js';
 import { editChannelPermission } from '@utils/discordChannels';
+import { getGuilds } from './botController';
 
 const CRON_LOOP_INTERVAL = 1000 * 60;
 
 export async function autoLockLoop() {
 	const startTime = Date.now();
 	const filtered = await prisma.autoLocker.findMany({ where: { lockAt: { lte: new Date(startTime) } } });
-	await client.guilds.fetch();
+	const guilds = await getGuilds(true);
 
 	for (const autoLockChannel of filtered) {
-		const guild = client.guilds.cache.get(autoLockChannel.guildId);
+		const guild = guilds.get(autoLockChannel.guildId);
 		if (!guild) {
 			await deleteAutoLockChannel(autoLockChannel);
 			continue;
