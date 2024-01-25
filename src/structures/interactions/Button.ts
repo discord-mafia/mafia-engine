@@ -6,6 +6,9 @@ export class CustomButton extends Interaction {
 
 	constructor(customID: string) {
 		super(customID);
+
+		console.log(customID);
+
 		if (CustomButton.buttons.has(customID)) throw new Error(`Custom ID ${customID} already exists.`);
 		CustomButton.buttons.set(customID, this);
 	}

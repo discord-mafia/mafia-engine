@@ -3,12 +3,14 @@ import { genCreateVoteCountEmbed, genVoteCountEmbed } from '@views/votecounter';
 import { SlashCommand } from '@structures/interactions/SlashCommand';
 import { CustomError } from '@utils/errors';
 import { ChannelType, PermissionFlagsBits } from 'discord.js';
+import { embedCreateAnonymousGroup } from '@views/anonymity';
 
 export default new SlashCommand('manage')
 	.setDescription('Manage an part of the bot')
 	.set((cmd) => {
 		cmd.addSubcommand((sub) => sub.setName('votecount').setDescription('Manage the votecounter in this channel'));
 		cmd.addSubcommand((sub) => sub.setName('autolocker').setDescription('Manage the autolocker in this channel'));
+		cmd.addSubcommand((sub) => sub.setName('anonymity').setDescription('Manage the anonymity in this channel'));
 		cmd.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels);
 	})
 	.onExecute(async (i) => {
@@ -30,23 +32,33 @@ export default new SlashCommand('manage')
 			});
 
 		try {
-			if (subcommand === 'votecount') {
-				const vc = (await getVoteCounter({ channelId: i.channelId })) ?? undefined;
-				if (!vc) return i.reply({ ...genCreateVoteCountEmbed(), ephemeral: true });
-				const payload = genVoteCountEmbed(vc);
-				return i.reply({ ...payload, ephemeral: true });
-			} else if (subcommand === 'autolocker') {
-				return i.reply({
-					content: 'Autolocker',
-					ephemeral: true,
-				});
-			} else {
-				return i.reply({
-					content: 'Unknown subcommand',
-					ephemeral: true,
-				});
+			switch (subcommand) {
+				case 'votecount': {
+					const vc = (await getVoteCounter({ channelId: i.channelId })) ?? undefined;
+					if (!vc) return i.reply({ ...genCreateVoteCountEmbed(), ephemeral: true });
+					const payload = genVoteCountEmbed(vc);
+					return i.reply({ ...payload, ephemeral: true });
+				}
+
+				case 'autolocker':
+					return i.reply({
+						content: 'Autolocker',
+						ephemeral: true,
+					});
+
+				case 'anonymity': {
+					const payload = embedCreateAnonymousGroup();
+					return await i.reply(payload);
+				}
+				default:
+					return i.reply({
+						content: 'Unknown subcommand',
+						ephemeral: true,
+					});
 			}
 		} catch (err) {
+			console.log(err);
+
 			if (err instanceof CustomError) await err.respond(i).catch((err) => console.log(err));
 			else if (i.isRepliable()) return i.reply({ content: 'An unknown error occurred', ephemeral: true }).catch((err) => console.log(err));
 			else console.log(err);
