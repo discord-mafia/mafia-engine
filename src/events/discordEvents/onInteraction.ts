@@ -1,8 +1,9 @@
 import type { Interaction } from 'discord.js';
-import { CustomButton } from '../../structures/interactions/Button';
-import { UserSelectMenu } from '../../structures/interactions/UserSelectMenu';
 import { SlashCommand } from '@structures/interactions/SlashCommand';
 import { Modal } from '@structures/interactions/Modal';
+import { CustomButtonBuilder } from '@structures/interactions/Button';
+import { Interaction as CustomInteraction, InteractionError } from '@structures/interactions/_Interaction';
+import { CustomUserSelectMenuBuilder } from '@structures/interactions/UserSelectMenu';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function onInteraction(i: Interaction<any>) {
@@ -23,25 +24,27 @@ export default async function onInteraction(i: Interaction<any>) {
 			console.log(err);
 		}
 	} else if (i.isButton()) {
-		const [customId, data] = CustomButton.getDataFromCustomID(i.customId);
+		const [customId, data] = CustomInteraction.getDataFromCustomID(i.customId);
 		if (!customId) return;
 
-		const customButton = CustomButton.buttons.get(customId);
+		const customButton = CustomButtonBuilder.buttons.get(customId);
 		if (!customButton) return i.reply({ content: 'This button does not exist', ephemeral: true });
 		try {
-			customButton.onExecute(i, data).catch((err) => {
+			if (!customButton.executeFunc) throw new InteractionError('This button has no functionality');
+			customButton.executeFunc(i, data).catch((err) => {
 				customButton.onError(i, err);
 			});
 		} catch (err) {
 			customButton.onError(i, err);
 		}
 	} else if (i.isUserSelectMenu()) {
-		const [customId, data] = UserSelectMenu.getDataFromCustomID(i.customId);
+		const [customId, data] = CustomInteraction.getDataFromCustomID(i.customId);
 		if (!customId) return;
-		const selectInteraction = UserSelectMenu.userSelectMenus.get(customId);
+		const selectInteraction = CustomUserSelectMenuBuilder.userSelectMenus.get(customId);
 		if (!selectInteraction) return i.reply({ content: 'This select menu does not exist', ephemeral: true });
 		try {
-			selectInteraction.onExecute(i, data).catch((err) => {
+			if (!selectInteraction.executeFunc) throw new InteractionError('This select menu has no functionality');
+			selectInteraction.executeFunc(i, data).catch((err) => {
 				selectInteraction.onError(i, err);
 			});
 		} catch (err) {
