@@ -1,5 +1,4 @@
 import CreateAnonymityGroup from '@root/events/buttons/anonymity/createAnonymityGroup';
-import { CustomButton } from '@structures/interactions/Button';
 import { ActionRowBuilder, BaseMessageOptions, ButtonBuilder, EmbedBuilder } from 'discord.js';
 
 export function embedCreateAnonymousGroup(): BaseMessageOptions {
@@ -9,8 +8,7 @@ export function embedCreateAnonymousGroup(): BaseMessageOptions {
 	embed.setColor('Red');
 	const row = new ActionRowBuilder<ButtonBuilder>();
 
-	const btn = CustomButton.getButtonOrThrow(CreateAnonymityGroup.customId);
-	row.addComponents(btn.generateButton());
+	row.addComponents(CreateAnonymityGroup.build());
 
 	return {
 		embeds: [embed],

@@ -1,17 +1,12 @@
-import type { ButtonBuilder, ButtonInteraction, CacheType } from 'discord.js';
-import { CustomButton } from '../../../structures/interactions/Button';
 import { getVoteCounter } from '@models/votecounter';
-import { prisma } from '../../..';
-import { InteractionError } from '../../../structures/interactions/_Interaction';
+import { prisma } from '@root/index';
+import { CustomButtonBuilder } from '@structures/interactions/Button';
+import { InteractionError } from '@structures/interactions/_Interaction';
 import { genCreateVoteCountEmbed, genVoteCountEmbed } from '@views/votecounter';
 
-export default class CreateVotecountButton extends CustomButton {
-	static customId = 'manage-vc-create';
-	constructor() {
-		super(CreateVotecountButton.customId);
-	}
-
-	async onExecute(i: ButtonInteraction<CacheType>) {
+export default new CustomButtonBuilder('manage-vc-create')
+	.onGenerate((builder) => builder.setLabel('Create VC'))
+	.onExecute(async (i) => {
 		if (!i.guild) throw new InteractionError('This command can only be used in a server');
 
 		await prisma.voteCounter.create({ data: { channelId: i.channelId } });
@@ -19,9 +14,4 @@ export default class CreateVotecountButton extends CustomButton {
 		if (!vc) return await i.update(genCreateVoteCountEmbed());
 		const payload = genVoteCountEmbed(vc);
 		await i.update(payload);
-	}
-
-	generateButton(): ButtonBuilder {
-		return super.generateButton().setLabel('Create VC');
-	}
-}
+	});

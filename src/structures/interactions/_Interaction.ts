@@ -12,7 +12,7 @@ export class InteractionError extends Error {
 }
 
 export class Interaction {
-	private customId: CustomID;
+	public customId: CustomID;
 
 	constructor(customId: CustomID) {
 		this.customId = customId;
