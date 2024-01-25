@@ -1,18 +1,13 @@
-import { type UserSelectMenuInteraction, type CacheType } from 'discord.js';
-import { UserSelectMenu } from '../../../structures/interactions/UserSelectMenu';
+import { CustomUserSelectMenuBuilder } from '../../../structures/interactions/UserSelectMenu';
 import { InteractionError } from '../../../structures/interactions/_Interaction';
 import { prisma } from '../../..';
 import { getOrCreateUser } from '@models/users';
 import { getVoteCounter, type FullPlayer, getPlayer } from '@models/votecounter';
 import { genCreateVoteCountEmbed, genPlayersEmbed } from '@views/votecounter';
 
-export default class ReplacePlayersMenu extends UserSelectMenu {
-	static customId = 'manage-vc-select-players-replace';
-	constructor() {
-		super(ReplacePlayersMenu.customId);
-	}
-
-	async onExecute(i: UserSelectMenuInteraction<CacheType>) {
+export default new CustomUserSelectMenuBuilder('manage-vc-select-players-replace')
+	.onGenerate((builder) => builder.setMaxValues(2).setMinValues(2).setPlaceholder('The player to replace and replace in'))
+	.onExecute(async (i) => {
 		if (!i.guild) throw new InteractionError('This command can only be used in a server');
 
 		const values = i.values;
@@ -60,9 +55,4 @@ export default class ReplacePlayersMenu extends UserSelectMenu {
 		if (!newVC) return i.update(genCreateVoteCountEmbed());
 		const playerMenuPayload = genPlayersEmbed(newVC);
 		await i.update(playerMenuPayload);
-	}
-
-	generateUserSelectMenu() {
-		return super.generateUserSelectMenu().setMaxValues(2).setMinValues(2).setPlaceholder('The player to replace and replace in');
-	}
-}
+	});

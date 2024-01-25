@@ -1,17 +1,12 @@
-import { type UserSelectMenuInteraction, type CacheType } from 'discord.js';
-import { UserSelectMenu } from '../../../structures/interactions/UserSelectMenu';
+import { CustomUserSelectMenuBuilder } from '../../../structures/interactions/UserSelectMenu';
 import { InteractionError } from '../../../structures/interactions/_Interaction';
 import { getVoteCounter, getPlayer } from '@models/votecounter';
 import { genCreateVoteCountEmbed } from '@views/votecounter';
 import SetVoteWeightModal from '../../modals/setVoteWeight';
 
-export default class VoteWeightPlayerMenu extends UserSelectMenu {
-	static customId = 'manage-vc-select-player-vote-weight';
-	constructor() {
-		super(VoteWeightPlayerMenu.customId);
-	}
-
-	async onExecute(i: UserSelectMenuInteraction<CacheType>) {
+export default new CustomUserSelectMenuBuilder('manage-vc-select-players-vote-weight')
+	.onGenerate((builder) => builder.setMaxValues(1).setMinValues(1).setPlaceholder('The player to change vote weight'))
+	.onExecute(async (i) => {
 		if (!i.guild) throw new InteractionError('This command can only be used in a server');
 
 		const values = i.values ?? [];
@@ -27,9 +22,4 @@ export default class VoteWeightPlayerMenu extends UserSelectMenu {
 		const modal = SetVoteWeightModal.getModalBuilder();
 		modal.setCustomId(SetVoteWeightModal.createCustomID(playerID));
 		await i.showModal(modal);
-	}
-
-	generateUserSelectMenu() {
-		return super.generateUserSelectMenu().setMaxValues(1).setMinValues(1).setPlaceholder('The player to change vote weight');
-	}
-}
+	});

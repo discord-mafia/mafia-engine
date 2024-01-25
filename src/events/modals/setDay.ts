@@ -1,11 +1,4 @@
-import {
-	ActionRowBuilder,
-	TextInputBuilder,
-	type CacheType,
-	type ModalSubmitInteraction,
-	type ModalActionRowComponentBuilder,
-	TextInputStyle,
-} from 'discord.js';
+import { ActionRowBuilder, TextInputBuilder, type CacheType, type ModalSubmitInteraction, type ModalActionRowComponentBuilder, TextInputStyle } from 'discord.js';
 import { Modal } from '../../structures/interactions/Modal';
 import { InteractionError } from '../../structures/interactions/_Interaction';
 import { prisma } from '../..';
