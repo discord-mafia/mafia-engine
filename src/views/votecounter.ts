@@ -1,5 +1,5 @@
 import { type FullVoteCount } from '@models/votecounter';
-import CreateVotecountButton from '@root/events/buttons/manageVotecount/createVotecount';
+import createVotecount from '@root/events/buttons/manageVotecount/createVotecount';
 import GoHomeButton from '@root/events/buttons/manageVotecount/goHome';
 import ManagePlayersButton from '@root/events/buttons/manageVotecount/gotoPlayersMenu';
 import GotoStateButton from '@root/events/buttons/manageVotecount/gotoStateMenu';
@@ -9,7 +9,6 @@ import RemovePlayersButton from '@root/events/buttons/manageVotecount/players/re
 import ReplacePlayersButton from '@root/events/buttons/manageVotecount/players/replacePlayer';
 import ManageVoteWeight from '@root/events/buttons/manageVotecount/state/changeVoteWeight';
 import JumpToDayButton from '@root/events/buttons/manageVotecount/state/jumpToDay';
-import { CustomButton } from '@root/structures/interactions/Button';
 import { type BaseMessageOptions, EmbedBuilder, ActionRowBuilder, type ButtonBuilder } from 'discord.js';
 import { type Snowflake } from 'discord.js';
 
@@ -19,9 +18,7 @@ export function genCreateVoteCountEmbed(): BaseMessageOptions {
 	embed.setDescription('There is no vote counter in this channel');
 	embed.setColor('Red');
 	const row = new ActionRowBuilder<ButtonBuilder>();
-
-	const btn = CustomButton.getButtonOrThrow(CreateVotecountButton.customId);
-	row.addComponents(btn.generateButton());
+	row.addComponents(createVotecount.build());
 
 	return {
 		embeds: [embed],
@@ -60,11 +57,7 @@ export function genVoteCountEmbed(vc: FullVoteCount): BaseMessageOptions {
 	});
 
 	const row = new ActionRowBuilder<ButtonBuilder>();
-	const managePlayersButton = CustomButton.getButtonOrThrow(ManagePlayersButton.customId);
-	const manageStateButton = CustomButton.getButtonOrThrow(GotoStateButton.customId);
-	const manageTogglesButton = CustomButton.getButtonOrThrow(GotoTogglesMenu.customId);
-
-	row.addComponents(managePlayersButton.generateButton(), manageTogglesButton.generateButton(), manageStateButton.generateButton());
+	row.addComponents(ManagePlayersButton.build(), GotoStateButton.build(), GotoTogglesMenu.build());
 
 	return {
 		embeds: [embed],
@@ -77,12 +70,7 @@ export function genStateEmbed(vc: FullVoteCount): BaseMessageOptions {
 	const { embeds } = genVoteCountEmbed(vc);
 
 	const row = new ActionRowBuilder<ButtonBuilder>();
-	const homeButton = CustomButton.getButtonOrThrow(GoHomeButton.customId);
-	const jumpToDay = CustomButton.getButtonOrThrow(JumpToDayButton.customId);
-	const setVoteWeight = CustomButton.getButtonOrThrow(ManageVoteWeight.customId);
-
-	row.addComponents(homeButton.generateButton(), jumpToDay.generateButton(), setVoteWeight.generateButton());
-
+	row.addComponents(GoHomeButton.build(), JumpToDayButton.build(), ManageVoteWeight.build());
 	return {
 		embeds,
 		components: [row],
@@ -94,12 +82,7 @@ export function genPlayersEmbed(vc: FullVoteCount): BaseMessageOptions {
 	const { embeds } = genVoteCountEmbed(vc);
 
 	const row = new ActionRowBuilder<ButtonBuilder>();
-	const homeButton = CustomButton.getButtonOrThrow(GoHomeButton.customId);
-	const addPlayersButton = CustomButton.getButtonOrThrow(AddPlayersButton.customId);
-	const removePlayersButton = CustomButton.getButtonOrThrow(RemovePlayersButton.customId);
-	const replacePlayerButton = CustomButton.getButtonOrThrow(ReplacePlayersButton.customId);
-
-	row.addComponents(homeButton.generateButton(), addPlayersButton.generateButton(), removePlayersButton.generateButton(), replacePlayerButton.generateButton());
+	row.addComponents(GoHomeButton.build(), AddPlayersButton.build(), RemovePlayersButton.build(), ReplacePlayersButton.build());
 
 	return {
 		embeds,
@@ -116,9 +99,7 @@ export function genPlaceholderEmbed(vc?: FullVoteCount): BaseMessageOptions {
 	embed.setColor('Yellow');
 
 	const row = new ActionRowBuilder<ButtonBuilder>();
-
-	const homeButton = CustomButton.getButtonOrThrow(GoHomeButton.customId);
-	row.addComponents(homeButton.generateButton());
+	row.addComponents(GoHomeButton.build());
 
 	return {
 		embeds: [embed],

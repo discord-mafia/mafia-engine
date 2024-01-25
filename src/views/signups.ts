@@ -125,18 +125,12 @@ export function genSignupSettingsEmbed(signup: FullSignup) {
 
 export function genSignupSettingsComponents(signup: FullSignup) {
 	const row = new ActionRowBuilder<ButtonBuilder>();
-
-	const removePlayerButtn = RemovePlayerFromSignupsButton.getButtonOrThrow(RemovePlayerFromSignupsButton.customId);
-	const customID = removePlayerButtn.createCustomID(signup.messageId);
-	const btn = removePlayerButtn.generateButton().setCustomId(customID);
-	row.addComponents(btn);
-
+	row.addComponents(RemovePlayerFromSignupsButton.build(signup.messageId));
 	return row;
 }
 
 export function genSignupRemovePlayersComponents(signup: FullSignup) {
 	const row = new ActionRowBuilder<UserSelectMenuBuilder>();
-	const selectMenu = SignupRemovePlayerMenu.getUserSelectMenuOrThrow(SignupRemovePlayerMenu.customId);
-	row.addComponents(selectMenu.generateUserSelectMenu(signup.messageId));
+	row.addComponents(SignupRemovePlayerMenu.build(signup.messageId));
 	return row;
 }

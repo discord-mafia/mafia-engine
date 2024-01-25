@@ -17,8 +17,7 @@ export default new CustomButtonBuilder('manage-vc-players-set-vote-weight')
 		const stateMenuPayload = genStateEmbed(newVC);
 
 		const row = new ActionRowBuilder<UserSelectMenuBuilder>();
-		const select = VoteWeightPlayerMenu.getUserSelectMenuOrThrow(VoteWeightPlayerMenu.customId);
-		row.addComponents(select.generateUserSelectMenu());
+		row.addComponents(VoteWeightPlayerMenu.build());
 
 		await i.update({ ...stateMenuPayload, components: [row] });
 	});

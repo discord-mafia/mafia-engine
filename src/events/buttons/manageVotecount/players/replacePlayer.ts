@@ -1,7 +1,6 @@
 import { type UserSelectMenuBuilder, ActionRowBuilder } from 'discord.js';
 import { CustomButtonBuilder } from '../../../../structures/interactions/Button';
 import { getVoteCounter } from '@models/votecounter';
-import { UserSelectMenu } from '../../../../structures/interactions/UserSelectMenu';
 import { genCreateVoteCountEmbed, genPlayersEmbed } from '@views/votecounter';
 import ReplacePlayersMenu from '@root/events/selectMenus/manageVotecount/replacePlayer';
 
@@ -13,9 +12,7 @@ export default new CustomButtonBuilder('manage-vc-players-replace')
 		const payload = genPlayersEmbed(vc);
 
 		const row = new ActionRowBuilder<UserSelectMenuBuilder>();
-
-		const select = UserSelectMenu.getUserSelectMenuOrThrow(ReplacePlayersMenu.customId);
-		row.addComponents(select.generateUserSelectMenu());
+		row.addComponents(ReplacePlayersMenu.build());
 
 		i.update({ embeds: payload.embeds, components: [row] });
 	});
