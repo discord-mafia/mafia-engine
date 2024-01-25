@@ -16,7 +16,7 @@ import { type Snowflake } from 'discord.js';
 export function genCreateVoteCountEmbed(): BaseMessageOptions {
 	const embed = new EmbedBuilder();
 	embed.setTitle('Create Vote-Counter');
-	embed.setDescription(`There is no vote counter in this channel`);
+	embed.setDescription('There is no vote counter in this channel');
 	embed.setColor('Red');
 	const row = new ActionRowBuilder<ButtonBuilder>();
 
@@ -32,7 +32,7 @@ export function genCreateVoteCountEmbed(): BaseMessageOptions {
 export function genVoteCountEmbed(vc: FullVoteCount): BaseMessageOptions {
 	const embed = new EmbedBuilder();
 	embed.setTitle('Manage Vote Counter');
-	embed.setDescription(`Manage the vote counter for the game`);
+	embed.setDescription('Manage the vote counter for the game');
 	embed.setColor('White');
 
 	// TOGGLES
@@ -112,7 +112,7 @@ export function genPlaceholderEmbed(vc?: FullVoteCount): BaseMessageOptions {
 
 	const embed = new EmbedBuilder();
 	embed.setTitle('PLACEHOLDER');
-	embed.setDescription(`This menu has not been created yet`);
+	embed.setDescription('This menu has not been created yet');
 	embed.setColor('Yellow');
 
 	const row = new ActionRowBuilder<ButtonBuilder>();
@@ -231,13 +231,13 @@ export function formatVoteCount(calculated: CalculatedVoteCount) {
 
 	if (calculated.votingNoLynch.length > 0) {
 		const noLynchVoteWeight = calculated.votingNoLynch.reduce((acc, cur) => acc + (calculated.weights.get(cur) ?? 1), 0);
-		const name = `Skipping: `;
+		const name = 'Skipping: ';
 		const value = calculated.votingNoLynch.length > 0 ? calculated.votingNoLynch.map((id) => players.get(id) ?? `<@${id}>`).join(', ') : 'None';
 		rawWagons.push({ name, size: noLynchVoteWeight, value });
 	}
 
 	if (calculated.nonVoters.length > 0) {
-		const name = `Abstaining: `;
+		const name = 'Abstaining: ';
 		const value = calculated.nonVoters
 			.map((id) => {
 				const player = players.get(id) ?? `<@${id}>`;
@@ -267,13 +267,13 @@ export function formatVoteCount(calculated: CalculatedVoteCount) {
 
 	if (noLynchValue) format += `\n${noLynchValue}`;
 	if (notVotingValue) format += `\n${notVotingValue}`;
-	if (noLynchValue || notVotingValue) format += `\n`;
+	if (noLynchValue || notVotingValue) format += '\n';
 
 	const hasSettings = calculated.settings.majority;
-	if (hasSettings) format += `\n- - - - -\n`;
+	if (hasSettings) format += '\n- - - - -\n';
 	if (calculated.settings.majority) format += `\nWith ${players.size} players, majority is ${Math.floor(players.size / 2 + 1)} votes`;
 
-	format += `\n\`\`\``;
+	format += '\n```';
 
 	return format;
 }

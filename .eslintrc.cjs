@@ -1,20 +1,21 @@
 module.exports = {
+	env: {
+		browser: true,
+		es2021: true,
+		node: true,
+	},
+	extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
 	parser: '@typescript-eslint/parser',
-	extends: ['plugin:@typescript-eslint/recommended'],
 	parserOptions: {
-		ecmaVersion: 2018,
+		ecmaVersion: 'latest',
 		sourceType: 'module',
 	},
+	plugins: ['@typescript-eslint'],
 	rules: {
-		'@typescript-eslint/array-type': 'off',
-		'@typescript-eslint/consistent-type-definitions': 'off',
-		'@typescript-eslint/consistent-type-imports': [
-			'warn',
-			{
-				prefer: 'type-imports',
-				fixStyle: 'inline-type-imports',
-			},
-		],
-		'@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+		indent: ['error', 'tab', { SwitchCase: 1 }],
+		'linebreak-style': ['error', 'unix'],
+		quotes: ['error', 'single'],
+		semi: ['error', 'always'],
+		'@typescript-eslint/no-unused-vars': ['error', { vars: 'all', args: 'after-used', ignoreRestSiblings: true, argsIgnorePattern: '^_' }],
 	},
 };

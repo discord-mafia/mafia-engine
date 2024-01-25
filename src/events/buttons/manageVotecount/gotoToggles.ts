@@ -34,17 +34,17 @@ export function genTogglesMenu(vc: FullVoteCount): BaseMessageOptions {
 		homeButton.generateButton(),
 		new ButtonBuilder()
 			.setCustomId(button.createCustomID(VCSettings.NO_LYNCH))
-			.setLabel(`Toggle No-Lynch`)
+			.setLabel('Toggle No-Lynch')
 			.setEmoji(vc.noLynch ? '🔳' : '⬜')
 			.setStyle(ButtonStyle.Secondary),
 		new ButtonBuilder()
 			.setCustomId(button.createCustomID(VCSettings.MAJORITY))
-			.setLabel(`Toggle Majority`)
+			.setLabel('Toggle Majority')
 			.setEmoji(vc.majority ? '🔳' : '⬜')
 			.setStyle(ButtonStyle.Secondary),
 		new ButtonBuilder()
 			.setCustomId(button.createCustomID(VCSettings.LOCK_VOTES))
-			.setLabel(`Toggle Vote-Lock`)
+			.setLabel('Toggle Vote-Lock')
 			.setEmoji(vc.lockVotes ? '🔳' : '⬜')
 			.setStyle(ButtonStyle.Secondary)
 	);

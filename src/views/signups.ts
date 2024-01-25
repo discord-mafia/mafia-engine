@@ -17,7 +17,7 @@ export function formatSignupEmbed(signup: FullSignup) {
 	const balancerList = signup.balancers.map((balancer) => balancer.user.username);
 
 	if ([...hostList, ...moderatorList, ...balancerList].length > 0) {
-		embed.setDescription((embed.data.description += `\n\n**__[ RUN BY ]__**`));
+		embed.setDescription((embed.data.description += '\n\n**__[ RUN BY ]__**'));
 
 		if (hostList.length > 0) {
 			embed.addFields({
