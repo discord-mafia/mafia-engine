@@ -3,7 +3,7 @@ import { genCreateVoteCountEmbed, genVoteCountEmbed } from '@views/votecounter';
 import { SlashCommand } from '@structures/interactions/SlashCommand';
 import { CustomError } from '@utils/errors';
 import { ChannelType, PermissionFlagsBits } from 'discord.js';
-import { embedCreateAnonymousGroup } from '@views/anonymity';
+import { anonEmbedMainPage } from '@views/anonymity';
 
 export default new SlashCommand('manage')
 	.setDescription('Manage an part of the bot')
@@ -47,8 +47,8 @@ export default new SlashCommand('manage')
 					});
 
 				case 'anonymity': {
-					const payload = embedCreateAnonymousGroup();
-					return await i.reply(payload);
+					const payload = await anonEmbedMainPage(i.channelId);
+					return await i.reply({ ...payload, ephemeral: true });
 				}
 				default:
 					return i.reply({
