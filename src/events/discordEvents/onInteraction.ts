@@ -4,6 +4,7 @@ import { Modal } from '@structures/interactions/Modal';
 import { CustomButtonBuilder } from '@structures/interactions/Button';
 import { Interaction as CustomInteraction, InteractionError } from '@structures/interactions/_Interaction';
 import { CustomUserSelectMenuBuilder } from '@structures/interactions/UserSelectMenu';
+import { CustomChannelSelectMenu } from '@structures/interactions/ChannelSelectMenu';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function onInteraction(i: Interaction<any>) {
@@ -41,6 +42,19 @@ export default async function onInteraction(i: Interaction<any>) {
 		const [customId, data] = CustomInteraction.getDataFromCustomID(i.customId);
 		if (!customId) return;
 		const selectInteraction = CustomUserSelectMenuBuilder.userSelectMenus.get(customId);
+		if (!selectInteraction) return i.reply({ content: 'This select menu does not exist', ephemeral: true });
+		try {
+			if (!selectInteraction.executeFunc) throw new InteractionError('This select menu has no functionality');
+			selectInteraction.executeFunc(i, data).catch((err) => {
+				selectInteraction.onError(i, err);
+			});
+		} catch (err) {
+			selectInteraction.onError(i, err);
+		}
+	} else if (i.isChannelSelectMenu()) {
+		const [customId, data] = CustomInteraction.getDataFromCustomID(i.customId);
+		if (!customId) return;
+		const selectInteraction = CustomChannelSelectMenu.selectMenus.get(customId);
 		if (!selectInteraction) return i.reply({ content: 'This select menu does not exist', ephemeral: true });
 		try {
 			if (!selectInteraction.executeFunc) throw new InteractionError('This select menu has no functionality');
