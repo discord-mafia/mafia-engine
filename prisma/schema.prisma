@@ -194,3 +194,9 @@ model AutoLocker {
   lockAt    DateTime
   createdAt DateTime @default(now())
 }
+
+model AnonymousGroup {
+  id             Int      @id @default(autoincrement())
+  linkedChannels String[]
+  createdAt      DateTime @default(now())
+}
