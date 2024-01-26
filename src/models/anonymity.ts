@@ -56,3 +56,23 @@ export async function linkChannelToGroup(groupID: number, channelId: string) {
 
 	return update;
 }
+
+export async function unlinkChannelFromGroup(groupID: number, channelId: string) {
+	const group = await getAnonymousGroup(channelId);
+	if (!group) return null;
+
+	const update = await prisma.anonymousGroup
+		.update({
+			where: {
+				id: group.id,
+			},
+			data: {
+				linkedChannels: {
+					set: group.linkedChannels.filter((v) => v != channelId),
+				},
+			},
+		})
+		.catch(null);
+
+	return update;
+}
