@@ -93,6 +93,26 @@ export function genSignupSettingsEmbed(signup: FullSignup) {
 	embed.setTitle('Signup Management');
 	embed.setDescription('This is your hub to manage the signup. Only designated hosts and admins can access this.');
 
+	if (signup.isAnonymous) {
+		for (const category of signup.categories) {
+			if (category.users.length == 0) continue;
+			const name = category.name;
+			const users = category.users;
+
+			let userStr = '```';
+			for (const user of users) {
+				userStr += `${user.user.username}\n`;
+			}
+			userStr += '```';
+
+			embed.addFields({
+				name: name,
+				value: userStr,
+				inline: true,
+			});
+		}
+	}
+
 	for (const category of signup.categories) {
 		if (category.users.length == 0) continue;
 		const name = category.name;
