@@ -31,7 +31,6 @@ export default async function OnMessageCreate(msg: Message<boolean>) {
 		const newWH = await parent.createWebhook({ name: 'Anonymity' });
 		webhook = newWH;
 	}
-	console.log(webhook);
 
 	if (webhook) {
 		webhook.send({
