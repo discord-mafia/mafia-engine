@@ -100,7 +100,9 @@ export default new CustomButtonBuilder('button-category')
 				if (count > 0) logger.log(LogType.Info, `User ${i.user.username} has left ${category.name} in <#${signup.channelId}>`, Colors.Red);
 			}
 		} else if (cache == 'settings') {
-			if (!member.permissions.has('ManageChannels')) return i.editReply({ content: 'You do not have permission to edit this signup' });
+			const isAdmin = member.permissions.has('Administrator');
+			const isHost = signup.hosts.map((v) => v.user.discordId).includes(i.user.id);
+			if (isAdmin || isHost) return i.editReply({ content: 'You do not have permission to edit this signup' });
 
 			const embed = genSignupSettingsEmbed(signup);
 			const row = genSignupSettingsComponents(signup);
