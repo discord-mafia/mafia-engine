@@ -1,10 +1,13 @@
-import { AnonymousGroup, getAnonymousProfiles } from '@models/anonymity';
+import { AnonymousGroup, AnonymousProfile, getAnonymousProfiles } from '@models/anonymity';
 import linkChannel from '@root/events/buttons/anonymity/channels/linkChannel';
 import unlinkChannel from '@root/events/buttons/anonymity/channels/unlinkChannel';
 import CreateAnonymityGroup from '@root/events/buttons/anonymity/createAnonymityGroup';
 import gotoChannels from '@root/events/buttons/anonymity/gotoChannels';
 import gotoHome from '@root/events/buttons/anonymity/gotoHome';
 import gotoProfiles from '@root/events/buttons/anonymity/gotoProfiles';
+import setAvatar from '@root/events/buttons/anonymity/profiles/controls/setAvatar';
+import setName from '@root/events/buttons/anonymity/profiles/controls/setName';
+import setUser from '@root/events/buttons/anonymity/profiles/controls/setUser';
 import newProfile from '@root/events/buttons/anonymity/profiles/newProfile';
 import removeProfile from '@root/events/buttons/anonymity/profiles/removeProfile';
 import updateProfile from '@root/events/buttons/anonymity/profiles/updateProfile';
@@ -86,9 +89,43 @@ export async function anonEmbedManageChannels(group: AnonymousGroup): Promise<Ba
 export async function anonEmbedManageProfiles(group: AnonymousGroup): Promise<BaseMessageOptions> {
 	const embed = await anonEmbedMainPageRaw(group);
 	embed.setTitle('Anonymous Group - Manage Profiles');
+	const row = new ActionRowBuilder<ButtonBuilder>();
+
+	const profiles = (await getAnonymousProfiles(group.id)) ?? [];
+	row.addComponents(gotoHome.build(), newProfile.build().setDisabled(profiles.length >= 25), updateProfile.build().setDisabled(profiles.length === 0), removeProfile.build().setDisabled(profiles.length === 0));
+
+	return {
+		embeds: [embed],
+		components: [row],
+	};
+}
+
+export async function anonEmbedManageSpecificProfile(profile: AnonymousProfile): Promise<BaseMessageOptions> {
+	const embed = new EmbedBuilder();
+	embed.setTitle(`Anonymous Profile - ${profile.name ?? 'Unnamed'}`);
+
+	embed.setFields(
+		{
+			name: 'Discord User',
+			value: `> ${profile.discordId ? `<@${profile.discordId}>` : 'None'}`,
+		},
+		{
+			name: 'Name',
+			value: `> ${profile.name ?? 'Unnamed'}`,
+		}
+	);
+
+	if (!profile.avatarURI)
+		embed.addFields({
+			name: 'Avatar',
+			value: '> None',
+		});
+	else embed.setThumbnail(profile.avatarURI);
 
 	const row = new ActionRowBuilder<ButtonBuilder>();
-	row.addComponents(gotoHome.build(), newProfile.build(), updateProfile.build(), removeProfile.build());
+	const profileID = profile.id.toString();
+
+	row.addComponents(gotoHome.build(), setUser.build(profileID), setName.build(profileID), setAvatar.build(profileID));
 
 	return {
 		embeds: [embed],

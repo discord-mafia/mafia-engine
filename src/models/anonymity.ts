@@ -41,6 +41,17 @@ export async function getAnonymousGroup(channelId: string) {
 	return group;
 }
 
+export async function getAnonymousGroupById(groupId: number): Promise<AnonymousGroup | null> {
+	const group = await prisma.anonymousGroup
+		.findUnique({
+			where: {
+				id: groupId,
+			},
+		})
+		.catch(null);
+	return group;
+}
+
 export async function linkChannelToGroup(groupID: number, channelId: string) {
 	const update = await prisma.anonymousGroup
 		.update({
@@ -78,7 +89,10 @@ export async function unlinkChannelFromGroup(groupID: number, channelId: string)
 	return update;
 }
 
-export type AnonymousProfile = NonNullable<Awaited<ReturnType<typeof getAnonymousProfiles>>>;
+export type AnonymousProfiles = NonNullable<Awaited<ReturnType<typeof getAnonymousProfiles>>>;
+type ArrayElementType<T> = T extends (infer U)[] ? U : never;
+export type AnonymousProfile = ArrayElementType<AnonymousProfiles>;
+
 export async function getAnonymousProfiles(groupId: number) {
 	const profiles = await prisma.anonymousProfile
 		.findMany({
@@ -91,4 +105,79 @@ export async function getAnonymousProfiles(groupId: number) {
 		.catch(null);
 
 	return profiles;
+}
+
+export async function getAnonymousProfile(profileId: number) {
+	const profile = await prisma.anonymousProfile
+		.findUnique({
+			where: {
+				id: profileId,
+			},
+		})
+		.catch(null);
+
+	return profile;
+}
+
+type CreateProfileData = {
+	name: string;
+	avatar: string;
+	discordId: string;
+};
+export async function createAnonymousProfile(groupId: number, options: Partial<CreateProfileData> = {}) {
+	const group = await getAnonymousGroupById(groupId);
+	if (!group) return null;
+
+	const profile = await prisma.anonymousProfile
+		.create({
+			data: {
+				anonymousGroupId: group.id,
+				name: options.name,
+				avatarURI: options.avatar,
+				discordId: options.discordId,
+			},
+		})
+		.catch(null);
+
+	return profile;
+}
+
+export async function updateAnonymousProfile(profileID: number, payload: Partial<CreateProfileData>) {
+	const updated = await prisma.anonymousProfile
+		.update({
+			where: {
+				id: profileID,
+			},
+			data: {
+				name: payload.name,
+				avatarURI: payload.avatar,
+				discordId: payload.discordId,
+			},
+		})
+		.catch(null);
+	return updated;
+}
+
+export async function deleteManyAnonymousProfiles(profileIDs: number[]) {
+	const deletions: DeletedProfile[] = [];
+
+	for (const profileID of profileIDs) {
+		const deletion = await deleteAnonymousProfile(profileID);
+		if (deletion) deletions.push(deletion);
+	}
+
+	return deletions;
+}
+
+export type DeletedProfile = NonNullable<Awaited<ReturnType<typeof deleteAnonymousProfile>>>;
+export async function deleteAnonymousProfile(id: number) {
+	const deletion = await prisma.anonymousProfile
+		.delete({
+			where: {
+				id,
+			},
+		})
+		.catch(null);
+
+	return deletion;
 }
