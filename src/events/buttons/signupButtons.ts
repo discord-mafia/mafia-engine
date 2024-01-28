@@ -102,7 +102,7 @@ export default new CustomButtonBuilder('button-category')
 		} else if (cache == 'settings') {
 			const isAdmin = member.permissions.has('Administrator');
 			const isHost = signup.hosts.map((v) => v.user.discordId).includes(i.user.id);
-			if (isAdmin || isHost) return i.editReply({ content: 'You do not have permission to edit this signup' });
+			if (!(isAdmin || isHost)) return i.editReply({ content: 'You do not have permission to edit this signup' });
 
 			const embed = genSignupSettingsEmbed(signup);
 			const row = genSignupSettingsComponents(signup);
