@@ -5,13 +5,14 @@ import fs from 'fs';
 import { SlashCommand } from '@structures/interactions/SlashCommand';
 import OnClientReady from '../events/discordEvents/clientReady';
 import onInteraction from '@root/events/discordEvents/onInteraction';
+import OnMessageCreate from '@root/events/discordEvents/onMessageCreate';
 
 export const DEFAULT_INTENTS = {
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildIntegrations, GatewayIntentBits.GuildPresences],
 	partials: [Partials.User],
 };
 
-const client = new Client(DEFAULT_INTENTS);
+export const client = new Client(DEFAULT_INTENTS);
 const clientREST = new REST({ version: '10' }).setToken(config.DISCORD_TOKEN);
 
 export async function loadInteractions() {
@@ -71,6 +72,7 @@ export async function startDiscordBot() {
 	client.on(Events.InteractionCreate, (i) => {
 		onInteraction(i);
 	});
+	client.on(Events.MessageCreate, OnMessageCreate);
 	client.on(Events.Error, (err) => {
 		console.log(err);
 	});
