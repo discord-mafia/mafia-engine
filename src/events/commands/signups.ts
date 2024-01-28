@@ -29,11 +29,13 @@ export default new SlashCommand('signups')
 		cmd.addUserOption((user) => user.setName('moderator').setDescription('Game moderator').setRequired(false));
 		cmd.addUserOption((user) => user.setName('balancer').setDescription('Game balancer').setRequired(false));
 		cmd.addUserOption((user) => user.setName('balancer2').setDescription('Game balancer #2').setRequired(false));
+		cmd.addBooleanOption((user) => user.setName('anonymous').setDescription('Hide the names of the players who sign up').setRequired(false));
 	})
 	.onExecute(async (i, _ctx) => {
 		const title = i.options.getString('title') ?? 'Game Signups';
 		const limit = i.options.getInteger('limit') ?? undefined;
 		const template = i.options.getString('template') ?? signupTemplates[0];
+		const isAnonymous = i.options.getBoolean('anonymous') ?? false;
 
 		const hosts = (() => {
 			const host1 = i.options.getUser('host');
@@ -104,6 +106,7 @@ export default new SlashCommand('signups')
 						data: categories,
 					},
 				},
+				isAnonymous: isAnonymous,
 			},
 		});
 

@@ -49,14 +49,18 @@ export function formatSignupEmbed(signup: FullSignup) {
 	});
 	// Order by focused first
 	const sortedCategories = signup.categories.sort((a, b) => (a.isFocused && !b.isFocused ? -1 : 1));
-
 	for (const category of sortedCategories) {
 		const { name, isLocked, limit } = category;
 		const userIds = category.users
 			.sort((a, b) => (a.isTurboHost && !b.isTurboHost ? -1 : 1))
 			.map((user, index) => {
 				totalUsers.push(user.user.discordId);
-				return `> ${index + 1}. ${user.user.username}${user.isTurboHost ? ' (Host)' : ''}`;
+
+				if (signup.isAnonymous) {
+					return `> ${index + 1}. Anonymous`;
+				} else {
+					return `> ${index + 1}. ${user.user.username}${user.isTurboHost ? ' (Host)' : ''}`;
+				}
 			});
 
 		const fieldName = `${name}${limit && limit > 0 ? ` (${userIds.length}/${limit})` : ` (${userIds.length})`}`;

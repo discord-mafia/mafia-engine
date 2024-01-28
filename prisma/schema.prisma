@@ -62,6 +62,7 @@ model Signup {
   isActive        Boolean  @default(true)
   requiredServers String[] @default([])
   isTurbo         Boolean  @default(false)
+  isAnonymous     Boolean  @default(false)
 
   hosts      SignupHostJunc[]
   moderators SignupModJunc[]
