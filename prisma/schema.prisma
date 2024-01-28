@@ -29,18 +29,19 @@ enum Permission {
 }
 
 model User {
-  id               Int                  @id @default(autoincrement())
-  discordId        String               @unique
-  username         String               @unique
-  permission       Permission           @default(User) // Replace with guild-specific perms later
-  signupBanned     Boolean              @default(false)
-  mvpStatus        Status               @default(None)
-  onWaitlist       Boolean              @default(false)
-  signupCategories SignupUserJunction[]
-  playerAccounts   Player[]
-  signupHosts      SignupHostJunc[]
-  signupMods       SignupModJunc[]
-  signupBalancers  SignupBalancerJunc[]
+  id                 Int                  @id @default(autoincrement())
+  discordId          String               @unique
+  username           String               @unique
+  permission         Permission           @default(User) // Replace with guild-specific perms later
+  signupBanned       Boolean              @default(false)
+  mvpStatus          Status               @default(None)
+  onWaitlist         Boolean              @default(false)
+  signupCategories   SignupUserJunction[]
+  playerAccounts     Player[]
+  signupHosts        SignupHostJunc[]
+  signupMods         SignupModJunc[]
+  signupBalancers    SignupBalancerJunc[]
+  anonymousProfiiles AnonymousProfile[]
 
   isRegistered Boolean @default(false)
 
@@ -197,7 +198,18 @@ model AutoLocker {
 }
 
 model AnonymousGroup {
-  id             Int      @id @default(autoincrement())
+  id             Int                @id @default(autoincrement())
   linkedChannels String[]
-  createdAt      DateTime @default(now())
+  createdAt      DateTime           @default(now())
+  profiles       AnonymousProfile[]
+}
+
+model AnonymousProfile {
+  id               Int            @id @default(autoincrement())
+  group            AnonymousGroup @relation(fields: [anonymousGroupId], references: [id])
+  user             User?          @relation(fields: [userId], references: [id])
+  anonymousGroupId Int
+  userId           Int?
+  name             String?
+  avatarURI        String?
 }
