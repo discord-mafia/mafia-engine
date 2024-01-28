@@ -16,7 +16,7 @@ export default new CustomChannelSelectMenu('anonymity-select-channels-unlink')
 		}
 
 		if (!channelID) {
-			const payload = await anonEmbedManageChannels(i.channelId);
+			const payload = await anonEmbedManageChannels(group);
 			await i.update(payload);
 			return await i.followUp({
 				ephemeral: true,
@@ -26,7 +26,7 @@ export default new CustomChannelSelectMenu('anonymity-select-channels-unlink')
 
 		const channel = await i.guild?.channels.fetch(channelID);
 		if (!channel || channel.type != ChannelType.GuildText) {
-			const payload = await anonEmbedManageChannels(i.channelId);
+			const payload = await anonEmbedManageChannels(group);
 			await i.update(payload);
 			return await i.followUp({
 				ephemeral: true,
@@ -35,7 +35,7 @@ export default new CustomChannelSelectMenu('anonymity-select-channels-unlink')
 		}
 
 		if (!group.linkedChannels.includes(channel.id)) {
-			const payload = await anonEmbedManageChannels(i.channelId);
+			const payload = await anonEmbedManageChannels(group);
 			await i.update(payload);
 			return await i.followUp({
 				ephemeral: true,
@@ -45,7 +45,7 @@ export default new CustomChannelSelectMenu('anonymity-select-channels-unlink')
 
 		const unlinked = await unlinkChannelFromGroup(group.id, channel.id);
 		if (!unlinked) {
-			const payload = await anonEmbedManageChannels(i.channelId);
+			const payload = await anonEmbedManageChannels(group);
 			await i.update(payload);
 			return await i.followUp({
 				ephemeral: true,
@@ -53,6 +53,6 @@ export default new CustomChannelSelectMenu('anonymity-select-channels-unlink')
 			});
 		}
 
-		const payload = await anonEmbedManageChannels(i.channelId);
+		const payload = await anonEmbedManageChannels(group);
 		return await i.update(payload);
 	});

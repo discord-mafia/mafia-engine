@@ -1,4 +1,4 @@
-import { getAnonymousGroup } from '@models/anonymity';
+import { AnonymousGroup, getAnonymousProfiles } from '@models/anonymity';
 import linkChannel from '@root/events/buttons/anonymity/channels/linkChannel';
 import unlinkChannel from '@root/events/buttons/anonymity/channels/unlinkChannel';
 import CreateAnonymityGroup from '@root/events/buttons/anonymity/createAnonymityGroup';
@@ -25,10 +25,7 @@ export function embedCreateAnonymousGroup(): BaseMessageOptions {
 	};
 }
 
-export async function anonEmbedMainPage(channelId: string): Promise<BaseMessageOptions> {
-	const group = await getAnonymousGroup(channelId);
-	if (!group || group.linkedChannels.length == 0) return embedCreateAnonymousGroup();
-
+async function anonEmbedMainPageRaw(group: AnonymousGroup): Promise<EmbedBuilder> {
 	const embed = new EmbedBuilder();
 	embed.setTitle('Anonymous Group');
 	embed.setColor('White');
@@ -38,6 +35,32 @@ export async function anonEmbedMainPage(channelId: string): Promise<BaseMessageO
 		value: group.linkedChannels.map((v) => `> <#${v}>`).join('\n'),
 	});
 
+	const profiles = await getAnonymousProfiles(group.id);
+	if (profiles) {
+		const fields: string[] = [];
+		const footer = '\n...';
+		let isCutOff = false;
+
+		for (const profile of profiles) {
+			const value = `> ${fields.length + 1}. ${profile.name ?? 'Unnamed'}`;
+			const currentLength = fields.join('\n') + '\n' + value + footer;
+			if (currentLength.length < 1024) fields.push(value);
+			else isCutOff = true;
+		}
+
+		let value = fields.length >= 1 ? fields.join('\n') : '> None';
+		if (isCutOff) value += footer;
+
+		embed.addFields({
+			name: `Profiles (${profiles.length})`,
+			value,
+		});
+	}
+	return embed;
+}
+
+export async function anonEmbedMainPage(group: AnonymousGroup): Promise<BaseMessageOptions> {
+	const embed = await anonEmbedMainPageRaw(group);
 	const row = new ActionRowBuilder<ButtonBuilder>();
 	row.addComponents(gotoChannels.build(), gotoProfiles.build());
 
@@ -47,18 +70,9 @@ export async function anonEmbedMainPage(channelId: string): Promise<BaseMessageO
 	};
 }
 
-export async function anonEmbedManageChannels(channelId: string): Promise<BaseMessageOptions> {
-	const group = await getAnonymousGroup(channelId);
-	if (!group || group.linkedChannels.length == 0) return embedCreateAnonymousGroup();
-
-	const embed = new EmbedBuilder();
+export async function anonEmbedManageChannels(group: AnonymousGroup): Promise<BaseMessageOptions> {
+	const embed = await anonEmbedMainPageRaw(group);
 	embed.setTitle('Anonymous Group - Manage Channels');
-	embed.setColor('White');
-
-	embed.addFields({
-		name: `Linked Channels (${group.linkedChannels.length})`,
-		value: group.linkedChannels.map((v) => `> <#${v}>`).join('\n'),
-	});
 
 	const row = new ActionRowBuilder<ButtonBuilder>();
 	row.addComponents(gotoHome.build(), linkChannel.build(), unlinkChannel.build());
@@ -69,18 +83,9 @@ export async function anonEmbedManageChannels(channelId: string): Promise<BaseMe
 	};
 }
 
-export async function anonEmbedManageProfiles(channelId: string): Promise<BaseMessageOptions> {
-	const group = await getAnonymousGroup(channelId);
-	if (!group || group.linkedChannels.length == 0) return embedCreateAnonymousGroup();
-
-	const embed = new EmbedBuilder();
+export async function anonEmbedManageProfiles(group: AnonymousGroup): Promise<BaseMessageOptions> {
+	const embed = await anonEmbedMainPageRaw(group);
 	embed.setTitle('Anonymous Group - Manage Profiles');
-	embed.setColor('White');
-
-	embed.addFields({
-		name: `Linked Channels (${group.linkedChannels.length})`,
-		value: group.linkedChannels.map((v) => `> <#${v}>`).join('\n'),
-	});
 
 	const row = new ActionRowBuilder<ButtonBuilder>();
 	row.addComponents(gotoHome.build(), newProfile.build(), updateProfile.build(), removeProfile.build());

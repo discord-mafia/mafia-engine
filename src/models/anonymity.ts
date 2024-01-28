@@ -26,6 +26,7 @@ export async function createAnonymousGroup(channelId: string) {
 	return !!group;
 }
 
+export type AnonymousGroup = NonNullable<Awaited<ReturnType<typeof getAnonymousGroup>>>;
 export async function getAnonymousGroup(channelId: string) {
 	const group = await prisma.anonymousGroup
 		.findFirst({
@@ -75,4 +76,19 @@ export async function unlinkChannelFromGroup(groupID: number, channelId: string)
 		.catch(null);
 
 	return update;
+}
+
+export type AnonymousProfile = NonNullable<Awaited<ReturnType<typeof getAnonymousProfiles>>>;
+export async function getAnonymousProfiles(groupId: number) {
+	const profiles = await prisma.anonymousProfile
+		.findMany({
+			where: {
+				group: {
+					id: groupId,
+				},
+			},
+		})
+		.catch(null);
+
+	return profiles;
 }
