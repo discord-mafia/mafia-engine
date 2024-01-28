@@ -56,8 +56,11 @@ export function formatSignupEmbed(signup: FullSignup) {
 			.map((user, index) => {
 				totalUsers.push(user.user.discordId);
 
+				let categoryName = name;
+				if (categoryName.endsWith('s')) categoryName = categoryName.slice(0, -1);
+
 				if (signup.isAnonymous) {
-					return `> ${index + 1}. Anonymous`;
+					return `> ${index + 1}. Anonymous ${categoryName}`;
 				} else {
 					return `> ${index + 1}. ${user.user.username}${user.isTurboHost ? ' (Host)' : ''}`;
 				}
