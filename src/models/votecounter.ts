@@ -63,13 +63,11 @@ export async function deletePlayerAndVotes(votecountId: number, discordId: strin
 }
 
 export type FullVoteCount = NonNullable<Awaited<ReturnType<typeof getVoteCounter>>>;
-export type VoteCountQuery =
-	| {
-			channelId: string;
-	  }
-	| {
-			id: number;
-	  };
+
+type ChannelQuery = { channelId: string };
+type SnowflakeQuery = { id: number };
+export type VoteCountQuery = ChannelQuery | SnowflakeQuery;
+
 export async function getVoteCounter(query: VoteCountQuery) {
 	return await prisma.voteCounter.findUnique({
 		where: query,

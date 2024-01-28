@@ -1,30 +1,18 @@
-import { type UserSelectMenuBuilder, type ButtonBuilder, type ButtonInteraction, type CacheType, ActionRowBuilder } from 'discord.js';
-import { CustomButton } from '../../../../structures/interactions/Button';
+import { type UserSelectMenuBuilder, ActionRowBuilder } from 'discord.js';
+import { CustomButtonBuilder } from '../../../../structures/interactions/Button';
 import { getVoteCounter } from '@models/votecounter';
-import { UserSelectMenu } from '../../../../structures/interactions/UserSelectMenu';
-import RemovePlayersMenu from '../../../selectMenus/manageVotecount/removePlayers';
 import { genCreateVoteCountEmbed, genPlayersEmbed } from '@views/votecounter';
+import RemovePlayersMenu from '@root/events/selectMenus/manageVotecount/removePlayers';
 
-export default class RemovePlayersButton extends CustomButton {
-	static customId = 'manage-vc-players-remove';
-	constructor() {
-		super(RemovePlayersButton.customId);
-	}
-
-	async onExecute(i: ButtonInteraction<CacheType>) {
+export default new CustomButtonBuilder('manage-vc-players-remove')
+	.onGenerate((builder) => builder.setLabel('Remove Player/s'))
+	.onExecute(async (i) => {
 		const vc = await getVoteCounter({ channelId: i.channelId });
 		if (!vc) return genCreateVoteCountEmbed();
 		const payload = genPlayersEmbed(vc);
 
 		const row = new ActionRowBuilder<UserSelectMenuBuilder>();
-
-		const select = UserSelectMenu.getUserSelectMenuOrThrow(RemovePlayersMenu.customId);
-		row.addComponents(select.generateUserSelectMenu());
+		row.addComponents(RemovePlayersMenu.build());
 
 		i.update({ embeds: payload.embeds, components: [row] });
-	}
-
-	generateButton(): ButtonBuilder {
-		return super.generateButton().setLabel('Remove Player/s');
-	}
-}
+	});

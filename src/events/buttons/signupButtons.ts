@@ -1,19 +1,15 @@
 import { getSignup } from '@models/signups';
 import config from '@root/config';
-import { LogType, Logger } from '@utils/logger';
-import { formatSignupEmbed, genSignupSettingsComponents, genSignupSettingsEmbed } from '@views/signups';
-import { Colors, type Role, type ButtonBuilder, type ButtonInteraction } from 'discord.js';
-import { prisma } from 'index';
+import { prisma } from '@root/index';
+import { CustomButtonBuilder } from '@structures/interactions/Button';
 import { InteractionError } from '@structures/interactions/_Interaction';
-import { CustomButton } from 'structures/interactions/Button';
+import { Logger, LogType } from '@utils/logger';
+import { genSignupSettingsEmbed, genSignupSettingsComponents, formatSignupEmbed } from '@views/signups';
+import { Colors, Role } from 'discord.js';
 
-export default class SignupCategoryButton extends CustomButton {
-	static customId = 'button-category';
-	constructor() {
-		super(SignupCategoryButton.customId);
-	}
-
-	async onExecute(i: ButtonInteraction, cache: string) {
+export default new CustomButtonBuilder('button-category')
+	.onGenerate((builder) => builder.setLabel('Manage Toggle'))
+	.onExecute(async (i, cache) => {
 		if (!i.guild) return new InteractionError('This button cannot be used outside of a server');
 		if (!cache) return new InteractionError('This button is invalid as it has no valid cache attached');
 
@@ -104,7 +100,9 @@ export default class SignupCategoryButton extends CustomButton {
 				if (count > 0) logger.log(LogType.Info, `User ${i.user.username} has left ${category.name} in <#${signup.channelId}>`, Colors.Red);
 			}
 		} else if (cache == 'settings') {
-			if (!member.permissions.has('ManageChannels')) return i.editReply({ content: 'You do not have permission to edit this signup' });
+			const isAdmin = member.permissions.has('Administrator');
+			const isHost = signup.hosts.map((v) => v.user.discordId).includes(i.user.id);
+			if (isAdmin || isHost) return i.editReply({ content: 'You do not have permission to edit this signup' });
 
 			const embed = genSignupSettingsEmbed(signup);
 			const row = genSignupSettingsComponents(signup);
@@ -157,9 +155,4 @@ export default class SignupCategoryButton extends CustomButton {
 
 		await i.message.edit({ embeds: [embed], components: row.components.length > 0 ? [row] : undefined });
 		await i.deleteReply();
-	}
-
-	generateButton(): ButtonBuilder {
-		return super.generateButton().setLabel('Manage Toggles');
-	}
-}
+	});

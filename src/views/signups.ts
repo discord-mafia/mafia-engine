@@ -17,7 +17,7 @@ export function formatSignupEmbed(signup: FullSignup) {
 	const balancerList = signup.balancers.map((balancer) => balancer.user.username);
 
 	if ([...hostList, ...moderatorList, ...balancerList].length > 0) {
-		embed.setDescription((embed.data.description += `\n\n**__[ RUN BY ]__**`));
+		embed.setDescription((embed.data.description += '\n\n**__[ RUN BY ]__**'));
 
 		if (hostList.length > 0) {
 			embed.addFields({
@@ -49,14 +49,18 @@ export function formatSignupEmbed(signup: FullSignup) {
 	});
 	// Order by focused first
 	const sortedCategories = signup.categories.sort((a, b) => (a.isFocused && !b.isFocused ? -1 : 1));
-
 	for (const category of sortedCategories) {
 		const { name, isLocked, limit } = category;
 		const userIds = category.users
 			.sort((a, b) => (a.isTurboHost && !b.isTurboHost ? -1 : 1))
 			.map((user, index) => {
 				totalUsers.push(user.user.discordId);
-				return `> ${index + 1}. ${user.user.username}${user.isTurboHost ? ' (Host)' : ''}`;
+
+				if (signup.isAnonymous) {
+					return `> ${index + 1}. Anonymous`;
+				} else {
+					return `> ${index + 1}. ${user.user.username}${user.isTurboHost ? ' (Host)' : ''}`;
+				}
 			});
 
 		const fieldName = `${name}${limit && limit > 0 ? ` (${userIds.length}/${limit})` : ` (${userIds.length})`}`;
@@ -88,6 +92,26 @@ export function genSignupSettingsEmbed(signup: FullSignup) {
 	embed.setColor('White');
 	embed.setTitle('Signup Management');
 	embed.setDescription('This is your hub to manage the signup. Only designated hosts and admins can access this.');
+
+	if (signup.isAnonymous) {
+		for (const category of signup.categories) {
+			if (category.users.length == 0) continue;
+			const name = category.name;
+			const users = category.users;
+
+			let userStr = '```';
+			for (const user of users) {
+				userStr += `${user.user.username}\n`;
+			}
+			userStr += '```';
+
+			embed.addFields({
+				name: name,
+				value: userStr,
+				inline: true,
+			});
+		}
+	}
 
 	for (const category of signup.categories) {
 		if (category.users.length == 0) continue;
@@ -125,18 +149,12 @@ export function genSignupSettingsEmbed(signup: FullSignup) {
 
 export function genSignupSettingsComponents(signup: FullSignup) {
 	const row = new ActionRowBuilder<ButtonBuilder>();
-
-	const removePlayerButtn = RemovePlayerFromSignupsButton.getButtonOrThrow(RemovePlayerFromSignupsButton.customId);
-	const customID = removePlayerButtn.createCustomID(signup.messageId);
-	const btn = removePlayerButtn.generateButton().setCustomId(customID);
-	row.addComponents(btn);
-
+	row.addComponents(RemovePlayerFromSignupsButton.build(signup.messageId));
 	return row;
 }
 
 export function genSignupRemovePlayersComponents(signup: FullSignup) {
 	const row = new ActionRowBuilder<UserSelectMenuBuilder>();
-	const selectMenu = SignupRemovePlayerMenu.getUserSelectMenuOrThrow(SignupRemovePlayerMenu.customId);
-	row.addComponents(selectMenu.generateUserSelectMenu(signup.messageId));
+	row.addComponents(SignupRemovePlayerMenu.build(signup.messageId));
 	return row;
 }

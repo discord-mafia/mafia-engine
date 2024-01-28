@@ -1,13 +1,10 @@
 import { type Snowflake } from 'discord.js';
 import { prisma } from 'index';
 
-type CitizenshipQuery =
-	| {
-			name: string;
-	  }
-	| {
-			discordId: Snowflake;
-	  };
+type NameQuery = { name: string };
+type DiscordIdQuery = { discordId: Snowflake };
+type CitizenshipQuery = NameQuery | DiscordIdQuery;
+
 export async function getCitizenship(query: CitizenshipQuery) {
 	try {
 		if ('name' in query) {

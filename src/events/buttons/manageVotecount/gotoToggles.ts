@@ -1,50 +1,41 @@
-import { type ButtonInteraction, type CacheType, ButtonBuilder, type BaseMessageOptions, ActionRowBuilder, ButtonStyle } from 'discord.js';
-import { CustomButton } from '../../../structures/interactions/Button';
-import ToggleSettingsButton, { VCSettings } from './toggles/toggleSettings';
+import { type BaseMessageOptions, ActionRowBuilder, ButtonStyle, ButtonBuilder } from 'discord.js';
+import { CustomButtonBuilder } from '../../../structures/interactions/Button';
+import { VCSettings } from './toggles/toggleSettings';
 import { getVoteCounter, type FullVoteCount } from '@models/votecounter';
 import { genCreateVoteCountEmbed, genVoteCountEmbed } from '@views/votecounter';
 import GoHomeButton from './goHome';
 
-export default class GotoTogglesMenu extends CustomButton {
-	static customId = 'manage-vc-toggles-menu';
-	constructor() {
-		super(GotoTogglesMenu.customId);
-	}
-
-	async onExecute(i: ButtonInteraction<CacheType>) {
+const toggleMenuBtn = new CustomButtonBuilder('manage-vc-toggles-menu')
+	.onGenerate((builder) => builder.setLabel('Manage Toggles'))
+	.onExecute(async (i) => {
 		const vc = await getVoteCounter({ channelId: i.channelId });
 		if (!vc) return i.update(genCreateVoteCountEmbed());
 		const payload = genTogglesMenu(vc);
-		i.update(payload);
-	}
+		return i.update(payload);
+	});
 
-	generateButton(): ButtonBuilder {
-		return super.generateButton().setLabel('Manage Toggles');
-	}
-}
+export default toggleMenuBtn;
 
 export function genTogglesMenu(vc: FullVoteCount): BaseMessageOptions {
 	const { embeds } = genVoteCountEmbed(vc);
 
 	const row = new ActionRowBuilder<ButtonBuilder>();
-	const button = CustomButton.getButtonOrThrow(ToggleSettingsButton.customId);
-	const homeButton = CustomButton.getButtonOrThrow(GoHomeButton.customId);
 
 	row.addComponents(
-		homeButton.generateButton(),
-		new ButtonBuilder()
-			.setCustomId(button.createCustomID(VCSettings.NO_LYNCH))
-			.setLabel(`Toggle No-Lynch`)
+		GoHomeButton.build(),
+		toggleMenuBtn
+			.build(VCSettings.NO_LYNCH)
+			.setLabel('Toggle No-Lynch')
 			.setEmoji(vc.noLynch ? '🔳' : '⬜')
 			.setStyle(ButtonStyle.Secondary),
-		new ButtonBuilder()
-			.setCustomId(button.createCustomID(VCSettings.MAJORITY))
-			.setLabel(`Toggle Majority`)
+		toggleMenuBtn
+			.build(VCSettings.MAJORITY)
+			.setLabel('Toggle Majority')
 			.setEmoji(vc.majority ? '🔳' : '⬜')
 			.setStyle(ButtonStyle.Secondary),
-		new ButtonBuilder()
-			.setCustomId(button.createCustomID(VCSettings.LOCK_VOTES))
-			.setLabel(`Toggle Vote-Lock`)
+		toggleMenuBtn
+			.build(VCSettings.LOCK_VOTES)
+			.setLabel('Toggle Vote-Lock')
 			.setEmoji(vc.lockVotes ? '🔳' : '⬜')
 			.setStyle(ButtonStyle.Secondary)
 	);

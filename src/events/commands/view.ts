@@ -20,14 +20,16 @@ export default new SlashCommand('view')
 		const subcommand = i.options.getSubcommand(true);
 
 		switch (subcommand) {
-			case 'role':
+			case 'role': {
 				const reqRoleName = i.options.getString('name', true);
 				const role = await getRoleByName(reqRoleName);
 				if (!role) return i.reply({ content: 'Role not found', ephemeral: true });
 				const embed = genRoleEmbed(role);
 				return await i.reply({ embeds: [embed], ephemeral: false });
-			default:
+			}
+			default: {
 				return i.reply({ content: 'Invalid subcommand', ephemeral: true });
+			}
 		}
 	})
 	.onAutoComplete(async (i) => {
@@ -35,10 +37,11 @@ export default new SlashCommand('view')
 		const subcommand = i.options.getSubcommand(true);
 
 		switch (subcommand) {
-			case 'role':
+			case 'role': {
 				const fetchNames = await getRoleNames(focused, { take: 5 });
 				if (!fetchNames) return i.respond([]);
 				return i.respond(fetchNames.map((m) => ({ name: capitalize(m.name), value: m.name })));
+			}
 			default:
 				return i.respond([]);
 		}

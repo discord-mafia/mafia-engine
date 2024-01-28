@@ -1,9 +1,8 @@
 import express from 'express';
 import path from 'path';
 import cors from 'cors';
-import config from './config';
-
-import { router as apiRouter } from './routers/apiRouter';
+import config from '@root/config';
+import { router as apiRouter } from '@routers/apiRouter';
 
 export const app = express();
 app.use(express.json());
@@ -16,8 +15,8 @@ app.get('*', (req, res) => {
 	res.sendFile(path.join(webAppPath, 'index.html'));
 });
 
-export function startServer() {
+export function startApiServer() {
 	app.listen(config.PORT, () => {
-		console.log(`Server is running on port ${config.PORT}`);
+		console.log(`[API] Running on PORT = ${config.PORT}`);
 	});
 }

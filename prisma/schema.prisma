@@ -62,6 +62,7 @@ model Signup {
   isActive        Boolean  @default(true)
   requiredServers String[] @default([])
   isTurbo         Boolean  @default(false)
+  isAnonymous     Boolean  @default(false)
 
   hosts      SignupHostJunc[]
   moderators SignupModJunc[]
@@ -183,4 +184,30 @@ model Role {
   roleColour   String?
   wikiUrl      String?
   isRetired    Boolean  @default(false)
+}
+
+// Auto Locker
+model AutoLocker {
+  id        Int      @id @default(autoincrement())
+  guildId   String
+  channelId String
+  roleId    String
+  lockAt    DateTime
+  createdAt DateTime @default(now())
+}
+
+model AnonymousGroup {
+  id             Int                @id @default(autoincrement())
+  linkedChannels String[]
+  createdAt      DateTime           @default(now())
+  profiles       AnonymousProfile[]
+}
+
+model AnonymousProfile {
+  id               Int            @id @default(autoincrement())
+  group            AnonymousGroup @relation(fields: [anonymousGroupId], references: [id])
+  anonymousGroupId Int
+  name             String?
+  avatarURI        String?
+  discordId        String?
 }

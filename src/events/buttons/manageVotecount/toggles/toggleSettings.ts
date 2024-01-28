@@ -1,8 +1,7 @@
-import type { ButtonBuilder, ButtonInteraction, CacheType } from 'discord.js';
-import { CustomButton } from '../../../../structures/interactions/Button';
-import { prisma } from '../../../..';
-import { genTogglesMenu } from '../gotoToggles';
+import { CustomButtonBuilder } from '../../../../structures/interactions/Button';
 import { getVoteCounter } from '@models/votecounter';
+import { prisma } from '@root/index';
+import { genTogglesMenu } from '../gotoToggles';
 
 export enum VCSettings {
 	LOCK_VOTES = 'lock-votes',
@@ -10,13 +9,9 @@ export enum VCSettings {
 	NO_LYNCH = 'nolynch',
 }
 
-export default class ToggleSettingsButton extends CustomButton {
-	static customId = 'manage-vc-toggle';
-	constructor() {
-		super(ToggleSettingsButton.customId);
-	}
-
-	async onExecute(i: ButtonInteraction<CacheType>, cache: string) {
+export default new CustomButtonBuilder('manage-vc-toggle')
+	.onGenerate((builder) => builder.setLabel('Home'))
+	.onExecute(async (i, cache) => {
 		if (!i.guild) return i.reply({ content: 'This command can only be used in a server', ephemeral: true });
 		if (!cache) return i.reply({ content: 'An error occured while creating the vote counter [ERR_01]', ephemeral: true });
 
@@ -24,10 +19,10 @@ export default class ToggleSettingsButton extends CustomButton {
 		const toggleMajority = cache === VCSettings.MAJORITY;
 		const toggleNoLynch = cache === VCSettings.NO_LYNCH;
 
-		if (!toggleLockVotes && !toggleMajority && !toggleNoLynch) return i.reply({ content: `The button you clicked was invalid [ERR_02]`, ephemeral: true });
+		if (!toggleLockVotes && !toggleMajority && !toggleNoLynch) return i.reply({ content: 'The button you clicked was invalid [ERR_02]', ephemeral: true });
 
 		const voteCounter = await getVoteCounter({ channelId: i.channelId });
-		if (!voteCounter) return i.reply({ content: `This is not a vote channel`, ephemeral: true });
+		if (!voteCounter) return i.reply({ content: 'This is not a vote channel', ephemeral: true });
 
 		const vc = await prisma.voteCounter.update({
 			where: {
@@ -55,9 +50,4 @@ export default class ToggleSettingsButton extends CustomButton {
 
 		const payload = genTogglesMenu(vc ?? undefined);
 		return await i.update(payload);
-	}
-
-	generateButton(): ButtonBuilder {
-		return super.generateButton().setLabel('Home');
-	}
-}
+	});

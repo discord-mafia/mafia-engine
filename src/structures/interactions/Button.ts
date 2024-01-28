@@ -1,26 +1,38 @@
-import { ButtonBuilder, type ButtonInteraction, ButtonStyle } from 'discord.js';
+import { ButtonBuilder as TrueButtonBuilder, type ButtonInteraction, ButtonStyle } from 'discord.js';
 import { Interaction } from './_Interaction';
 
-export class CustomButton extends Interaction {
-	public static buttons: Map<string, CustomButton> = new Map();
+export type ButtonBuilderFunc = (builder: TrueButtonBuilder, data?: string) => TrueButtonBuilder;
+export type OnButtonExecute = (i: ButtonInteraction, cache?: string) => Promise<unknown | void>;
+export class CustomButtonBuilder extends Interaction {
+	public static buttons: Map<string, CustomButtonBuilder> = new Map();
 
+	private builder?: ButtonBuilderFunc;
+	public executeFunc?: OnButtonExecute;
 	constructor(customID: string) {
 		super(customID);
-		if (CustomButton.buttons.has(customID)) throw new Error(`Custom ID ${customID} already exists.`);
-		CustomButton.buttons.set(customID, this);
+		if (CustomButtonBuilder.buttons.has(customID)) throw new Error(`[BUTTON] Custom ID ${customID} already exists.`);
+		CustomButtonBuilder.buttons.set(customID, this);
 	}
 
-	generateButton(data?: string): ButtonBuilder {
-		return new ButtonBuilder().setCustomId(this.createCustomID(data)).setLabel('Example Button').setStyle(ButtonStyle.Secondary);
+	onGenerate(fn: ButtonBuilderFunc) {
+		this.builder = fn;
+		return this;
 	}
 
-	async onExecute(_i: ButtonInteraction, _cache?: string): Promise<unknown | void> {
-		return undefined;
+	onExecute(fn: OnButtonExecute) {
+		this.executeFunc = fn;
+		return this;
 	}
 
-	static getButtonOrThrow(customId: string) {
-		const button = CustomButton.buttons.get(customId);
-		if (button) return button;
-		else throw Error(`No button with custom ID ${customId} was found.`);
+	build(data?: string) {
+		const buttonBuilder = new TrueButtonBuilder().setCustomId(this.createCustomID(data)).setLabel('Error').setStyle(ButtonStyle.Secondary);
+		if (!this.builder) return buttonBuilder.setCustomId(`button-error-${this.customId}`);
+		return this.builder(buttonBuilder, data);
+	}
+
+	static getButtonOrThrow(customID: string) {
+		const button = this.buttons.get(customID);
+		if (!button) throw Error('Button does not exist with ID ' + customID);
+		return button;
 	}
 }

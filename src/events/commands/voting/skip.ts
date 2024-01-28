@@ -1,5 +1,5 @@
 import { prisma } from '../../..';
-import { calculateVoteCount, formatVoteCount } from '../../../util/votecount';
+import { calculateVoteCount, formatVoteCount } from '@views/votecounter';
 import { CustomError } from '../../../util/errors';
 import { getVoteCounterOrThrow, getVoteCounterPlayerOrThrow, getVoteCounter } from '@models/votecounter';
 import { SlashCommand } from '@structures/interactions/SlashCommand';
@@ -11,8 +11,7 @@ export default new SlashCommand('skip').setDescription('[GAME] Vote to skip toda
 		const voteCounter = await getVoteCounterOrThrow({ channelId: i.channelId });
 		const player = await getVoteCounterPlayerOrThrow(voteCounter.id, i.user.id);
 
-		if (voteCounter.lockVotes && voteCounter.votes.reduce((acc, curr) => acc + (curr.voterId == player.id ? 1 : 0), 0) > 0)
-			return i.reply({ content: 'You have already locked in your vote', ephemeral: true });
+		if (voteCounter.lockVotes && voteCounter.votes.reduce((acc, curr) => acc + (curr.voterId == player.id ? 1 : 0), 0) > 0) return i.reply({ content: 'You have already locked in your vote', ephemeral: true });
 
 		const preCalculated = calculateVoteCount(voteCounter);
 		if (preCalculated.majorityReached) return i.reply({ content: 'Majority has already been reached', ephemeral: true });

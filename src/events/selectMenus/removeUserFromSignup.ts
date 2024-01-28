@@ -1,17 +1,12 @@
-import { type UserSelectMenuInteraction, type CacheType } from 'discord.js';
 import { getSignup } from '@models/signups';
 import { prisma } from 'index';
-import { UserSelectMenu } from 'structures/interactions/UserSelectMenu';
+import { CustomUserSelectMenuBuilder } from 'structures/interactions/UserSelectMenu';
 import { InteractionError } from '@structures/interactions/_Interaction';
 import { formatSignupEmbed } from '@views/signups';
 
-export default class SignupRemovePlayerMenu extends UserSelectMenu {
-	static customId = 'remove-user-from-signup';
-	constructor() {
-		super(SignupRemovePlayerMenu.customId);
-	}
-
-	async onExecute(i: UserSelectMenuInteraction<CacheType>, cache?: string) {
+export default new CustomUserSelectMenuBuilder('manage-signps-players-remove')
+	.onGenerate((builder) => builder.setMaxValues(20).setMinValues(1).setPlaceholder('Players to remove from the signup'))
+	.onExecute(async (i, cache) => {
 		if (!i.guild) throw new InteractionError('This command can only be used in a server');
 		if (!i.channel) throw new InteractionError('This command can only be used in a channel');
 		if (!cache) throw new InteractionError('This command is invalid as it has no valid cache attached');
@@ -49,9 +44,4 @@ export default class SignupRemovePlayerMenu extends UserSelectMenu {
 		signupMessage.edit({ embeds: [embed], components: [row] });
 
 		await i.editReply({ content: 'Removed users from signup' });
-	}
-
-	generateUserSelectMenu(messageId: string) {
-		return super.generateUserSelectMenu(messageId).setMaxValues(20).setMinValues(1).setPlaceholder('Players to remove from the signup');
-	}
-}
+	});

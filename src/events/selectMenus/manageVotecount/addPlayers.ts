@@ -1,18 +1,13 @@
-import { type UserSelectMenuInteraction, type CacheType } from 'discord.js';
-import { UserSelectMenu } from '../../../structures/interactions/UserSelectMenu';
+import { CustomUserSelectMenuBuilder } from '../../../structures/interactions/UserSelectMenu';
 import { InteractionError } from '../../../structures/interactions/_Interaction';
 import { prisma } from '../../..';
 import { getOrCreateUser } from '@models/users';
 import { getVoteCounter, getPlayer } from '@models/votecounter';
 import { genCreateVoteCountEmbed, genPlayersEmbed } from '@views/votecounter';
-export default class AddPlayersMenu extends UserSelectMenu {
-	static customId = 'manage-vc-select-players-add';
-	constructor() {
-		super(AddPlayersMenu.customId);
-	}
 
-	async onExecute(i: UserSelectMenuInteraction<CacheType>) {
-		console.log('AddPlayersMenu.onExecute');
+export default new CustomUserSelectMenuBuilder('manage-vc-select-players-add')
+	.onGenerate((builder) => builder.setMaxValues(25).setMinValues(1).setPlaceholder('Players to add to the vote counter'))
+	.onExecute(async (i) => {
 		if (!i.guild) throw new InteractionError('This command can only be used in a server');
 
 		const values = i.values;
@@ -32,10 +27,6 @@ export default class AddPlayersMenu extends UserSelectMenu {
 		}
 
 		if (newPlayers.length <= 0) throw new InteractionError('No new players were provided');
-
-		// Create players
-
-		console.log(existingPlayers, newPlayers);
 
 		const failedPlayers: string[] = [];
 		const successfulPlayers: string[] = [];
@@ -77,9 +68,4 @@ export default class AddPlayersMenu extends UserSelectMenu {
 		if (!newVC) return i.update(genCreateVoteCountEmbed());
 		const playerMenuPayload = genPlayersEmbed(newVC);
 		await i.update(playerMenuPayload);
-	}
-
-	generateUserSelectMenu() {
-		return super.generateUserSelectMenu().setMaxValues(25).setMinValues(1).setPlaceholder('Players to add to the vote counter');
-	}
-}
+	});
