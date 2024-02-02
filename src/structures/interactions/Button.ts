@@ -25,7 +25,7 @@ export class CustomButtonBuilder extends Interaction {
 	}
 
 	build(data?: string) {
-		const buttonBuilder = new TrueButtonBuilder().setCustomId(this.createCustomID(data)).setLabel('Error').setStyle(ButtonStyle.Secondary);
+		const buttonBuilder = new TrueButtonBuilder().setCustomId(this.createCustomID(data)).setStyle(ButtonStyle.Secondary);
 		if (!this.builder) return buttonBuilder.setCustomId(`button-error-${this.customId}`);
 		return this.builder(buttonBuilder, data);
 	}
