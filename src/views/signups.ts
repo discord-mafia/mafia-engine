@@ -5,6 +5,7 @@ import SignupRemovePlayerMenu from '@root/events/selectMenus/removeUserFromSignu
 import viewDatabaseInfo from '@root/events/buttons/manageSignups/viewDatabaseInfo';
 import gotoHome from '@root/events/buttons/manageSignups/gotoHome';
 import manageSpecificQueue from '@root/events/buttons/manageSignups/manageCategories';
+import connectFeature from '@root/events/buttons/manageSignups/connectFeature';
 
 export function formatSignupEmbed(signup: FullSignup) {
 	const embed = new EmbedBuilder();
@@ -187,7 +188,7 @@ export function signupSettingsMain(signup: FullSignup): BaseMessageOptions {
 
 	const row = new ActionRowBuilder<ButtonBuilder>();
 
-	row.addComponents(manageSpecificQueue.build(signup.messageId), viewDatabaseInfo.build(signup.messageId));
+	row.addComponents(manageSpecificQueue.build(signup.messageId), connectFeature.build(signup.messageId), viewDatabaseInfo.build(signup.messageId));
 
 	return {
 		embeds: [embed],
