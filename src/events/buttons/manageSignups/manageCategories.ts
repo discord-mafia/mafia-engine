@@ -1,6 +1,8 @@
-import { signupSettingsManageCategories } from '@views/signups';
 import { getSignup } from '@models/signups';
+import manageCategory from '@root/events/selectMenus/signups/manageCategory';
 import { CustomButtonBuilder } from '@structures/interactions/Button';
+import { signupSettingsMain } from '@views/signups';
+import { ActionRowBuilder, StringSelectMenuBuilder } from 'discord.js';
 
 export default new CustomButtonBuilder('signups-manage-categories')
 	.onGenerate((builder) => builder.setLabel('Manage Categories'))
@@ -9,6 +11,22 @@ export default new CustomButtonBuilder('signups-manage-categories')
 		if (!cache) return i.reply({ content: 'The button you pressed was invalid', ephemeral: true });
 		const signup = await getSignup({ messageId: cache });
 		if (!signup) return i.reply({ content: 'The button you pressed was for a signup that no longer exists', ephemeral: true });
-		const payload = signupSettingsManageCategories(signup);
+
+		const payload = signupSettingsMain(signup);
+		const row = new ActionRowBuilder<StringSelectMenuBuilder>();
+
+		const select = manageCategory.build(signup.messageId);
+		select.addOptions(
+			signup.categories.map((v) => {
+				return {
+					label: v.name,
+					value: v.id.toString(),
+				};
+			})
+		);
+
+		row.addComponents(select);
+		payload.components = [row];
+
 		return await i.update(payload);
 	});

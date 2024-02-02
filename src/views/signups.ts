@@ -4,7 +4,7 @@ import removeUser from '@root/events/buttons/manageSignups/removePlayer';
 import SignupRemovePlayerMenu from '@root/events/selectMenus/removeUserFromSignup';
 import viewDatabaseInfo from '@root/events/buttons/manageSignups/viewDatabaseInfo';
 import gotoHome from '@root/events/buttons/manageSignups/gotoHome';
-import manageCategories from '@root/events/buttons/manageSignups/manageCategories';
+import manageSpecificQueue from '@root/events/buttons/manageSignups/manageCategories';
 
 export function formatSignupEmbed(signup: FullSignup) {
 	const embed = new EmbedBuilder();
@@ -187,7 +187,7 @@ export function signupSettingsMain(signup: FullSignup): BaseMessageOptions {
 
 	const row = new ActionRowBuilder<ButtonBuilder>();
 
-	row.addComponents(manageCategories.build(signup.messageId), viewDatabaseInfo.build(signup.messageId));
+	row.addComponents(manageSpecificQueue.build(signup.messageId), viewDatabaseInfo.build(signup.messageId));
 
 	return {
 		embeds: [embed],
@@ -216,8 +216,27 @@ export function signupSettingsDatabase(signup: FullSignup): BaseMessageOptions {
 	return { embeds: [embed], components: [row] };
 }
 
-export function signupSettingsManageCategories(signup: FullSignup): BaseMessageOptions {
-	const embed = getBasicEmbed({ title: 'Categories' });
+export function signupSettingsManageCategory(signup: FullSignup, categoryID: number): BaseMessageOptions {
+	const category = signup.categories.find((v) => v.id === categoryID);
+	if (!category) return signupSettingsMain(signup);
+
+	const embed = getBasicEmbed({ title: category.name });
+
+	const name = category.name;
+	const users = category.users;
+
+	let userStr = '```';
+	for (const user of users) {
+		userStr += `<@${user.user.discordId}> - ${user.user.username}\n`;
+	}
+	if (users.length === 0) userStr += 'None Yet...';
+	userStr += '```';
+
+	embed.addFields({
+		name: name,
+		value: userStr,
+		inline: true,
+	});
 
 	const row = new ActionRowBuilder<ButtonBuilder>();
 	row.addComponents(gotoHome.build(signup.messageId), removeUser.build(signup.messageId));
