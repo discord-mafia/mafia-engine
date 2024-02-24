@@ -1,8 +1,8 @@
-import { getSignup } from '@models/signups';
-import { prisma } from 'index';
-import { CustomUserSelectMenuBuilder } from 'structures/interactions/UserSelectMenu';
-import { InteractionError } from '@structures/interactions/_Interaction';
-import { formatSignupEmbed, signupSettingsMain } from '@views/signups';
+import { prisma } from '../..';
+import { getSignup } from '../../models/signups';
+import { CustomUserSelectMenuBuilder } from '../../structures/interactions/UserSelectMenu';
+import { InteractionError } from '../../structures/interactions/_Interaction';
+import { formatSignupEmbed, signupSettingsMain } from '../../views/signups';
 
 export default new CustomUserSelectMenuBuilder('manage-signps-players-remove')
 	.onGenerate((builder) => builder.setMaxValues(20).setMinValues(1).setPlaceholder('Players to remove from ALL categories'))

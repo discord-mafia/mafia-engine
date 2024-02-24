@@ -1,7 +1,7 @@
 import { EmbedBuilder } from 'discord.js';
 import { getMembersWithDiscordRole } from '../../util/discordRole';
 import config from '../../config';
-import { SlashCommand } from '@structures/interactions/SlashCommand';
+import { SlashCommand } from '../../structures/interactions/SlashCommand';
 
 const StaffRoles: string[] = [
 	'648664560936550400', // Co-Owners
@@ -10,7 +10,7 @@ const StaffRoles: string[] = [
 ];
 
 const CommunityContributorRoles: string[] = [
-	'903394030904299541',  // Technician
+	'903394030904299541', // Technician
 	'1134180413288501398', // Archivist
 	'1163201195519787029', // Game Balancer
 	'1174433972718157924', // Wiki Editor

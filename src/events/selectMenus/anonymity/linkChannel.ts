@@ -1,7 +1,7 @@
-import { getAnonymousGroup, linkChannelToGroup } from '@models/anonymity';
-import { CustomChannelSelectMenu } from '@structures/interactions/ChannelSelectMenu';
-import { anonEmbedManageChannels, embedCreateAnonymousGroup } from '@views/anonymity';
 import { ChannelType } from 'discord.js';
+import { getAnonymousGroup, linkChannelToGroup } from '../../../models/anonymity';
+import { CustomChannelSelectMenu } from '../../../structures/interactions/ChannelSelectMenu';
+import { embedCreateAnonymousGroup, anonEmbedManageChannels } from '../../../views/anonymity';
 
 export default new CustomChannelSelectMenu('anonymity-select-channels-link')
 	.onGenerate((builder) => builder.setPlaceholder('Select the channel to link').setMinValues(1).setMaxValues(1))

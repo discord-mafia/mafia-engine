@@ -1,7 +1,7 @@
-import { genCUID } from '@utils/random';
-import { type ColorResolvable, WebhookClient } from 'discord.js';
-import config from '@root/config';
-import { genLoggerEmbed } from '@views/logger';
+import { ColorResolvable, WebhookClient } from 'discord.js';
+import config from '../config';
+import { genLoggerEmbed } from '../views/logger';
+import { genCUID } from './random';
 
 export enum LogType {
 	Error = 'Error',

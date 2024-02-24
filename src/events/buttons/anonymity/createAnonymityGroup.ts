@@ -1,8 +1,8 @@
+import { ChannelType } from 'discord.js';
+import { anonymousGroupExistsInChannel, createAnonymousGroup } from '../../../models/anonymity';
 import { CustomButtonBuilder } from '../../../structures/interactions/Button';
 import { InteractionError } from '../../../structures/interactions/_Interaction';
-import { embedCreateAnonymousGroup } from '@views/anonymity';
-import { ChannelType } from 'discord.js';
-import { anonymousGroupExistsInChannel, createAnonymousGroup } from '@models/anonymity';
+import { embedCreateAnonymousGroup } from '../../../views/anonymity';
 
 export default new CustomButtonBuilder('manage-anonymity-create')
 	.onGenerate((builder) => builder.setLabel('Create Anonymous Group'))

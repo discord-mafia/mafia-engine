@@ -1,6 +1,6 @@
-import { getVoteCounter } from '@models/votecounter';
-import { CustomButtonBuilder } from '@structures/interactions/Button';
-import { genCreateVoteCountEmbed, genPlayersEmbed } from '@views/votecounter';
+import { getVoteCounter } from '../../../models/votecounter';
+import { CustomButtonBuilder } from '../../../structures/interactions/Button';
+import { genCreateVoteCountEmbed, genPlayersEmbed } from '../../../views/votecounter';
 
 export default new CustomButtonBuilder('manage-vc-players-tab')
 	.onGenerate((builder) => builder.setLabel('Manage Players'))

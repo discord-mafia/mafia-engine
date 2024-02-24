@@ -1,8 +1,8 @@
 import express from 'express';
 import path from 'path';
 import cors from 'cors';
-import config from '@root/config';
-import { router as apiRouter } from '@routers/apiRouter';
+import config from '../config';
+import { router as apiRouter } from '../routers/apiRouter';
 
 export const app = express();
 app.use(express.json());

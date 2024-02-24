@@ -1,7 +1,7 @@
+import { getVoteCounter, getPlayer } from '../../../models/votecounter';
 import { CustomUserSelectMenuBuilder } from '../../../structures/interactions/UserSelectMenu';
 import { InteractionError } from '../../../structures/interactions/_Interaction';
-import { getVoteCounter, getPlayer } from '@models/votecounter';
-import { genCreateVoteCountEmbed } from '@views/votecounter';
+import { genCreateVoteCountEmbed } from '../../../views/votecounter';
 import SetVoteWeightModal from '../../modals/setVoteWeight';
 
 export default new CustomUserSelectMenuBuilder('manage-vc-select-players-vote-weight')

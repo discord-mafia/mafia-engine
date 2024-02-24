@@ -1,9 +1,9 @@
-import { getAnonymousGroup, getAnonymousProfile } from '@models/anonymity';
-import setProfileUser from '@root/events/selectMenus/anonymity/setProfileUser';
-import { CustomButtonBuilder } from '@structures/interactions/Button';
-import { InteractionError } from '@structures/interactions/_Interaction';
-import { anonEmbedManageSpecificProfile, embedCreateAnonymousGroup } from '@views/anonymity';
 import { ActionRowBuilder, UserSelectMenuBuilder } from 'discord.js';
+import { getAnonymousGroup, getAnonymousProfile } from '../../../../../models/anonymity';
+import { CustomButtonBuilder } from '../../../../../structures/interactions/Button';
+import { InteractionError } from '../../../../../structures/interactions/_Interaction';
+import { embedCreateAnonymousGroup, anonEmbedManageSpecificProfile } from '../../../../../views/anonymity';
+import setProfileUser from '../../../../selectMenus/anonymity/setProfileUser';
 
 export default new CustomButtonBuilder('manage-anonymity-profile-set-user')
 	.onGenerate((builder) => builder.setLabel('Set User'))

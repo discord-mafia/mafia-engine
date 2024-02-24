@@ -1,9 +1,9 @@
-import { anonEmbedManageChannels, embedCreateAnonymousGroup } from '@views/anonymity';
+import { getAnonymousGroup } from '../../../../models/anonymity';
 import { CustomButtonBuilder } from '../../../../structures/interactions/Button';
 import { InteractionError } from '../../../../structures/interactions/_Interaction';
 import { ActionRowBuilder, ChannelSelectMenuBuilder } from 'discord.js';
-import linkChannel from '@root/events/selectMenus/anonymity/linkChannel';
-import { getAnonymousGroup } from '@models/anonymity';
+import { anonEmbedManageChannels, embedCreateAnonymousGroup } from '../../../../views/anonymity';
+import linkChannel from '../../../selectMenus/anonymity/linkChannel';
 
 export default new CustomButtonBuilder('manage-anonymity-link-channel')
 	.onGenerate((builder) => builder.setLabel('Link Channel'))

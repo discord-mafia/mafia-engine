@@ -1,8 +1,8 @@
 import { ButtonStyle } from 'discord.js';
+import { getAnonymousGroup } from '../../../models/anonymity';
 import { CustomButtonBuilder } from '../../../structures/interactions/Button';
 import { InteractionError } from '../../../structures/interactions/_Interaction';
-import { anonEmbedMainPage, embedCreateAnonymousGroup } from '@views/anonymity';
-import { getAnonymousGroup } from '@models/anonymity';
+import { anonEmbedMainPage, embedCreateAnonymousGroup } from '../../../views/anonymity';
 
 export default new CustomButtonBuilder('manage-anonymity-goto-home')
 	.onGenerate((builder) => builder.setLabel('Home').setStyle(ButtonStyle.Primary))

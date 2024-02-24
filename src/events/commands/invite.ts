@@ -1,4 +1,4 @@
-import { SlashCommand } from '@structures/interactions/SlashCommand';
+import { SlashCommand } from '../../structures/interactions/SlashCommand';
 
 export default new SlashCommand('invite')
 	.setDescription('See the invite links for our servers')
@@ -16,9 +16,7 @@ export default new SlashCommand('invite')
 			)
 		);
 
-		cmd.addBooleanOption((pub) =>
-			pub.setName('reveal').setDescription('Send this publicly (ignore or FALSE for just yourself)').setRequired(false)
-		);
+		cmd.addBooleanOption((pub) => pub.setName('reveal').setDescription('Send this publicly (ignore or FALSE for just yourself)').setRequired(false));
 	})
 	.onExecute(async (i) => {
 		const link = i.options.getString('server', true);

@@ -1,8 +1,8 @@
-import { getVoteCounter } from '@models/votecounter';
-import { prisma } from '@root/index';
-import { CustomButtonBuilder } from '@structures/interactions/Button';
-import { InteractionError } from '@structures/interactions/_Interaction';
-import { genCreateVoteCountEmbed, genVoteCountEmbed } from '@views/votecounter';
+import { prisma } from '../../..';
+import { getVoteCounter } from '../../../models/votecounter';
+import { CustomButtonBuilder } from '../../../structures/interactions/Button';
+import { InteractionError } from '../../../structures/interactions/_Interaction';
+import { genCreateVoteCountEmbed, genVoteCountEmbed } from '../../../views/votecounter';
 
 export default new CustomButtonBuilder('manage-vc-create')
 	.onGenerate((builder) => builder.setLabel('Create VC'))

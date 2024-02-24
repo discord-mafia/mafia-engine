@@ -1,7 +1,7 @@
-import { getSignup } from '@models/signups';
-import { InteractionError } from '@structures/interactions/_Interaction';
-import { CustomStringSelectMenu } from '@structures/interactions/StringSelectMenu';
-import { signupSettingsManageCategory } from '@views/signups';
+import { getSignup } from '../../../models/signups';
+import { CustomStringSelectMenu } from '../../../structures/interactions/StringSelectMenu';
+import { InteractionError } from '../../../structures/interactions/_Interaction';
+import { signupSettingsManageCategory } from '../../../views/signups';
 
 export default new CustomStringSelectMenu('manage-signups-categories')
 	.onGenerate((builder) => builder.setMaxValues(1).setMinValues(1).setPlaceholder('Select the category to manage'))

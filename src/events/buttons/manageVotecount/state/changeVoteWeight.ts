@@ -1,9 +1,9 @@
+import { getVoteCounter } from '../../../../models/votecounter';
 import { CustomButtonBuilder } from '../../../../structures/interactions/Button';
-import { getVoteCounter } from '@models/votecounter';
-import VoteWeightPlayerMenu from '@root/events/selectMenus/manageVotecount/selectPlayerVoteWeight';
-import { InteractionError } from '@structures/interactions/_Interaction';
-import { genCreateVoteCountEmbed, genStateEmbed } from '@views/votecounter';
 import { ActionRowBuilder, UserSelectMenuBuilder } from 'discord.js';
+import { InteractionError } from '../../../../structures/interactions/_Interaction';
+import { genCreateVoteCountEmbed, genStateEmbed } from '../../../../views/votecounter';
+import VoteWeightPlayerMenu from '../../../selectMenus/manageVotecount/selectPlayerVoteWeight';
 
 export default new CustomButtonBuilder('manage-vc-players-set-vote-weight')
 	.onGenerate((builder) => builder.setLabel('Set Vote Weight'))

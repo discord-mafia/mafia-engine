@@ -1,8 +1,8 @@
 import { type AutoLocker } from '@prisma/client';
 import { prisma } from '..';
 import { ChannelType } from 'discord.js';
-import { editChannelPermission } from '@utils/discordChannels';
 import { getGuilds } from './botController';
+import { editChannelPermission } from '../util/discordChannels';
 
 const CRON_LOOP_INTERVAL = 1000 * 60;
 

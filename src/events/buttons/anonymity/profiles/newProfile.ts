@@ -1,7 +1,7 @@
-import { createAnonymousProfile, getAnonymousGroup } from '@models/anonymity';
+import { getAnonymousGroup, createAnonymousProfile } from '../../../../models/anonymity';
 import { CustomButtonBuilder } from '../../../../structures/interactions/Button';
 import { InteractionError } from '../../../../structures/interactions/_Interaction';
-import { anonEmbedManageProfiles, anonEmbedManageSpecificProfile, embedCreateAnonymousGroup } from '@views/anonymity';
+import { embedCreateAnonymousGroup, anonEmbedManageProfiles, anonEmbedManageSpecificProfile } from '../../../../views/anonymity';
 
 export default new CustomButtonBuilder('manage-anonymity-profile-new')
 	.onGenerate((builder) => builder.setLabel('Add Profile'))

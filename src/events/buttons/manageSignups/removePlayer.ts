@@ -1,6 +1,6 @@
-import { getSignup } from '@models/signups';
-import { CustomButtonBuilder } from '@structures/interactions/Button';
 import { ActionRowBuilder, UserSelectMenuBuilder } from 'discord.js';
+import { getSignup } from '../../../models/signups';
+import { CustomButtonBuilder } from '../../../structures/interactions/Button';
 import removeUserSelect from '../../selectMenus/removeUserFromSignup';
 export enum VCSettings {
 	LOCK_VOTES = 'lock-votes',

@@ -1,6 +1,6 @@
-import { client } from '@controllers/botController';
-import { getAnonymousGroup, getAnonymousProfiles } from '@models/anonymity';
 import { ChannelType, Message, Webhook } from 'discord.js';
+import { client } from '../../controllers/botController';
+import { getAnonymousGroup, getAnonymousProfiles } from '../../models/anonymity';
 
 export default async function OnMessageCreate(msg: Message<boolean>) {
 	if (!msg.channel.isThread()) return;

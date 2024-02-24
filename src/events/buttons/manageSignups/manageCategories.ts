@@ -1,8 +1,8 @@
-import { getSignup } from '@models/signups';
-import manageCategory from '@root/events/selectMenus/signups/manageCategory';
-import { CustomButtonBuilder } from '@structures/interactions/Button';
-import { signupSettingsMain } from '@views/signups';
 import { ActionRowBuilder, StringSelectMenuBuilder } from 'discord.js';
+import { getSignup } from '../../../models/signups';
+import { CustomButtonBuilder } from '../../../structures/interactions/Button';
+import { signupSettingsMain } from '../../../views/signups';
+import manageCategory from '../../selectMenus/signups/manageCategory';
 
 export default new CustomButtonBuilder('signups-manage-categories')
 	.onGenerate((builder) => builder.setLabel('Manage Categories'))

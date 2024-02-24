@@ -1,5 +1,5 @@
-import type { Role } from '@models/gameRoles';
 import { EmbedBuilder, type ColorResolvable } from 'discord.js';
+import { Role } from '../models/gameRoles';
 
 export function genRoleEmbed(role: Role) {
 	const embed = new EmbedBuilder();

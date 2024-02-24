@@ -1,7 +1,7 @@
-import { prisma } from '@root/index';
-import { SlashCommand } from '@structures/interactions/SlashCommand';
-import { InteractionError } from '@structures/interactions/_Interaction';
 import { ChannelType, PermissionFlagsBits } from 'discord.js';
+import { prisma } from '../../..';
+import { SlashCommand } from '../../../structures/interactions/SlashCommand';
+import { InteractionError } from '../../../structures/interactions/_Interaction';
 
 export default new SlashCommand('autolock')
 	.setDescription('Lock a channel at a particular time')

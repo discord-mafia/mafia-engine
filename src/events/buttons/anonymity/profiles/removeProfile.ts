@@ -1,9 +1,9 @@
-import { getAnonymousGroup, getAnonymousProfiles } from '@models/anonymity';
+import { ActionRowBuilder, StringSelectMenuBuilder } from 'discord.js';
+import { getAnonymousGroup, getAnonymousProfiles } from '../../../../models/anonymity';
 import { CustomButtonBuilder } from '../../../../structures/interactions/Button';
 import { InteractionError } from '../../../../structures/interactions/_Interaction';
-import { anonEmbedManageProfiles, embedCreateAnonymousGroup } from '@views/anonymity';
-import { ActionRowBuilder, StringSelectMenuBuilder } from 'discord.js';
-import removeProfile from '@root/events/selectMenus/anonymity/removeProfile';
+import { embedCreateAnonymousGroup, anonEmbedManageProfiles } from '../../../../views/anonymity';
+import removeProfile from '../../../selectMenus/anonymity/removeProfile';
 
 export default new CustomButtonBuilder('manage-anonymity-profile-remove')
 	.onGenerate((builder) => builder.setLabel('Remove Profile'))

@@ -1,8 +1,8 @@
+import { prisma } from '../../..';
+import { getVoteCounter, getPlayer } from '../../../models/votecounter';
 import { CustomUserSelectMenuBuilder } from '../../../structures/interactions/UserSelectMenu';
 import { InteractionError } from '../../../structures/interactions/_Interaction';
-import { getVoteCounter, getPlayer } from '@models/votecounter';
-import { genCreateVoteCountEmbed, genStateEmbed } from '@views/votecounter';
-import { prisma } from '@root/index';
+import { genCreateVoteCountEmbed, genStateEmbed } from '../../../views/votecounter';
 
 export default new CustomUserSelectMenuBuilder('manage-vc-select-players-votable')
 	.onGenerate((builder) => builder.setMaxValues(1).setMinValues(1).setPlaceholder('The players to change vote weight'))

@@ -1,9 +1,9 @@
 import { ActionRowBuilder, TextInputBuilder, type CacheType, type ModalSubmitInteraction, type ModalActionRowComponentBuilder, TextInputStyle } from 'discord.js';
 import { Modal } from '../../structures/interactions/Modal';
 import { InteractionError } from '../../structures/interactions/_Interaction';
-import { getVoteCounter } from '@models/votecounter';
-import { genCreateVoteCountEmbed, genStateEmbed } from '@views/votecounter';
-import { prisma } from '@root/index';
+import { prisma } from '../..';
+import { getVoteCounter } from '../../models/votecounter';
+import { genCreateVoteCountEmbed, genStateEmbed } from '../../views/votecounter';
 
 export default new Modal('manage-vc-players-set-vote-weight')
 	.set((modal) => {

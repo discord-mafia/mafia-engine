@@ -1,9 +1,9 @@
 import { CustomUserSelectMenuBuilder } from '../../../structures/interactions/UserSelectMenu';
 import { InteractionError } from '../../../structures/interactions/_Interaction';
 import { prisma } from '../../..';
-import { getOrCreateUser } from '@models/users';
-import { getVoteCounter, getPlayer } from '@models/votecounter';
-import { genCreateVoteCountEmbed, genPlayersEmbed } from '@views/votecounter';
+import { getOrCreateUser } from '../../../models/users';
+import { getVoteCounter, getPlayer } from '../../../models/votecounter';
+import { genCreateVoteCountEmbed, genPlayersEmbed } from '../../../views/votecounter';
 
 export default new CustomUserSelectMenuBuilder('manage-vc-select-players-add')
 	.onGenerate((builder) => builder.setMaxValues(25).setMinValues(1).setPlaceholder('Players to add to the vote counter'))

@@ -1,6 +1,6 @@
-import { prisma } from 'index';
-import { sql } from '@models/database';
+import { prisma } from '../';
 import { z } from 'zod';
+import { sql } from './database';
 
 type RoleNameQuery = {
 	forceLowercase: boolean;

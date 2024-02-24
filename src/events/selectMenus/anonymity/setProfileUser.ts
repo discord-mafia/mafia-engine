@@ -1,7 +1,7 @@
-import { getAnonymousProfile, updateAnonymousProfile } from '@models/anonymity';
+import { getAnonymousProfile, updateAnonymousProfile } from '../../../models/anonymity';
 import { CustomUserSelectMenuBuilder } from '../../../structures/interactions/UserSelectMenu';
 import { InteractionError } from '../../../structures/interactions/_Interaction';
-import { anonEmbedManageSpecificProfile } from '@views/anonymity';
+import { anonEmbedManageSpecificProfile } from '../../../views/anonymity';
 
 export default new CustomUserSelectMenuBuilder('anon-profile-set-user')
 	.onGenerate((builder) => builder.setMaxValues(1).setMinValues(1).setPlaceholder('Players to set as the anonymous profile'))

@@ -1,6 +1,6 @@
+import { prisma } from '../../../..';
+import { getVoteCounter } from '../../../../models/votecounter';
 import { CustomButtonBuilder } from '../../../../structures/interactions/Button';
-import { getVoteCounter } from '@models/votecounter';
-import { prisma } from '@root/index';
 import { genTogglesMenu } from '../gotoToggles';
 
 export enum VCSettings {
