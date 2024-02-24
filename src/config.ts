@@ -14,8 +14,7 @@ const envSchema = z.object({
 	TURBO_SERVER_ID: z.string(),
 
 	VITE_REACT_APP_CLERK_PUBLISHABLE_KEY: z.string().optional(),
-	DISCORD_OAUTH_REDIRECT_URI: z.string(),
-
+	DISCORD_OAUTH_REDIRECT_URI: z.string().optional(),
 	GENERAL_LOG_WEBHOOK: z.string().url().optional(),
 	SIGNUP_LOG_WEBHOOK: z.string().url().nullish(),
 });
