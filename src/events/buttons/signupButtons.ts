@@ -4,7 +4,7 @@ import { prisma } from '@root/index';
 import { CustomButtonBuilder } from '@structures/interactions/Button';
 import { InteractionError } from '@structures/interactions/_Interaction';
 import { Logger, LogType } from '@utils/logger';
-import { genSignupSettingsEmbed, genSignupSettingsComponents, formatSignupEmbed } from '@views/signups';
+import { formatSignupEmbed, signupSettingsMain } from '@views/signups';
 import { Colors, Role } from 'discord.js';
 
 export default new CustomButtonBuilder('button-category')
@@ -103,11 +103,8 @@ export default new CustomButtonBuilder('button-category')
 			const isAdmin = member.permissions.has('Administrator');
 			const isHost = signup.hosts.map((v) => v.user.discordId).includes(i.user.id);
 			if (!(isAdmin || isHost)) return i.editReply({ content: 'You do not have permission to edit this signup' });
-
-			const embed = genSignupSettingsEmbed(signup);
-			const row = genSignupSettingsComponents(signup);
-
-			return i.editReply({ embeds: [embed], components: [row] });
+			const payload = signupSettingsMain(signup);
+			return i.editReply(payload);
 		} else {
 			const categoryId = parseInt(cache);
 			if (isNaN(categoryId)) return i.editReply({ content: 'This button is invalid' });

@@ -1,7 +1,11 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, type UserSelectMenuBuilder, type Snowflake } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, type UserSelectMenuBuilder, type Snowflake, BaseMessageOptions } from 'discord.js';
 import { type FullSignup } from '@models/signups';
-import RemovePlayerFromSignupsButton from '@root/events/buttons/manageSignups/removePlayer';
+import removeUser from '@root/events/buttons/manageSignups/removePlayer';
 import SignupRemovePlayerMenu from '@root/events/selectMenus/removeUserFromSignup';
+import viewDatabaseInfo from '@root/events/buttons/manageSignups/viewDatabaseInfo';
+import gotoHome from '@root/events/buttons/manageSignups/gotoHome';
+import manageSpecificQueue from '@root/events/buttons/manageSignups/manageCategories';
+import connectFeature from '@root/events/buttons/manageSignups/connectFeature';
 
 export function formatSignupEmbed(signup: FullSignup) {
 	const embed = new EmbedBuilder();
@@ -152,7 +156,7 @@ export function genSignupSettingsEmbed(signup: FullSignup) {
 
 export function genSignupSettingsComponents(signup: FullSignup) {
 	const row = new ActionRowBuilder<ButtonBuilder>();
-	row.addComponents(RemovePlayerFromSignupsButton.build(signup.messageId));
+	row.addComponents(removeUser.build(signup.messageId));
 	return row;
 }
 
@@ -160,4 +164,83 @@ export function genSignupRemovePlayersComponents(signup: FullSignup) {
 	const row = new ActionRowBuilder<UserSelectMenuBuilder>();
 	row.addComponents(SignupRemovePlayerMenu.build(signup.messageId));
 	return row;
+}
+
+type BasicEmbedOptions = {
+	title?: string;
+};
+function getBasicEmbed(options: BasicEmbedOptions = {}): EmbedBuilder {
+	const embed = new EmbedBuilder();
+	embed.setTitle('Signup Management');
+	embed.setDescription('This is your hub to manage the signup. Only designated hosts and admins can access this.');
+	if (options.title) embed.setTitle(embed.data.title + ` - ${options.title}`);
+	return embed;
+}
+
+export function signupSettingsMain(signup: FullSignup): BaseMessageOptions {
+	const embed = getBasicEmbed();
+
+	const categories = signup.categories.map((v) => `> ${v.name} ${v.limit > 0 ? `(${v.users.length}/${v.limit})` : `(${v.users.length}`})`);
+	embed.addFields({
+		name: 'Categories',
+		value: categories.length > 0 ? categories.join('\n') : '> None',
+	});
+
+	const row = new ActionRowBuilder<ButtonBuilder>();
+
+	row.addComponents(manageSpecificQueue.build(signup.messageId), connectFeature.build(signup.messageId), viewDatabaseInfo.build(signup.messageId));
+
+	return {
+		embeds: [embed],
+		components: [row],
+	};
+}
+
+export function signupSettingsDatabase(signup: FullSignup): BaseMessageOptions {
+	const embed = getBasicEmbed({ title: 'Database' });
+	embed.addFields(
+		{
+			name: 'Signup Index',
+			value: '> ' + signup.id.toString(),
+			inline: true,
+		},
+		{
+			name: 'Category Index List',
+			value: signup.categories.length > 0 ? signup.categories.map((x) => `> ${x.name} - ${x.id}`).join('\n') : '> None',
+			inline: true,
+		}
+	);
+
+	const row = new ActionRowBuilder<ButtonBuilder>();
+	row.addComponents(gotoHome.build(signup.messageId));
+
+	return { embeds: [embed], components: [row] };
+}
+
+export function signupSettingsManageCategory(signup: FullSignup, categoryID: number): BaseMessageOptions {
+	const category = signup.categories.find((v) => v.id === categoryID);
+	if (!category) return signupSettingsMain(signup);
+
+	const embed = getBasicEmbed({ title: category.name });
+
+	const name = category.name;
+	const users = category.users;
+
+	let userStr = '```';
+	for (const user of users) {
+		userStr += `<@${user.user.discordId}> - ${user.user.username}\n`;
+	}
+	if (users.length === 0) userStr += 'None Yet...';
+	userStr += '```';
+
+	embed.addFields({
+		name: name,
+		value: userStr,
+		inline: true,
+	});
+
+	const row = new ActionRowBuilder<ButtonBuilder>();
+	row.addComponents(gotoHome.build(signup.messageId), removeUser.build(signup.messageId));
+
+	return { embeds: [embed], components: [row] };
 }

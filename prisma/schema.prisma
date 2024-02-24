@@ -135,6 +135,7 @@ model Player {
   votesIncoming Vote[]       @relation(name: "votedTarget")
   votesOutgoing Vote[]       @relation(name: "voter")
   voteWeight    Int          @default(1)
+  canBeVoted    Boolean      @default(true)
 
   @@unique([voteCounterId, discordId])
 }

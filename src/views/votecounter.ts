@@ -9,6 +9,7 @@ import RemovePlayersButton from '@root/events/buttons/manageVotecount/players/re
 import ReplacePlayersButton from '@root/events/buttons/manageVotecount/players/replacePlayer';
 import ManageVoteWeight from '@root/events/buttons/manageVotecount/state/changeVoteWeight';
 import JumpToDayButton from '@root/events/buttons/manageVotecount/state/jumpToDay';
+import toggleVotable from '@root/events/buttons/manageVotecount/state/toggleVotable';
 import { type BaseMessageOptions, EmbedBuilder, ActionRowBuilder, type ButtonBuilder } from 'discord.js';
 import { type Snowflake } from 'discord.js';
 
@@ -49,7 +50,7 @@ export function genVoteCountEmbed(vc: FullVoteCount): BaseMessageOptions {
 		inline: true,
 	});
 
-	const players = vc.players.length > 0 ? vc.players.map((p, i) => `${i + 1}. ${p.user.username} ${p.voteWeight == 1 ? '' : `[x${p.voteWeight}]`}`).join('\n') : '> None';
+	const players = vc.players.length > 0 ? vc.players.map((p, i) => `${i + 1}. ${p.user.username} ${p.voteWeight == 1 ? `${p.canBeVoted ? '' : '[cannot be voted]'}` : `[x${p.voteWeight}${p.canBeVoted ? '' : ', cannot be voted'}]`}`).join('\n') : '> None';
 	embed.addFields({
 		name: 'Players',
 		value: players,
@@ -70,7 +71,7 @@ export function genStateEmbed(vc: FullVoteCount): BaseMessageOptions {
 	const { embeds } = genVoteCountEmbed(vc);
 
 	const row = new ActionRowBuilder<ButtonBuilder>();
-	row.addComponents(GoHomeButton.build(), JumpToDayButton.build(), ManageVoteWeight.build());
+	row.addComponents(GoHomeButton.build(), JumpToDayButton.build(), ManageVoteWeight.build(), toggleVotable.build());
 	return {
 		embeds,
 		components: [row],
@@ -115,6 +116,7 @@ export function calculateVoteCount(vc: FullVoteCount) {
 
 	let votingNoLynch: Snowflake[] = [];
 	let nonVoters: Snowflake[] = [];
+	const cannotBeVoted: Snowflake[] = [];
 
 	vc.votes.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 	const checkMajorityReached = () => {
@@ -125,6 +127,8 @@ export function calculateVoteCount(vc: FullVoteCount) {
 		players.set(player.discordId, player.user.username);
 		weights.set(player.discordId, player.voteWeight);
 		nonVoters.push(player.discordId);
+
+		if (!player.canBeVoted) cannotBeVoted.push(player.discordId);
 	}
 
 	for (const vote of vc.votes) {
@@ -139,7 +143,12 @@ export function calculateVoteCount(vc: FullVoteCount) {
 
 		wagons.forEach((wagon, key) => {
 			const exists = wagon.includes(voterId);
-			const isFocused = !isNoLynch && !isUnvote && key == votedTargetId;
+
+			const isNotVotingNL = !isNoLynch;
+			const isNotVotingUnvote = !isUnvote;
+			const isTarget = key == votedTargetId;
+			const canBeVoted = vote.votedTarget?.canBeVoted === undefined ? true : vote.votedTarget.canBeVoted;
+			const isFocused = isNotVotingNL && isNotVotingUnvote && isTarget && canBeVoted;
 
 			if (exists && !isFocused) {
 				votingNoLynch = votingNoLynch.filter((id) => id != voterId);
@@ -174,6 +183,7 @@ export function calculateVoteCount(vc: FullVoteCount) {
 			majority: vc.majority,
 		},
 		iteration: [vc.currentRound, vc.currentIteration],
+		cannotBeVoted,
 	};
 }
 
@@ -190,6 +200,7 @@ export function formatVoteCount(calculated: CalculatedVoteCount) {
 		value: string;
 	};
 	const rawWagons: Wagon[] = [];
+	let cannotBeVotedString: undefined | string;
 
 	wagons.forEach((wagon, key) => {
 		if (wagon.length > 0) {
@@ -230,6 +241,18 @@ export function formatVoteCount(calculated: CalculatedVoteCount) {
 		rawWagons.push({ name, size: calculated.nonVoters.length, value });
 	}
 
+	if (calculated.cannotBeVoted.length > 0) {
+		const name = 'Cannot Be Voted: ';
+		const value = calculated.cannotBeVoted
+			.map((id) => {
+				const player = players.get(id) ?? `<@${id}>`;
+				return `${player}`;
+			})
+			.join(', ');
+
+		cannotBeVotedString = name + value;
+	}
+
 	// Go through rawWagons and make all the first element in the array the same length, pad with spaces
 	const longestWagonName = Math.max(...rawWagons.map((wagon) => wagon.name.length));
 	const longestSizeCharacters = Math.max(...rawWagons.map((wagon) => wagon.size.toString().length));
@@ -249,6 +272,7 @@ export function formatVoteCount(calculated: CalculatedVoteCount) {
 	if (noLynchValue) format += `\n${noLynchValue}`;
 	if (notVotingValue) format += `\n${notVotingValue}`;
 	if (noLynchValue || notVotingValue) format += '\n';
+	if (cannotBeVotedString) format += `\n${cannotBeVotedString}`;
 
 	const hasSettings = calculated.settings.majority;
 	if (hasSettings) format += '\n- - - - -\n';

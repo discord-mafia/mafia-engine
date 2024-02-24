@@ -1,7 +1,7 @@
-import { genSignupSettingsEmbed, genSignupRemovePlayersComponents } from '@views/signups';
 import { getSignup } from '@models/signups';
 import { CustomButtonBuilder } from '@structures/interactions/Button';
-
+import { ActionRowBuilder, UserSelectMenuBuilder } from 'discord.js';
+import removeUserSelect from '../../selectMenus/removeUserFromSignup';
 export enum VCSettings {
 	LOCK_VOTES = 'lock-votes',
 	MAJORITY = 'majority',
@@ -16,8 +16,8 @@ export default new CustomButtonBuilder('remove-player-from-signup')
 		const signup = await getSignup({ messageId: cache });
 		if (!signup) return i.reply({ content: 'The button you pressed was for a signup that no longer exists', ephemeral: true });
 
-		const embed = genSignupSettingsEmbed(signup);
-		const row = genSignupRemovePlayersComponents(signup);
+		const row = new ActionRowBuilder<UserSelectMenuBuilder>();
+		row.addComponents(removeUserSelect.build(signup.messageId));
 
-		return await i.update({ embeds: [embed], components: [row] });
+		return await i.update({ components: [row] });
 	});
