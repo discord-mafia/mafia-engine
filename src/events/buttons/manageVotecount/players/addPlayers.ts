@@ -1,8 +1,8 @@
 import { type UserSelectMenuBuilder, ActionRowBuilder } from 'discord.js';
 import { CustomButtonBuilder } from '../../../../structures/interactions/Button';
-import { getVoteCounter } from '@models/votecounter';
 import AddPlayersMenu from '../../../selectMenus/manageVotecount/addPlayers';
-import { genCreateVoteCountEmbed, genPlayersEmbed } from '@views/votecounter';
+import { getVoteCounter } from '../../../../models/votecounter';
+import { genCreateVoteCountEmbed, genPlayersEmbed } from '../../../../views/votecounter';
 
 export default new CustomButtonBuilder('manage-vc-players-add')
 	.onGenerate((builder) => builder.setLabel('Add Player/s'))

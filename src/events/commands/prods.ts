@@ -1,17 +1,13 @@
 import { ChannelType, Colors, EmbedBuilder, type Message, type TextChannel } from 'discord.js';
-import { SlashCommand } from '@structures/interactions/SlashCommand';
+import { SlashCommand } from '../../structures/interactions/SlashCommand';
 
 export default new SlashCommand('prods')
 	.setDescription('Generate prods')
 	.set((cmd) => {
 		cmd.addRoleOption((role) => role.setName('aliveline').setDescription('Role which all living players have').setRequired(true));
-		cmd.addChannelOption((channel) =>
-			channel.setName('channel').setDescription('Channel to check prods within').addChannelTypes(ChannelType.GuildText).setRequired(true)
-		);
+		cmd.addChannelOption((channel) => channel.setName('channel').setDescription('Channel to check prods within').addChannelTypes(ChannelType.GuildText).setRequired(true));
 		cmd.addIntegerOption((str) => str.setName('ago').setDescription('How many hours to check back').setRequired(true));
-		cmd.addIntegerOption((str) =>
-			str.setName('requirement').setDescription('How many posts do you want them to have to pass.').setRequired(true)
-		);
+		cmd.addIntegerOption((str) => str.setName('requirement').setDescription('How many posts do you want them to have to pass.').setRequired(true));
 	})
 	.onExecute(async (i) => {
 		const aliveLine = i.options.getRole('aliveline', true);

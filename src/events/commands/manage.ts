@@ -1,10 +1,10 @@
-import { getVoteCounter } from '@models/votecounter';
-import { genCreateVoteCountEmbed, genVoteCountEmbed } from '@views/votecounter';
-import { SlashCommand } from '@structures/interactions/SlashCommand';
-import { CustomError } from '@utils/errors';
-import { ChannelType, PermissionFlagsBits } from 'discord.js';
-import { anonEmbedMainPage, embedCreateAnonymousGroup } from '@views/anonymity';
-import { getAnonymousGroup } from '@models/anonymity';
+import { PermissionFlagsBits, ChannelType } from 'discord.js';
+import { getAnonymousGroup } from '../../models/anonymity';
+import { getVoteCounter } from '../../models/votecounter';
+import { SlashCommand } from '../../structures/interactions/SlashCommand';
+import { CustomError } from '../../util/errors';
+import { anonEmbedMainPage, embedCreateAnonymousGroup } from '../../views/anonymity';
+import { genCreateVoteCountEmbed, genVoteCountEmbed } from '../../views/votecounter';
 
 export default new SlashCommand('manage')
 	.setDescription('Manage an part of the bot')

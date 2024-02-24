@@ -1,16 +1,16 @@
-import { AnonymousGroup, AnonymousProfile, getAnonymousProfiles } from '@models/anonymity';
-import linkChannel from '@root/events/buttons/anonymity/channels/linkChannel';
-import unlinkChannel from '@root/events/buttons/anonymity/channels/unlinkChannel';
-import CreateAnonymityGroup from '@root/events/buttons/anonymity/createAnonymityGroup';
-import gotoChannels from '@root/events/buttons/anonymity/gotoChannels';
-import gotoHome from '@root/events/buttons/anonymity/gotoHome';
-import gotoProfiles from '@root/events/buttons/anonymity/gotoProfiles';
-import setAvatar from '@root/events/buttons/anonymity/profiles/controls/setAvatar';
-import setName from '@root/events/buttons/anonymity/profiles/controls/setName';
-import setUser from '@root/events/buttons/anonymity/profiles/controls/setUser';
-import newProfile from '@root/events/buttons/anonymity/profiles/newProfile';
-import removeProfile from '@root/events/buttons/anonymity/profiles/removeProfile';
-import updateProfile from '@root/events/buttons/anonymity/profiles/updateProfile';
+import { AnonymousGroup, AnonymousProfile, getAnonymousProfiles } from '../models/anonymity';
+import linkChannel from '../events/buttons/anonymity/channels/linkChannel';
+import unlinkChannel from '../events/buttons/anonymity/channels/unlinkChannel';
+import CreateAnonymityGroup from '../events/buttons/anonymity/createAnonymityGroup';
+import gotoChannels from '../events/buttons/anonymity/gotoChannels';
+import gotoHome from '../events/buttons/anonymity/gotoHome';
+import gotoProfiles from '../events/buttons/anonymity/gotoProfiles';
+import setAvatar from '../events/buttons/anonymity/profiles/controls/setAvatar';
+import setName from '../events/buttons/anonymity/profiles/controls/setName';
+import setUser from '../events/buttons/anonymity/profiles/controls/setUser';
+import newProfile from '../events/buttons/anonymity/profiles/newProfile';
+import removeProfile from '../events/buttons/anonymity/profiles/removeProfile';
+import updateProfile from '../events/buttons/anonymity/profiles/updateProfile';
 import { ActionRowBuilder, BaseMessageOptions, ButtonBuilder, EmbedBuilder } from 'discord.js';
 
 export function embedCreateAnonymousGroup(): BaseMessageOptions {

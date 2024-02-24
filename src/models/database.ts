@@ -1,4 +1,4 @@
-import config from '@root/config';
+import config from '../config';
 import { Client } from 'pg';
 
 const pgClient = new Client({

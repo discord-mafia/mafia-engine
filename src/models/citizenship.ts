@@ -1,5 +1,5 @@
 import { type Snowflake } from 'discord.js';
-import { prisma } from 'index';
+import { prisma } from '../';
 
 type NameQuery = { name: string };
 type DiscordIdQuery = { discordId: Snowflake };

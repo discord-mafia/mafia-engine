@@ -1,7 +1,7 @@
-import { capitalize } from '@utils/string';
-import { getRoleByName, getRoleNames } from '@models/gameRoles';
-import { genRoleEmbed } from '@views/roles';
-import { SlashCommand } from '@structures/interactions/SlashCommand';
+import { getRoleByName, getRoleNames } from '../../models/gameRoles';
+import { SlashCommand } from '../../structures/interactions/SlashCommand';
+import { capitalize } from '../../util/string';
+import { genRoleEmbed } from '../../views/roles';
 
 export default new SlashCommand('role')
 	.setDescription('View a role')

@@ -1,6 +1,6 @@
-import { signupSettingsMain } from '@views/signups';
-import { getSignup } from '@models/signups';
-import { CustomButtonBuilder } from '@structures/interactions/Button';
+import { getSignup } from '../../../../models/signups';
+import { CustomButtonBuilder } from '../../../../structures/interactions/Button';
+import { signupSettingsMain } from '../../../../views/signups';
 
 export default new CustomButtonBuilder('signups-connect-feature-vc')
 	.onGenerate((builder) => builder.setLabel('VoteCounter'))

@@ -1,9 +1,9 @@
-import { getAnonymousGroup, getAnonymousProfiles } from '@models/anonymity';
+import { ActionRowBuilder, StringSelectMenuBuilder } from 'discord.js';
+import { getAnonymousGroup, getAnonymousProfiles } from '../../../../models/anonymity';
 import { CustomButtonBuilder } from '../../../../structures/interactions/Button';
 import { InteractionError } from '../../../../structures/interactions/_Interaction';
-import { anonEmbedManageProfiles, embedCreateAnonymousGroup } from '@views/anonymity';
-import editProfile from '@root/events/selectMenus/anonymity/editProfile';
-import { ActionRowBuilder, StringSelectMenuBuilder } from 'discord.js';
+import { embedCreateAnonymousGroup, anonEmbedManageProfiles } from '../../../../views/anonymity';
+import editProfile from '../../../selectMenus/anonymity/editProfile';
 
 export default new CustomButtonBuilder('manage-anonymity-profile-update')
 	.onGenerate((builder) => builder.setLabel('Edit Profile'))

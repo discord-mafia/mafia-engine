@@ -1,6 +1,6 @@
-import { getVoteCounter } from '@models/votecounter';
-import { CustomButtonBuilder } from '@structures/interactions/Button';
-import { genCreateVoteCountEmbed, genStateEmbed } from '@views/votecounter';
+import { getVoteCounter } from '../../../models/votecounter';
+import { CustomButtonBuilder } from '../../../structures/interactions/Button';
+import { genCreateVoteCountEmbed, genStateEmbed } from '../../../views/votecounter';
 
 export default new CustomButtonBuilder('manage-vc-state-menu')
 	.onGenerate((builder) => builder.setLabel('Manage State'))

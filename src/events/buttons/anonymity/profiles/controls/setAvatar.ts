@@ -1,8 +1,8 @@
-import { getAnonymousGroup } from '@models/anonymity';
-import setAvatar from '@root/events/modals/anonymity/setAvatar';
-import { CustomButtonBuilder } from '@structures/interactions/Button';
-import { InteractionError } from '@structures/interactions/_Interaction';
-import { embedCreateAnonymousGroup } from '@views/anonymity';
+import { getAnonymousGroup } from '../../../../../models/anonymity';
+import { CustomButtonBuilder } from '../../../../../structures/interactions/Button';
+import { InteractionError } from '../../../../../structures/interactions/_Interaction';
+import { embedCreateAnonymousGroup } from '../../../../../views/anonymity';
+import setAvatar from '../../../../modals/anonymity/setAvatar';
 
 export default new CustomButtonBuilder('manage-anonymity-profile-set-avatar')
 	.onGenerate((builder) => builder.setLabel('Set Avatar'))

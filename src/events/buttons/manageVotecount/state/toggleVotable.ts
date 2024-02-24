@@ -1,9 +1,9 @@
-import selectPlayerToggleVotable from '@root/events/selectMenus/manageVotecount/selectPlayerToggleVotable';
+import { getVoteCounter } from '../../../../models/votecounter';
 import { CustomButtonBuilder } from '../../../../structures/interactions/Button';
-import { getVoteCounter } from '@models/votecounter';
-import { InteractionError } from '@structures/interactions/_Interaction';
-import { genCreateVoteCountEmbed, genStateEmbed } from '@views/votecounter';
 import { ActionRowBuilder, UserSelectMenuBuilder } from 'discord.js';
+import { InteractionError } from '../../../../structures/interactions/_Interaction';
+import { genCreateVoteCountEmbed, genStateEmbed } from '../../../../views/votecounter';
+import selectPlayerToggleVotable from '../../../selectMenus/manageVotecount/selectPlayerToggleVotable';
 
 export default new CustomButtonBuilder('manage-vc-players-toggle-votable')
 	.onGenerate((builder) => builder.setLabel('Toggle Player Votable'))

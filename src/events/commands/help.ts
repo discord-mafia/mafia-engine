@@ -1,5 +1,5 @@
 import { type APIApplicationCommandOptionChoice, EmbedBuilder } from 'discord.js';
-import { SlashCommand } from '@structures/interactions/SlashCommand';
+import { SlashCommand } from '../../structures/interactions/SlashCommand';
 
 const options: Record<string, string> = {
 	'Wiki Main Page': 'https://discord-mafia-role-cards.fandom.com/wiki/Discord_Mafia_Role_cards_Wiki',
@@ -41,11 +41,6 @@ export default new SlashCommand('help')
 		const option = options[selectedOption];
 		if (!option) return i.reply({ content: 'Invalid request', ephemeral: true });
 
-		const embed = new EmbedBuilder()
-			.setTitle(selectedOption)
-			.setURL(option)
-			.setThumbnail(i.guild.iconURL())
-			.setDescription('Click on the link to access the wiki page')
-			.setColor('White');
+		const embed = new EmbedBuilder().setTitle(selectedOption).setURL(option).setThumbnail(i.guild.iconURL()).setDescription('Click on the link to access the wiki page').setColor('White');
 		await i.reply({ embeds: [embed] });
 	});

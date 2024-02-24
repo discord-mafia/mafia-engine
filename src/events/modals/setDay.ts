@@ -2,9 +2,8 @@ import { ActionRowBuilder, TextInputBuilder, type CacheType, type ModalSubmitInt
 import { Modal } from '../../structures/interactions/Modal';
 import { InteractionError } from '../../structures/interactions/_Interaction';
 import { prisma } from '../..';
-import { getVoteCounter } from '@models/votecounter';
-import { genCreateVoteCountEmbed, genStateEmbed } from '@views/votecounter';
-
+import { getVoteCounter } from '../../models/votecounter';
+import { genCreateVoteCountEmbed, genStateEmbed } from '../../views/votecounter';
 export default new Modal('manage-vc-players-set-day')
 	.set((modal) => {
 		modal.setTitle('Set Day');

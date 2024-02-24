@@ -1,6 +1,6 @@
-import { signupSettingsDatabase } from '@views/signups';
-import { getSignup } from '@models/signups';
-import { CustomButtonBuilder } from '@structures/interactions/Button';
+import { getSignup } from '../../../models/signups';
+import { CustomButtonBuilder } from '../../../structures/interactions/Button';
+import { signupSettingsDatabase } from '../../../views/signups';
 
 export default new CustomButtonBuilder('signups-view-db')
 	.onGenerate((builder) => builder.setEmoji('🗄️'))

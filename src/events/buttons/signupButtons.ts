@@ -1,11 +1,11 @@
-import { getSignup } from '@models/signups';
-import config from '@root/config';
-import { prisma } from '@root/index';
-import { CustomButtonBuilder } from '@structures/interactions/Button';
-import { InteractionError } from '@structures/interactions/_Interaction';
-import { Logger, LogType } from '@utils/logger';
-import { formatSignupEmbed, signupSettingsMain } from '@views/signups';
 import { Colors, Role } from 'discord.js';
+import config from '../../config';
+import { prisma } from '../..';
+import { getSignup } from '../../models/signups';
+import { CustomButtonBuilder } from '../../structures/interactions/Button';
+import { InteractionError } from '../../structures/interactions/_Interaction';
+import { Logger, LogType } from '../../util/logger';
+import { signupSettingsMain, formatSignupEmbed } from '../../views/signups';
 
 export default new CustomButtonBuilder('button-category')
 	.onGenerate((builder) => builder.setLabel('Manage Toggle'))

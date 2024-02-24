@@ -1,7 +1,7 @@
 import { ChannelType, PermissionFlagsBits } from 'discord.js';
-import { InteractionError } from '@structures/interactions/_Interaction';
-import { SlashCommand } from '@structures/interactions/SlashCommand';
-import { getSignup } from '@models/signups';
+import { getSignup } from '../../../models/signups';
+import { SlashCommand } from '../../../structures/interactions/SlashCommand';
+import { InteractionError } from '../../../structures/interactions/_Interaction';
 
 export default new SlashCommand('playerchats')
 	.setDescription('Create playerchats')

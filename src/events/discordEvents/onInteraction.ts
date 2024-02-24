@@ -1,11 +1,11 @@
 import type { Interaction } from 'discord.js';
-import { SlashCommand } from '@structures/interactions/SlashCommand';
-import { Modal } from '@structures/interactions/Modal';
-import { CustomButtonBuilder } from '@structures/interactions/Button';
-import { Interaction as CustomInteraction, InteractionError } from '@structures/interactions/_Interaction';
-import { CustomUserSelectMenuBuilder } from '@structures/interactions/UserSelectMenu';
-import { CustomChannelSelectMenu } from '@structures/interactions/ChannelSelectMenu';
-import { CustomStringSelectMenu } from '@structures/interactions/StringSelectMenu';
+import { Interaction as CustomInteraction, InteractionError } from '../../structures/interactions/_Interaction';
+import { CustomButtonBuilder } from '../../structures/interactions/Button';
+import { CustomChannelSelectMenu } from '../../structures/interactions/ChannelSelectMenu';
+import { Modal } from '../../structures/interactions/Modal';
+import { SlashCommand } from '../../structures/interactions/SlashCommand';
+import { CustomStringSelectMenu } from '../../structures/interactions/StringSelectMenu';
+import { CustomUserSelectMenuBuilder } from '../../structures/interactions/UserSelectMenu';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function onInteraction(i: Interaction<any>) {

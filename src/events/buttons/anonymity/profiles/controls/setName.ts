@@ -1,8 +1,8 @@
-import { getAnonymousGroup } from '@models/anonymity';
-import setName from '@root/events/modals/anonymity/setName';
-import { CustomButtonBuilder } from '@structures/interactions/Button';
-import { InteractionError } from '@structures/interactions/_Interaction';
-import { embedCreateAnonymousGroup } from '@views/anonymity';
+import { getAnonymousGroup } from '../../../../../models/anonymity';
+import { CustomButtonBuilder } from '../../../../../structures/interactions/Button';
+import { InteractionError } from '../../../../../structures/interactions/_Interaction';
+import { embedCreateAnonymousGroup } from '../../../../../views/anonymity';
+import setName from '../../../../modals/anonymity/setName';
 
 export default new CustomButtonBuilder('manage-anonymity-profile-set-name')
 	.onGenerate((builder) => builder.setLabel('Set Name'))

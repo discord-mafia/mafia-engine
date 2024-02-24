@@ -1,9 +1,9 @@
 {
 	"scripts": {
-		"start": "node ./build/index.js",
+		"start": "node ./build/src/index.js",
 		"build:prisma": "npx prisma format && npx prisma generate && npx prisma db push",
 		"build": "tsc && tsc-alias && npm run web:build",
-		"start:local": "pm2 start ./build/index.js --name betrayal-bot",
+		"start:local": "pm2 start ./build/src/index.js --name betrayal-bot",
 		"dev": "nodemon src/index.ts",
 		"lint": "eslint . --ext .ts",
 		"typecheck": "tsc --noEmit",

@@ -1,8 +1,8 @@
-import { getOrCreateUser } from '@models/users';
 import { prisma } from '../..';
-import { getSignup } from '@models/signups';
-import { formatSignupEmbed } from '@views/signups';
-import { SlashCommand } from '@structures/interactions/SlashCommand';
+import { getSignup } from '../../models/signups';
+import { getOrCreateUser } from '../../models/users';
+import { SlashCommand } from '../../structures/interactions/SlashCommand';
+import { formatSignupEmbed } from '../../views/signups';
 
 const signupTemplates: string[] = ['Basic', 'Mentors'];
 

@@ -1,4 +1,4 @@
-import { SlashCommand } from '@structures/interactions/SlashCommand';
+import { SlashCommand } from '../../structures/interactions/SlashCommand';
 
 const FROG_IMAGES = [
 	'https://media.discordapp.net/attachments/1119025192946110464/1192704160777371668/photo-1496070242169-b672c576566b.png?ex=65aa0b4f&is=6597964f&hm=60a46bae1d2f5474a6e7caf1876f20ca7dbaa36444d97f31f2cb36f8259e44ad&=&format=webp&quality=lossless&width=1798&height=1404',

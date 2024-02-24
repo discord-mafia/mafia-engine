@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { startDiscordBot } from '@controllers/botController';
-import { startApiServer } from '@controllers/apiController';
+import { startApiServer } from './controllers/apiController';
+import { startDiscordBot } from './controllers/botController';
 
 export const prisma = new PrismaClient();
 

@@ -1,7 +1,6 @@
+import { getVoteCounter } from '../../../../models/votecounter';
 import { CustomButtonBuilder } from '../../../../structures/interactions/Button';
-import { getVoteCounter } from '@models/votecounter';
-import { genCreateVoteCountEmbed } from '@views/votecounter';
-
+import { genCreateVoteCountEmbed } from '../../../../views/votecounter';
 import SetDayModal from '../../../modals/setDay';
 
 export default new CustomButtonBuilder('manage-vc-players-jump-to-day')

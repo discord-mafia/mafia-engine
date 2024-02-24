@@ -1,7 +1,7 @@
+import { getVoteCounter, deletePlayerAndVotes } from '../../../models/votecounter';
 import { CustomUserSelectMenuBuilder } from '../../../structures/interactions/UserSelectMenu';
 import { InteractionError } from '../../../structures/interactions/_Interaction';
-import { getVoteCounter, deletePlayerAndVotes } from '@models/votecounter';
-import { genCreateVoteCountEmbed, genPlayersEmbed } from '@views/votecounter';
+import { genCreateVoteCountEmbed, genPlayersEmbed } from '../../../views/votecounter';
 
 export default new CustomUserSelectMenuBuilder('manage-vc-select-players-remove')
 	.onGenerate((builder) => builder.setMaxValues(25).setMinValues(1).setPlaceholder('Players to remove from the vote counter. THIS DELETES ALL THEIR VOTES!'))

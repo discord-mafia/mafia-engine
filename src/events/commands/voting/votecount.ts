@@ -1,6 +1,6 @@
-import { getVoteCounter } from '@models/votecounter';
-import { SlashCommand } from '@structures/interactions/SlashCommand';
-import { calculateVoteCount, formatVoteCount } from '@views/votecounter';
+import { getVoteCounter } from '../../../models/votecounter';
+import { SlashCommand } from '../../../structures/interactions/SlashCommand';
+import { calculateVoteCount, formatVoteCount } from '../../../views/votecounter';
 
 export default new SlashCommand('votecount')
 	.setDescription('[GAME] View the vote count')

@@ -1,19 +1,12 @@
 import { SlashCommandBuilder, type ChatInputCommandInteraction, type AutocompleteInteraction } from 'discord.js';
-import { LogType, Logger } from '@utils/logger';
-import { type User, getUserById } from '@models/users';
-import registerCitizenship from '@root/events/modals/registerCitizenship';
 import { Interaction } from './_Interaction';
-
-export type Unauthorized = {
-	citizenship: null;
-};
-export type Authorized = {
-	citizenship: User;
-};
+import registerCitizenship from '../../events/modals/registerCitizenship';
+import { getUserById } from '../../models/users';
+import { Logger, LogType } from '../../util/logger';
 
 export type SlashCommandContext = {
 	logger: Logger;
-} & (Unauthorized | Authorized);
+};
 
 export type SlashCommandExecute = (i: ChatInputCommandInteraction, ctx: SlashCommandContext) => unknown | Promise<unknown>;
 const defaultSlashCommandExecute: SlashCommandExecute = async (i, _ctx) => {
@@ -71,7 +64,6 @@ export class SlashCommand extends Interaction {
 
 		const ctx: SlashCommandContext = {
 			logger,
-			citizenship: user,
 		};
 
 		try {

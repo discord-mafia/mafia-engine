@@ -1,8 +1,8 @@
 import { prisma } from '../../..';
-import { calculateVoteCount, formatVoteCount } from '@views/votecounter';
+import { getVoteCounterOrThrow, getVoteCounterPlayerOrThrow, getPlayer, getVoteCounter } from '../../../models/votecounter';
+import { SlashCommand } from '../../../structures/interactions/SlashCommand';
 import { CustomError } from '../../../util/errors';
-import { getVoteCounterOrThrow, getVoteCounterPlayerOrThrow, getPlayer, getVoteCounter } from '@models/votecounter';
-import { SlashCommand } from '@structures/interactions/SlashCommand';
+import { calculateVoteCount, formatVoteCount } from '../../../views/votecounter';
 
 export default new SlashCommand('vote')
 	.setDescription('[GAME] Vote for a player')

@@ -1,6 +1,6 @@
-import { deleteManyAnonymousProfiles, getAnonymousGroup, getAnonymousGroupById } from '@models/anonymity';
-import { CustomStringSelectMenu } from '@structures/interactions/StringSelectMenu';
-import { anonEmbedManageProfiles, embedCreateAnonymousGroup } from '@views/anonymity';
+import { getAnonymousGroup, deleteManyAnonymousProfiles, getAnonymousGroupById } from '../../../models/anonymity';
+import { CustomStringSelectMenu } from '../../../structures/interactions/StringSelectMenu';
+import { embedCreateAnonymousGroup, anonEmbedManageProfiles } from '../../../views/anonymity';
 
 export default new CustomStringSelectMenu('anonymity-select-profile-remove')
 	.onGenerate((b) => b.setMinValues(1).setMaxValues(1).setPlaceholder('Select the profiles you wish to remove'))

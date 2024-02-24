@@ -1,11 +1,11 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, type UserSelectMenuBuilder, type Snowflake, BaseMessageOptions } from 'discord.js';
-import { type FullSignup } from '@models/signups';
-import removeUser from '@root/events/buttons/manageSignups/removePlayer';
-import SignupRemovePlayerMenu from '@root/events/selectMenus/removeUserFromSignup';
-import viewDatabaseInfo from '@root/events/buttons/manageSignups/viewDatabaseInfo';
-import gotoHome from '@root/events/buttons/manageSignups/gotoHome';
-import manageSpecificQueue from '@root/events/buttons/manageSignups/manageCategories';
-import connectFeature from '@root/events/buttons/manageSignups/connectFeature';
+import { type FullSignup } from '../models/signups';
+import removeUser from '../events/buttons/manageSignups/removePlayer';
+import SignupRemovePlayerMenu from '../events/selectMenus/removeUserFromSignup';
+import viewDatabaseInfo from '../events/buttons/manageSignups/viewDatabaseInfo';
+import gotoHome from '../events/buttons/manageSignups/gotoHome';
+import manageSpecificQueue from '../events/buttons/manageSignups/manageCategories';
+import connectFeature from '../events/buttons/manageSignups/connectFeature';
 
 export function formatSignupEmbed(signup: FullSignup) {
 	const embed = new EmbedBuilder();

@@ -1,7 +1,7 @@
-import { CustomButtonBuilder } from '../../../structures/interactions/Button';
-import { getVoteCounter } from '@models/votecounter';
-import { genCreateVoteCountEmbed, genVoteCountEmbed } from '@views/votecounter';
 import { ButtonStyle } from 'discord.js';
+import { getVoteCounter } from '../../../models/votecounter';
+import { CustomButtonBuilder } from '../../../structures/interactions/Button';
+import { genCreateVoteCountEmbed, genVoteCountEmbed } from '../../../views/votecounter';
 
 export default new CustomButtonBuilder('manage-vc-home')
 	.onGenerate((builder) => builder.setLabel('Home').setStyle(ButtonStyle.Primary))

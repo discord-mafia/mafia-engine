@@ -1,8 +1,8 @@
 import { prisma } from '../../..';
-import { calculateVoteCount, formatVoteCount } from '@views/votecounter';
+import { getVoteCounterOrThrow, getVoteCounterPlayerOrThrow, getVoteCounter } from '../../../models/votecounter';
+import { SlashCommand } from '../../../structures/interactions/SlashCommand';
 import { CustomError } from '../../../util/errors';
-import { getVoteCounterOrThrow, getVoteCounterPlayerOrThrow, getVoteCounter } from '@models/votecounter';
-import { SlashCommand } from '@structures/interactions/SlashCommand';
+import { calculateVoteCount, formatVoteCount } from '../../../views/votecounter';
 
 export default new SlashCommand('skip').setDescription('[GAME] Vote to skip todays lynch (no-lynch)').onExecute(async (i) => {
 	if (!i.guild) return;

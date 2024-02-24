@@ -1,5 +1,5 @@
-import { CustomError } from '@utils/errors';
 import { prisma } from '..';
+import { CustomError } from '../util/errors';
 
 export async function getOrCreatePlayer(voteCountId: number, discordId: string) {
 	try {

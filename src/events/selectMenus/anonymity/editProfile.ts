@@ -1,6 +1,6 @@
-import { getAnonymousGroup, getAnonymousProfile } from '@models/anonymity';
-import { CustomStringSelectMenu } from '@structures/interactions/StringSelectMenu';
-import { anonEmbedManageProfiles, anonEmbedManageSpecificProfile, embedCreateAnonymousGroup } from '@views/anonymity';
+import { getAnonymousGroup, getAnonymousProfile } from '../../../models/anonymity';
+import { CustomStringSelectMenu } from '../../../structures/interactions/StringSelectMenu';
+import { embedCreateAnonymousGroup, anonEmbedManageProfiles, anonEmbedManageSpecificProfile } from '../../../views/anonymity';
 
 export default new CustomStringSelectMenu('anonymity-select-profile-edit')
 	.onGenerate((b) => b.setMaxValues(1).setMinValues(1).setPlaceholder('Select the profile you wish to edit'))

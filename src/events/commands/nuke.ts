@@ -1,12 +1,10 @@
 import { type CategoryChannel, type Channel, ChannelType, PermissionFlagsBits } from 'discord.js';
-import { SlashCommand } from '@structures/interactions/SlashCommand';
+import { SlashCommand } from '../../structures/interactions/SlashCommand';
 
 export default new SlashCommand('nuke')
 	.setDescription('Delete all channels underneath a category')
 	.set((cmd) => {
-		cmd.addChannelOption((x) =>
-			x.setName('category').setDescription('Category to delete all channels under').setRequired(true).addChannelTypes(ChannelType.GuildCategory)
-		);
+		cmd.addChannelOption((x) => x.setName('category').setDescription('Category to delete all channels under').setRequired(true).addChannelTypes(ChannelType.GuildCategory));
 
 		cmd.setDefaultMemberPermissions(PermissionFlagsBits.Administrator);
 	})

@@ -1,9 +1,8 @@
 import { ActionRowBuilder, TextInputBuilder, type CacheType, type ModalSubmitInteraction, type ModalActionRowComponentBuilder, TextInputStyle } from 'discord.js';
-
-import { Modal } from '@structures/interactions/Modal';
-import { InteractionError } from '@structures/interactions/_Interaction';
-import { getAnonymousProfile, updateAnonymousProfile } from '@models/anonymity';
-import { anonEmbedManageSpecificProfile } from '@views/anonymity';
+import { getAnonymousProfile, updateAnonymousProfile } from '../../../models/anonymity';
+import { Modal } from '../../../structures/interactions/Modal';
+import { InteractionError } from '../../../structures/interactions/_Interaction';
+import { anonEmbedManageSpecificProfile } from '../../../views/anonymity';
 
 export default new Modal('anon-set-name')
 	.set((modal) => {

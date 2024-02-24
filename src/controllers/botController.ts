@@ -1,12 +1,11 @@
-import config from '@root/config';
-import { Client, Events, GatewayIntentBits, Partials, REST, Routes, type SlashCommandBuilder } from 'discord.js';
+import { GatewayIntentBits, Partials, Client, REST, SlashCommandBuilder, Routes, Events } from 'discord.js';
 import path from 'path';
+import onInteraction from '../events/discordEvents/onInteraction';
+import OnMessageCreate from '../events/discordEvents/onMessageCreate';
+import { SlashCommand } from '../structures/interactions/SlashCommand';
+import config from '../config';
 import fs from 'fs';
-import { SlashCommand } from '@structures/interactions/SlashCommand';
 import OnClientReady from '../events/discordEvents/clientReady';
-import onInteraction from '@root/events/discordEvents/onInteraction';
-import OnMessageCreate from '@root/events/discordEvents/onMessageCreate';
-
 export const DEFAULT_INTENTS = {
 	intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildIntegrations, GatewayIntentBits.GuildPresences],
 	partials: [Partials.User],

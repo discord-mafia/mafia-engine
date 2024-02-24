@@ -1,15 +1,15 @@
-import { type FullVoteCount } from '@models/votecounter';
-import createVotecount from '@root/events/buttons/manageVotecount/createVotecount';
-import GoHomeButton from '@root/events/buttons/manageVotecount/goHome';
-import ManagePlayersButton from '@root/events/buttons/manageVotecount/gotoPlayersMenu';
-import GotoStateButton from '@root/events/buttons/manageVotecount/gotoStateMenu';
-import GotoTogglesMenu from '@root/events/buttons/manageVotecount/gotoToggles';
-import AddPlayersButton from '@root/events/buttons/manageVotecount/players/addPlayers';
-import RemovePlayersButton from '@root/events/buttons/manageVotecount/players/removePlayers';
-import ReplacePlayersButton from '@root/events/buttons/manageVotecount/players/replacePlayer';
-import ManageVoteWeight from '@root/events/buttons/manageVotecount/state/changeVoteWeight';
-import JumpToDayButton from '@root/events/buttons/manageVotecount/state/jumpToDay';
-import toggleVotable from '@root/events/buttons/manageVotecount/state/toggleVotable';
+import { type FullVoteCount } from '../models/votecounter';
+import createVotecount from '../events/buttons/manageVotecount/createVotecount';
+import GoHomeButton from '../events/buttons/manageVotecount/goHome';
+import ManagePlayersButton from '../events/buttons/manageVotecount/gotoPlayersMenu';
+import GotoStateButton from '../events/buttons/manageVotecount/gotoStateMenu';
+import GotoTogglesMenu from '../events/buttons/manageVotecount/gotoToggles';
+import AddPlayersButton from '../events/buttons/manageVotecount/players/addPlayers';
+import RemovePlayersButton from '../events/buttons/manageVotecount/players/removePlayers';
+import ReplacePlayersButton from '../events/buttons/manageVotecount/players/replacePlayer';
+import ManageVoteWeight from '../events/buttons/manageVotecount/state/changeVoteWeight';
+import JumpToDayButton from '../events/buttons/manageVotecount/state/jumpToDay';
+import toggleVotable from '../events/buttons/manageVotecount/state/toggleVotable';
 import { type BaseMessageOptions, EmbedBuilder, ActionRowBuilder, type ButtonBuilder } from 'discord.js';
 import { type Snowflake } from 'discord.js';
 

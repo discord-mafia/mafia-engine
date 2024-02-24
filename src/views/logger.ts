@@ -1,5 +1,5 @@
-import { LogType } from '@utils/logger';
 import { type ColorResolvable, Colors, EmbedBuilder } from 'discord.js';
+import { LogType } from '../util/logger';
 
 export function genLoggerEmbed(cuid: string, type: LogType, message: string, color?: ColorResolvable) {
 	const embed = new EmbedBuilder();

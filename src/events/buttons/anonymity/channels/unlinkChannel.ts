@@ -1,9 +1,9 @@
 import { ActionRowBuilder, ChannelSelectMenuBuilder } from 'discord.js';
 import { CustomButtonBuilder } from '../../../../structures/interactions/Button';
 import { InteractionError } from '../../../../structures/interactions/_Interaction';
-import { anonEmbedManageProfiles, embedCreateAnonymousGroup } from '@views/anonymity';
-import unlinkChannel from '@root/events/selectMenus/anonymity/unlinkChannel';
-import { getAnonymousGroup } from '@models/anonymity';
+import { getAnonymousGroup } from '../../../../models/anonymity';
+import { anonEmbedManageProfiles, embedCreateAnonymousGroup } from '../../../../views/anonymity';
+import unlinkChannel from '../../../selectMenus/anonymity/unlinkChannel';
 
 export default new CustomButtonBuilder('manage-anonymity-unlink-channel')
 	.onGenerate((builder) => builder.setLabel('Unlink Channel'))

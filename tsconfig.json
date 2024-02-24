@@ -15,18 +15,7 @@
 		"moduleResolution": "node",
 		"isolatedModules": true,
 		"incremental": true,
-		"noUncheckedIndexedAccess": true,
-
-		"baseUrl": "./src/",
-		"paths": {
-			"@utils/*": ["util/*"],
-			"@models/*": ["models/*"],
-			"@views/*": ["views/*"],
-			"@structures/*": ["structures/*"],
-			"@routers/*": ["routers/*"],
-			"@controllers/*": ["controllers/*"],
-			"@root/*": ["./*"]
-		}
+		"noUncheckedIndexedAccess": true
 	},
 	"exclude": ["node_modules", "build", "client", "web"]
 }
