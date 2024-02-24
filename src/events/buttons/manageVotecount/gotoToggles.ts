@@ -1,6 +1,6 @@
 import { type BaseMessageOptions, ActionRowBuilder, ButtonStyle, ButtonBuilder } from 'discord.js';
 import { CustomButtonBuilder } from '../../../structures/interactions/Button';
-import { VCSettings } from './toggles/toggleSettings';
+import toggleSettings, { VCSettings } from './toggles/toggleSettings';
 import GoHomeButton from './goHome';
 import { getVoteCounter, FullVoteCount } from '../../../models/votecounter';
 import { genCreateVoteCountEmbed, genVoteCountEmbed } from '../../../views/votecounter';
@@ -23,17 +23,17 @@ export function genTogglesMenu(vc: FullVoteCount): BaseMessageOptions {
 
 	row.addComponents(
 		GoHomeButton.build(),
-		toggleMenuBtn
+		toggleSettings
 			.build(VCSettings.NO_LYNCH)
 			.setLabel('Toggle No-Lynch')
 			.setEmoji(vc.noLynch ? '🔳' : '⬜')
 			.setStyle(ButtonStyle.Secondary),
-		toggleMenuBtn
+		toggleSettings
 			.build(VCSettings.MAJORITY)
 			.setLabel('Toggle Majority')
 			.setEmoji(vc.majority ? '🔳' : '⬜')
 			.setStyle(ButtonStyle.Secondary),
-		toggleMenuBtn
+		toggleSettings
 			.build(VCSettings.LOCK_VOTES)
 			.setLabel('Toggle Vote-Lock')
 			.setEmoji(vc.lockVotes ? '🔳' : '⬜')
