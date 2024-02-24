@@ -24,6 +24,8 @@ export default new CustomButtonBuilder('manage-vc-toggle')
 		const voteCounter = await getVoteCounter({ channelId: i.channelId });
 		if (!voteCounter) return i.reply({ content: 'This is not a vote channel', ephemeral: true });
 
+		console.log('OLD', voteCounter);
+
 		const vc = await prisma.voteCounter.update({
 			where: {
 				id: voteCounter.id,
@@ -47,6 +49,8 @@ export default new CustomButtonBuilder('manage-vc-toggle')
 				},
 			},
 		});
+
+		console.log('VC', vc);
 
 		const payload = genTogglesMenu(vc ?? undefined);
 		return await i.update(payload);
