@@ -8,6 +8,7 @@ export function genRoleEmbed(role: Role) {
 
 	if (role.flavourText) embed.setDescription(`*${role.flavourText}*`);
 	if (role.wikiUrl) embed.setURL(role.wikiUrl);
+	if (role.iconUrl) embed.setThumbnail(role.iconUrl);
 	if (role.isRetired)
 		embed.setFooter({
 			text: 'This role is retired',
