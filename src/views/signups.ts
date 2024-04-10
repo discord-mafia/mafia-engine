@@ -57,9 +57,9 @@ export function formatSignupEmbed(signup: FullSignup) {
 		const { name, isLocked, limit } = category;
 		const userIds = category.users
 			.sort((a, b) => (a.isTurboHost && !b.isTurboHost ? -1 : 1))
+			.sort((a, b) => (a.joinedAt > b.joinedAt ? -1 : 1))
 			.map((user, index) => {
 				totalUsers.push(user.user.discordId);
-
 				let categoryName = name;
 				if (categoryName.endsWith('s')) categoryName = categoryName.slice(0, -1);
 
