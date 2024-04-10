@@ -120,6 +120,7 @@ model SignupUserJunction {
   user             User           @relation(fields: [userId], references: [id])
   userId           Int
   isTurboHost      Boolean        @default(false)
+  joinedAt         DateTime       @default(now())
 }
 
 // Vote Counter
