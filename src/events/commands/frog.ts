@@ -1,4 +1,6 @@
+import axios from 'axios';
 import { SlashCommand } from '../../structures/interactions/SlashCommand';
+import config from '../../config';
 
 const FROG_IMAGES = [
 	'https://media.discordapp.net/attachments/1119025192946110464/1192704160777371668/photo-1496070242169-b672c576566b.png?ex=65aa0b4f&is=6597964f&hm=60a46bae1d2f5474a6e7caf1876f20ca7dbaa36444d97f31f2cb36f8259e44ad&=&format=webp&quality=lossless&width=1798&height=1404',
@@ -8,7 +10,27 @@ const FROG_IMAGES = [
 	'https://media.discordapp.net/attachments/1119025192946110464/1192713138039173242/photo-1598537179958-687e6cc625fb.png?ex=65aa13ab&is=65979eab&hm=21195a9ad8aa44ed5873d23ff57412d296eb15a88c756256b9b5b8f850382ec4&=&format=webp&quality=lossless&width=2106&height=1404',
 ];
 
+function getBackupFrog() {
+	return FROG_IMAGES[Math.floor(Math.random() * FROG_IMAGES.length)] ?? 'Frog ribbited and jumped away... how sad';
+}
+
 export default new SlashCommand('frog').setDescription('Ribbit.').onExecute(async (i, _ctx) => {
-	const randomFrog = FROG_IMAGES[Math.floor(Math.random() * FROG_IMAGES.length)] ?? 'Frog ribbited and jumped away... how sad';
-	return i.reply({ content: `${randomFrog}` });
+	await i.deferReply();
+
+	const client_id = config.UNSPLASH_CLIENT_ID;
+	if (!client_id) return i.editReply({ content: getBackupFrog() });
+	const query = `https://api.unsplash.com/photos/random?client_id=${client_id}&query=frog`;
+
+	try {
+		const response = await axios.get(query);
+		if (response.status == 200) {
+			const image = response.data.urls.raw;
+			console.log(image);
+			return i.editReply({ content: `${image}` });
+		}
+
+		return i.editReply({ content: getBackupFrog() });
+	} catch (err) {
+		return i.editReply({ content: getBackupFrog() });
+	}
 });
