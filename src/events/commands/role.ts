@@ -9,7 +9,6 @@ export default new SlashCommand('role')
 		cmd.addStringOption((option) => option.setName('name').setDescription('The name of the role').setRequired(true).setAutocomplete(true));
 	})
 	.onExecute(async (i, _ctx) => {
-		if (!i.guild) return;
 		const name = i.options.getString('name', true);
 
 		const role = await getRoleByName(name);

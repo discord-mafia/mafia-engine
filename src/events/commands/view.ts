@@ -15,8 +15,6 @@ export default new SlashCommand('view')
 		);
 	})
 	.onExecute(async (i, _ctx) => {
-		if (!i.guild) return;
-
 		const subcommand = i.options.getSubcommand(true);
 
 		switch (subcommand) {
