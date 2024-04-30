@@ -17,6 +17,8 @@ const envSchema = z.object({
 	DISCORD_OAUTH_REDIRECT_URI: z.string().optional(),
 	GENERAL_LOG_WEBHOOK: z.string().url().optional(),
 	SIGNUP_LOG_WEBHOOK: z.string().url().nullish(),
+
+	UNSPLASH_CLIENT_ID: z.string().optional(),
 });
 
 export function fetchConfig() {

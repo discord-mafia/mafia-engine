@@ -24,6 +24,8 @@ export default new CustomButtonBuilder('button-category')
 		const signup = await getSignup({ messageId });
 		if (!signup) return i.editReply({ content: 'This button is invalid' });
 
+		const isAnonymous = signup.isAnonymous;
+
 		const fetchedUser =
 			(await prisma.user.findUnique({
 				where: {
@@ -55,7 +57,7 @@ export default new CustomButtonBuilder('button-category')
 						const hasRole = member.roles.cache.has(role);
 						if (hasRole) member.roles.remove(role);
 					} catch (err) {
-						logger.log(LogType.Error, `Failed to remove role <@&${role}> from user ${member.user.username} <#${signup.channelId}>`);
+						if (!isAnonymous) logger.log(LogType.Error, `Failed to remove role <@&${role}> from user ${member.user.username} <#${signup.channelId}>`);
 					}
 				}
 
@@ -96,8 +98,7 @@ export default new CustomButtonBuilder('button-category')
 		if (cache == 'leave') {
 			for (const category of signup.categories) {
 				const count = await removeFromCategory(category.id, i.user.id);
-
-				if (count > 0) logger.log(LogType.Info, `User ${i.user.username} has left ${category.name} in <#${signup.channelId}>`, Colors.Red);
+				if (count > 0 && !isAnonymous) logger.log(LogType.Info, `User ${i.user.username} has left ${category.name} in <#${signup.channelId}>`, Colors.Red);
 			}
 		} else if (cache == 'settings') {
 			const isAdmin = member.permissions.has('Administrator');
@@ -127,11 +128,11 @@ export default new CustomButtonBuilder('button-category')
 
 								addRoles.push(role);
 							} catch (err) {
-								logger.log(LogType.Error, `Failed to add role <@&${category.attachedRoleId}> to user ${member.user.username} in <#${signup.channelId}>`, Colors.Red);
+								if (!isAnonymous) logger.log(LogType.Error, `Failed to add role <@&${category.attachedRoleId}> to user ${member.user.username} in <#${signup.channelId}>`, Colors.Red);
 							}
 						}
 
-						logger.log(LogType.Info, `User ${i.user.username} has joined ${category.name} in <#${signup.channelId}>`, category.isFocused ? Colors.Green : Colors.Yellow);
+						if (!isAnonymous) logger.log(LogType.Info, `User ${i.user.username} has joined ${category.name} in <#${signup.channelId}>`, category.isFocused ? Colors.Green : Colors.Yellow);
 					}
 				}
 			}
