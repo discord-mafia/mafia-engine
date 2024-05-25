@@ -32,11 +32,20 @@ export default async function OnMessageCreate(msg: Message<boolean>) {
 		webhook = newWH;
 	}
 
+	const stickerURLs = msg.stickers.map((sticker) => {
+		const url = `https://media.discordapp.net/stickers/${sticker.id}.gif?size=2048`;
+		return url;
+	});
+
+	const msgContent = msg.content + '\n' + stickerURLs.join('\n');
+
 	if (webhook) {
-		webhook.send({
-			content: msg.content,
-			avatarURL: profile.avatarURI ?? undefined,
-			username: profile.name ?? undefined,
-		});
+		webhook
+			.send({
+				content: msgContent,
+				avatarURL: profile.avatarURI ?? undefined,
+				username: profile.name ?? undefined,
+			})
+			.catch(() => {});
 	}
 }
