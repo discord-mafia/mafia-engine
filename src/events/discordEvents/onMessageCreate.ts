@@ -1,4 +1,4 @@
-import { ChannelType, Message, Webhook } from 'discord.js';
+import { ChannelType, Message, Sticker, Webhook } from 'discord.js';
 import { client } from '../../controllers/botController';
 import { getAnonymousGroup, getAnonymousProfiles } from '../../models/anonymity';
 
@@ -32,7 +32,15 @@ export default async function OnMessageCreate(msg: Message<boolean>) {
 		webhook = newWH;
 	}
 
-	const stickerURLs = msg.stickers.map((sticker) => {
+	const stickers: Sticker[] = [];
+	for (const stickerData of msg.stickers) {
+		const sticker = stickerData[1];
+		const fetchedSticker = await sticker.fetch();
+		if (fetchedSticker.guildId == msg.guildId) stickers.push(fetchedSticker);
+		else console.log(fetchedSticker);
+	}
+
+	const stickerURLs = stickers.map((sticker) => {
 		const url = `https://media.discordapp.net/stickers/${sticker.id}.gif?size=2048`;
 		return url;
 	});
