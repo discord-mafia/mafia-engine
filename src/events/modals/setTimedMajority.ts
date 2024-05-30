@@ -12,11 +12,9 @@ export default new Modal('manage-vc-players-set-timed-majority')
 		row.addComponents(new TextInputBuilder().setCustomId('discord-timestamp').setLabel('Discord Timestamp ("none" to clear)').setStyle(TextInputStyle.Short).setRequired(true));
 		modal.addComponents(row);
 	})
-	.onExecute(async (i: ModalSubmitInteraction<CacheType>, cache) => {
+	.onExecute(async (i: ModalSubmitInteraction<CacheType>) => {
 		if (!i.guild) throw new InteractionError('This command can only be used in a server');
 		if (!i.channel) throw new InteractionError('This command can only be used in a channel');
-		if (!cache) throw new InteractionError('No cache was provided');
-
 		const discordTimestamp = i.fields.getTextInputValue('discord-timestamp');
 		if (!discordTimestamp) throw new InteractionError('No discord timestamp was supplied');
 
