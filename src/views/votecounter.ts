@@ -132,7 +132,14 @@ export function calculateVoteCount(vc: FullVoteCount) {
 	}
 
 	for (const vote of vc.votes) {
-		if (vc.majority && checkMajorityReached()) continue;
+		let canMajorityBeReached = vc.majority;
+		if (vc.majorityAfter) {
+			const now = new Date();
+			const after = new Date(vc.majorityAfter);
+			if (now > after) canMajorityBeReached = true;
+		}
+
+		if (canMajorityBeReached && checkMajorityReached()) continue;
 
 		const voterId = vote.voter.discordId;
 		const votedTargetId = vote.votedTarget?.discordId;
