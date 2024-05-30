@@ -12,6 +12,7 @@ import JumpToDayButton from '../events/buttons/manageVotecount/state/jumpToDay';
 import toggleVotable from '../events/buttons/manageVotecount/state/toggleVotable';
 import { type BaseMessageOptions, EmbedBuilder, ActionRowBuilder, type ButtonBuilder } from 'discord.js';
 import { type Snowflake } from 'discord.js';
+import { convertDiscordTimestamp } from '../util/time';
 
 export function genCreateVoteCountEmbed(): BaseMessageOptions {
 	const embed = new EmbedBuilder();
@@ -38,9 +39,13 @@ export function genVoteCountEmbed(vc: FullVoteCount): BaseMessageOptions {
 	const isNoLynch = vc.noLynch ? '✅' : '❌';
 	const isLockVotes = vc.lockVotes ? '✅' : '❌';
 
+	let toggleStr = `Majority: ${isMajority}\nNo-Lynch: ${isNoLynch}\nLock Votes: ${isLockVotes}`;
+	if (vc.majorityAfter) {
+		toggleStr += `\nTimed Majority: <t:${Math.floor(vc.majorityAfter.getTime() / 1000)}:f> or <t:${Math.floor(vc.majorityAfter.getTime() / 1000)}:R>`;
+	}
 	embed.addFields({
 		name: 'Toggles',
-		value: `Majority: ${isMajority}\nNo-Lynch: ${isNoLynch}\nLock Votes: ${isLockVotes}`,
+		value: toggleStr,
 		inline: true,
 	});
 
@@ -118,6 +123,8 @@ export function calculateVoteCount(vc: FullVoteCount) {
 	let nonVoters: Snowflake[] = [];
 	const cannotBeVoted: Snowflake[] = [];
 
+	let canMajorityBeReached = vc.majority;
+
 	vc.votes.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 	const checkMajorityReached = () => {
 		return Math.max(...Array.from(wagons.values()).map((val) => val.reduce((acc, cur) => acc + (weights.get(cur) ?? 1), 0))) >= Math.floor(vc.players.length / 2 + 1);
@@ -132,7 +139,16 @@ export function calculateVoteCount(vc: FullVoteCount) {
 	}
 
 	for (const vote of vc.votes) {
-		if (vc.majority && checkMajorityReached()) continue;
+		if (vc.majorityAfter) {
+			const now = new Date();
+			const after = new Date(vc.majorityAfter);
+
+			if (now > after) canMajorityBeReached = true;
+
+			console.log(now.getTime(), after.getTime(), now.getTime() - after.getTime(), canMajorityBeReached);
+		}
+
+		if (canMajorityBeReached && checkMajorityReached()) continue;
 
 		const voterId = vote.voter.discordId;
 		const votedTargetId = vote.votedTarget?.discordId;
@@ -177,10 +193,11 @@ export function calculateVoteCount(vc: FullVoteCount) {
 		wagons,
 		nonVoters,
 		votingNoLynch,
-		majorityReached: vc.majority && checkMajorityReached(),
+		majorityReached: canMajorityBeReached && checkMajorityReached(),
 		weights,
 		settings: {
-			majority: vc.majority,
+			majority: canMajorityBeReached,
+			maajorityAfter: vc.majorityAfter,
 		},
 		iteration: [vc.currentRound, vc.currentIteration],
 		cannotBeVoted,
@@ -277,7 +294,10 @@ export function formatVoteCount(calculated: CalculatedVoteCount) {
 	const hasSettings = calculated.settings.majority;
 	if (hasSettings) format += '\n- - - - -\n';
 	if (calculated.settings.majority) format += `\nWith ${players.size} players, majority is ${Math.floor(players.size / 2 + 1)} votes`;
-
+	else if (calculated.settings.maajorityAfter) {
+		const time = convertDiscordTimestamp(Math.floor(calculated.settings.maajorityAfter.getTime() / 1000));
+		format += `\nWith ${players.size} players, majority of ${Math.floor(players.size / 2 + 1)} will be enabled at ${time}`;
+	}
 	format += '\n```';
 
 	return format;
