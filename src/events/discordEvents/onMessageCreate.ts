@@ -3,6 +3,7 @@ import { client } from '../../controllers/botController';
 import { getAnonymousGroup, getAnonymousProfiles } from '../../models/anonymity';
 
 export default async function OnMessageCreate(msg: Message<boolean>) {
+	if (!msg.guild) return;
 	if (!msg.channel.isThread()) return;
 
 	const threadChannel = msg.channel;
@@ -53,6 +54,9 @@ export default async function OnMessageCreate(msg: Message<boolean>) {
 				content: msgContent,
 				avatarURL: profile.avatarURI ?? undefined,
 				username: profile.name ?? undefined,
+				allowedMentions: {
+					roles: [],
+				},
 			})
 			.catch(() => {});
 	}
