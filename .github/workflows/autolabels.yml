@@ -23,7 +23,12 @@ jobs:
 
             - name: Add "Needs Triage" label to new issue
               if: steps.check_labels.outputs.has_labels == 'false'
-              uses: actions-ecosystem/action-add-labels@v1
+              uses: actions/github-script@v6
               with:
-                  github_token: ${{ secrets.GITHUB_TOKEN }}
-                  labels: 'Needs Triage'
+                  script: |
+                      github.issues.addLabels({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: context.issue.number,
+                        labels: ["Needs Triage"]
+                      });
