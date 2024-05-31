@@ -1,19 +1,29 @@
-name: 'Issue Labeler'
+name: Label new issues with "Needs Triage"
+
 on:
     issues:
-        types: [opened, edited]
-
-permissions:
-    issues: write
-    contents: read
+        types: [opened]
 
 jobs:
-    triage:
+    label-new-issues:
         runs-on: ubuntu-latest
+
         steps:
-            - uses: github/issue-labeler@v3.3 #May not be the latest version
+            - name: Check if issue already has labels
+              id: check_labels
+              uses: actions/github-script@v6
               with:
-                  configuration-path: .github/autolabels.yml
-                  not-before: 2020-01-15T02:54:32Z
-                  enable-versioned-regex: 0
-                  repo-token: ${{ github.token }}
+                  script: |
+                      const labels = context.payload.issue.labels;
+                      if (labels.length > 0) {
+                        core.setOutput('has_labels', 'true');
+                      } else {
+                        core.setOutput('has_labels', 'false');
+                      }
+
+            - name: Add "Needs Triage" label to new issue
+              if: steps.check_labels.outputs.has_labels == 'false'
+              uses: actions-ecosystem/action-add-labels@v1
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  labels: 'Needs Triage'
