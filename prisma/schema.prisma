@@ -154,6 +154,8 @@ model VoteCounter {
   noLynch   Boolean @default(true)
   majority  Boolean @default(true)
   lockVotes Boolean @default(false)
+
+  majorityAfter DateTime?
 }
 
 model Vote {

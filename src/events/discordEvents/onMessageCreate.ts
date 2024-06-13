@@ -1,8 +1,9 @@
-import { ChannelType, Message, Webhook } from 'discord.js';
+import { ChannelType, Message, Sticker, Webhook } from 'discord.js';
 import { client } from '../../controllers/botController';
 import { getAnonymousGroup, getAnonymousProfiles } from '../../models/anonymity';
 
 export default async function OnMessageCreate(msg: Message<boolean>) {
+	if (!msg.guild) return;
 	if (!msg.channel.isThread()) return;
 
 	const threadChannel = msg.channel;
@@ -32,11 +33,31 @@ export default async function OnMessageCreate(msg: Message<boolean>) {
 		webhook = newWH;
 	}
 
+	const stickers: Sticker[] = [];
+	for (const stickerData of msg.stickers) {
+		const sticker = stickerData[1];
+		const fetchedSticker = await sticker.fetch();
+		if (fetchedSticker.guildId == msg.guildId) stickers.push(fetchedSticker);
+		else console.log(fetchedSticker);
+	}
+
+	const stickerURLs = stickers.map((sticker) => {
+		const url = `https://media.discordapp.net/stickers/${sticker.id}.gif?size=2048`;
+		return url;
+	});
+
+	const msgContent = msg.content + '\n' + stickerURLs.join('\n');
+
 	if (webhook) {
-		webhook.send({
-			content: msg.content,
-			avatarURL: profile.avatarURI ?? undefined,
-			username: profile.name ?? undefined,
-		});
+		webhook
+			.send({
+				content: msgContent,
+				avatarURL: profile.avatarURI ?? undefined,
+				username: profile.name ?? undefined,
+				allowedMentions: {
+					roles: [],
+				},
+			})
+			.catch(() => {});
 	}
 }
