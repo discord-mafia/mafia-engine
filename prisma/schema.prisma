@@ -1,0 +1,217 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pg_trgm]
+}
+
+enum Status {
+  None
+  Bronze
+  Silver
+  Gold
+  Diamond
+  Platinum
+}
+
+enum Permission {
+  Admin
+  Moderator
+  Host
+  User
+}
+
+model User {
+  id               Int                  @id @default(autoincrement())
+  discordId        String               @unique
+  username         String               @unique
+  permission       Permission           @default(User) // Replace with guild-specific perms later
+  signupBanned     Boolean              @default(false)
+  mvpStatus        Status               @default(None)
+  onWaitlist       Boolean              @default(false)
+  signupCategories SignupUserJunction[]
+  playerAccounts   Player[]
+  signupHosts      SignupHostJunc[]
+  signupMods       SignupModJunc[]
+  signupBalancers  SignupBalancerJunc[]
+
+  isRegistered Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([discordId])
+}
+
+model Signup {
+  id         Int              @id @default(autoincrement())
+  name       String?
+  serverId   String
+  channelId  String
+  messageId  String           @unique
+  categories SignupCategory[]
+  hostRoleId String?
+
+  isActive        Boolean  @default(true)
+  requiredServers String[] @default([])
+  isTurbo         Boolean  @default(false)
+  isAnonymous     Boolean  @default(false)
+
+  hosts      SignupHostJunc[]
+  moderators SignupModJunc[]
+  balancers  SignupBalancerJunc[]
+
+  createdAt DateTime @default(now())
+}
+
+model SignupHostJunc {
+  id       Int    @id @default(autoincrement())
+  signup   Signup @relation(fields: [signupId], references: [id])
+  user     User   @relation(fields: [userId], references: [id])
+  signupId Int
+  userId   Int
+}
+
+model SignupModJunc {
+  id       Int    @id @default(autoincrement())
+  signup   Signup @relation(fields: [signupId], references: [id])
+  user     User   @relation(fields: [userId], references: [id])
+  signupId Int
+  userId   Int
+}
+
+model SignupBalancerJunc {
+  id       Int    @id @default(autoincrement())
+  signup   Signup @relation(fields: [signupId], references: [id])
+  user     User   @relation(fields: [userId], references: [id])
+  signupId Int
+  userId   Int
+}
+
+model SignupCategory {
+  id             Int     @id @default(autoincrement())
+  signup         Signup  @relation(fields: [signupId], references: [id])
+  signupId       Int
+  name           String
+  isFocused      Boolean @default(false)
+  limit          Int     @default(-1)
+  isLocked       Boolean @default(false)
+  emoji          String?
+  attachedRoleId String?
+
+  users      SignupUserJunction[]
+  buttonName String? // Uses the name if not set
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SignupUserJunction {
+  id               Int            @id @default(autoincrement())
+  signupCategory   SignupCategory @relation(fields: [signupCategoryId], references: [id])
+  signupCategoryId Int
+  user             User           @relation(fields: [userId], references: [id])
+  userId           Int
+  isTurboHost      Boolean        @default(false)
+  joinedAt         DateTime       @default(now())
+}
+
+// Vote Counter
+
+model Player {
+  id              Int     @id @default(autoincrement())
+  voteCounterId   Int?
+  discordId       String
+  automatedGameId String?
+
+  voteCounter   VoteCounter? @relation(fields: [voteCounterId], references: [id])
+  user          User         @relation(fields: [discordId], references: [discordId])
+  votesIncoming Vote[]       @relation(name: "votedTarget")
+  votesOutgoing Vote[]       @relation(name: "voter")
+  voteWeight    Int          @default(1)
+  canBeVoted    Boolean      @default(true)
+
+  @@unique([voteCounterId, discordId])
+}
+
+model VoteCounter {
+  id        Int      @id @default(autoincrement())
+  channelId String   @unique
+  votes     Vote[]
+  players   Player[]
+
+  currentRound     Int      @default(1)
+  currentIteration Int      @default(0)
+  lastCheckedVotes DateTime @default(now())
+
+  noLynch   Boolean @default(true)
+  majority  Boolean @default(true)
+  lockVotes Boolean @default(false)
+
+  majorityAfter DateTime?
+}
+
+model Vote {
+  id            Int  @id @default(autoincrement())
+  voteCounterId Int
+  votedTargetId Int?
+  voterId       Int
+
+  voteCounter VoteCounter @relation(fields: [voteCounterId], references: [id])
+  votedTarget Player?     @relation(fields: [votedTargetId], references: [id], name: "votedTarget")
+  voter       Player      @relation(fields: [voterId], references: [id], name: "voter")
+  reason      String?
+
+  isNoLynch Boolean @default(false)
+
+  createdAt DateTime @default(now())
+}
+
+// Role Cards
+model Role {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  otherNames   String[]
+  alignment    String
+  subAlignment String?
+  abilities    String
+  winCondition String
+  iconUrl      String?
+  flavourText  String?
+  roleColour   String?
+  wikiUrl      String?
+  isRetired    Boolean  @default(false)
+}
+
+// Auto Locker
+model AutoLocker {
+  id        Int      @id @default(autoincrement())
+  guildId   String
+  channelId String
+  roleId    String
+  lockAt    DateTime
+  createdAt DateTime @default(now())
+}
+
+model AnonymousGroup {
+  id             Int                @id @default(autoincrement())
+  linkedChannels String[]
+  createdAt      DateTime           @default(now())
+  profiles       AnonymousProfile[]
+}
+
+model AnonymousProfile {
+  id               Int            @id @default(autoincrement())
+  group            AnonymousGroup @relation(fields: [anonymousGroupId], references: [id])
+  anonymousGroupId Int
+  name             String?
+  avatarURI        String?
+  discordId        String?
+}

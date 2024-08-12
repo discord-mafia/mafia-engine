@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "commonjs",
+		"lib": ["es6"],
+		"allowJs": true,
+		"outDir": "build",
+		"strict": true,
+		"noImplicitAny": true,
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"checkJs": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"moduleResolution": "node",
+		"isolatedModules": true,
+		"incremental": true,
+		"noUncheckedIndexedAccess": true
+	},
+	"exclude": ["node_modules", "build", "client", "web"]
+}
