@@ -1,1 +1,5 @@
-console.log('Hello, World!');
+import { startDiscordBot } from './controllers/discord';
+
+(async () => {
+	await startDiscordBot();
+})();
