@@ -1,3 +1,5 @@
-import TestBuilder from '../builders/test';
+import { SlashCommand } from '../builders/slashCommand';
 
-export default new TestBuilder();
+export const test = new SlashCommand('test').onExecute(async (i) => {
+	await i.reply({ content: 'Hello World!', ephemeral: true });
+});

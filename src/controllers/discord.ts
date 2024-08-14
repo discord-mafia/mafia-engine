@@ -1,8 +1,47 @@
+import {
+	Client,
+	Events,
+	GatewayIntentBits,
+	Partials,
+	REST,
+	Routes,
+	SlashCommandBuilder,
+} from 'discord.js';
 import fs from 'fs';
 import path from 'path';
+import { SlashCommand } from '../builders/slashCommand';
+import config from '../config';
+
+import OnClientReady from '../events/clientReady';
+import onInteraction from '../events/interactionCreate';
+
+export const DEFAULT_INTENTS = {
+	intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMembers,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.MessageContent,
+		GatewayIntentBits.GuildIntegrations,
+		GatewayIntentBits.GuildPresences,
+	],
+	partials: [Partials.User],
+};
+
+export const client = new Client(DEFAULT_INTENTS);
+const clientREST = new REST({ version: '10' }).setToken(config.DISCORD_TOKEN);
 
 export async function startDiscordBot() {
+	client.on(Events.ClientReady, OnClientReady);
+	client.on(Events.InteractionCreate, (i) => {
+		onInteraction(i);
+	});
+	client.on(Events.Error, (err) => {
+		console.log(err);
+	});
+
 	await loadInteractions();
+	await client.login(config.DISCORD_TOKEN);
+	await registerCommands();
 }
 
 async function loadInteractions() {
@@ -37,4 +76,34 @@ async function loadInteractions() {
 
 	await loadFiles(interactionPath);
 	console.log('[BOT] Loaded interactions');
+}
+
+export async function registerCommands() {
+	try {
+		const commandList: SlashCommandBuilder[] = [];
+		SlashCommand.slashCommands.forEach((val) => {
+			return commandList.push(val.getBuilder());
+		});
+
+		const registeredCommands = (await clientREST.put(
+			Routes.applicationCommands(config.DISCORD_CLIENT_ID),
+			{
+				body: commandList,
+			}
+		)) as unknown;
+
+		if (Array.isArray(registeredCommands)) {
+			if (registeredCommands.length != commandList.length) {
+				console.log(
+					`\x1B[31mFailed to load ${
+						commandList.length - registeredCommands.length
+					} commands`
+				);
+			}
+		}
+
+		console.log('[BOT] Registered commands');
+	} catch (err) {
+		console.error(err);
+	}
 }
