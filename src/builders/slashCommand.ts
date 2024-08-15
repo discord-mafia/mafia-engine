@@ -27,6 +27,7 @@ export type SlashCommandAutocomplete = (
 export class SlashCommand extends SlashCommandBuilder {
 	public static slashCommands = new Map<string, SlashCommand>();
 	private executeFunction: SlashCommandExecute = defaultSlashCommandExecute;
+	private autocompleteFunction?: SlashCommandAutocomplete;
 
 	constructor(name: string) {
 		super();
@@ -38,6 +39,11 @@ export class SlashCommand extends SlashCommandBuilder {
 
 	public onExecute(executeFunction: SlashCommandExecute) {
 		this.executeFunction = executeFunction;
+		return this;
+	}
+
+	public onAutocomplete(autocompleteFunction: SlashCommandAutocomplete) {
+		this.autocompleteFunction = autocompleteFunction;
 		return this;
 	}
 

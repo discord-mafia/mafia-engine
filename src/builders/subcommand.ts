@@ -13,6 +13,7 @@ export type SlashCommandExecute = (
 	i: ChatInputCommandInteraction,
 	ctx: SlashCommandContext
 ) => unknown | Promise<unknown>;
+
 const defaultSlashCommandExecute: SlashCommandExecute = async (i, _ctx) => {
 	await i.reply({
 		content: 'This slash command has not been implemented yet.',
@@ -26,6 +27,7 @@ export type SlashCommandAutocomplete = (
 
 export class SubCommand extends SlashCommandSubcommandBuilder {
 	private executeFunction: SlashCommandExecute = defaultSlashCommandExecute;
+	private autocompleteFunction?: SlashCommandAutocomplete;
 	public name: string;
 	constructor(name: string) {
 		super();
@@ -35,6 +37,11 @@ export class SubCommand extends SlashCommandSubcommandBuilder {
 
 	public onExecute(executeFunction: SlashCommandExecute) {
 		this.executeFunction = executeFunction;
+		return this;
+	}
+
+	public onAutocomplete(autocompleteFunction: SlashCommandAutocomplete) {
+		this.autocompleteFunction = autocompleteFunction;
 		return this;
 	}
 
@@ -68,6 +75,15 @@ export class SubCommand extends SlashCommandSubcommandBuilder {
 				content: message,
 				ephemeral: true,
 			});
+		}
+	}
+
+	public async autocomplete(inter: AutocompleteInteraction) {
+		if (!this.autocompleteFunction) return;
+		try {
+			await this.autocompleteFunction(inter);
+		} catch (err) {
+			console.log(err);
 		}
 	}
 }

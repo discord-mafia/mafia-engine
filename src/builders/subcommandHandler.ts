@@ -1,4 +1,5 @@
 import {
+	AutocompleteInteraction,
 	SlashCommandBuilder,
 	type ChatInputCommandInteraction,
 } from 'discord.js';
@@ -32,6 +33,21 @@ export class SubCommandHandler extends SlashCommandBuilder {
 			throw new InteractionError('Invalid subcommand provided');
 
 		await subcommand.run(inter);
+	}
+
+	public async onAutocomplete(inter: AutocompleteInteraction) {
+		const subcommandHandle = inter.options.getSubcommand();
+		if (!subcommandHandle)
+			throw new InteractionError('No subcommand provided');
+
+		const subcommand = this.subcommands.get(subcommandHandle);
+		if (!subcommand)
+			throw new InteractionError('Invalid subcommand provided');
+
+		if (!subcommand.onAutocomplete)
+			throw new InteractionError('Subcommand has no onAutocomplete');
+
+		return await subcommand.autocomplete(inter);
 	}
 
 	public build() {

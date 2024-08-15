@@ -4,11 +4,13 @@ import { SubCommand } from '../../builders/subcommand';
 import { InteractionError } from '../../utils/errors';
 import {
 	forceAddUserToCategory,
+	getCategoryNames,
 	getHydratedSignup,
 	getSignupByChannel,
 } from '../../db/signups';
 import { formatSignupEmbed, formatSignupComponents } from '../../views/signup';
 import { getOrInsertUser } from '../../db/users';
+import { trigramSimilarity } from '../../utils/string';
 
 export const addUserToSignups = new SubCommand('add')
 	.setDescription('Add a user to a category')
@@ -17,6 +19,7 @@ export const addUserToSignups = new SubCommand('add')
 			.setName('category')
 			.setDescription('The category to add the user')
 			.setRequired(true)
+			.setAutocomplete(true)
 	)
 	.addUserOption((o) =>
 		o
@@ -67,4 +70,24 @@ export const addUserToSignups = new SubCommand('add')
 			content: 'Added user to category',
 			ephemeral: true,
 		});
+	})
+	.onAutocomplete(async (i) => {
+		const { value } = i.options.getFocused(true);
+		if (!i.channel || i.channel.type != ChannelType.GuildText)
+			return await i.respond([]);
+
+		const signup = await getSignupByChannel(i.channel.id);
+		if (!signup) return await i.respond([]);
+
+		const categoryNames = await getCategoryNames(signup.id);
+		if (categoryNames.length < 2) return await i.respond([]);
+
+		const list = trigramSimilarity(value, categoryNames, 5);
+		if (list.length == 0) return await i.respond([]);
+
+		return await i.respond(
+			list.map((c) => {
+				return { name: c.str, value: c.str };
+			})
+		);
 	});

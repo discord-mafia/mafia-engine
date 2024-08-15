@@ -9,6 +9,21 @@ export default async function onInteraction(i: Interaction<any>) {
 	try {
 		if (i.isChatInputCommand()) {
 			handleSlashCommand(i);
+		} else if (i.isAutocomplete()) {
+			if (i.options.getSubcommand()) {
+				const handler = SubCommandHandler.subcommandHandlers.get(
+					i.commandName
+				);
+				if (!handler)
+					return await i.respond([
+						{
+							name: 'Invalid Subcommand',
+							value: 'Invalid Subcommand',
+						},
+					]);
+
+				await handler.onAutocomplete(i);
+			}
 		} else if (i.isButton()) {
 			const parsedCustomID = parseCustomId(i.customId);
 			const button = Button.buttons.get(parsedCustomID.custom_id);

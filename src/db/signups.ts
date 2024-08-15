@@ -286,3 +286,11 @@ export async function removeUserFromCategory(
 		)
 		.returning();
 }
+
+export async function getCategoryNames(signupId: number) {
+	const categories = await db
+		.select()
+		.from(signupCategories)
+		.where(eq(signupCategories.signupId, signupId));
+	return categories.map((cat) => cat.name);
+}
