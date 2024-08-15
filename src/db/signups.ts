@@ -8,6 +8,8 @@ import {
 	varchar,
 } from 'drizzle-orm/pg-core';
 import { users } from './users';
+import { eq } from 'drizzle-orm';
+import { db } from '../controllers/database';
 
 export const signups = pgTable(
 	'signups',
@@ -69,3 +71,26 @@ export const signup_user = pgTable(
 		};
 	}
 );
+
+export type Signup = typeof signups.$inferSelect;
+export type NewSignup = typeof signups.$inferInsert;
+export type SignupCategory = typeof signup_cateogies.$inferSelect;
+export type NewSignupCategory = typeof signup_cateogies.$inferInsert;
+export type SignupUser = typeof signup_user.$inferSelect;
+export type NewSignupUser = typeof signup_user.$inferInsert;
+
+export async function getSignup(id: number): Promise<Signup | null> {
+	const res = await db
+		.select()
+		.from(signups)
+		.where(eq(signups.id, id))
+		.limit(1);
+	return res.shift() ?? null;
+}
+
+export async function insertSignup(
+	new_signup: NewSignup
+): Promise<Signup | null> {
+	const res = await db.insert(signups).values(new_signup).returning();
+	return res.shift() ?? null;
+}
