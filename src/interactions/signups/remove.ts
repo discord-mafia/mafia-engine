@@ -8,6 +8,7 @@ import {
 	removeUserFromCategory,
 } from '../../db/signups';
 import { formatSignupEmbed, formatSignupComponents } from '../../views/signup';
+import { getUserByName } from '../../db/users';
 
 export const removeUserFromSignups = new SubCommand('remove')
 	.setDescription('Remove a user from a category')
@@ -17,10 +18,12 @@ export const removeUserFromSignups = new SubCommand('remove')
 			.setDescription('The category to remove the user from')
 			.setRequired(true)
 	)
-	.addUserOption((o) =>
+	.addStringOption((o) =>
 		o
 			.setName('user')
-			.setDescription('The user to remove from the category')
+			.setDescription(
+				'The username of the user to remove from the category'
+			)
 			.setRequired(true)
 	)
 	.onExecute(async (i) => {
@@ -34,11 +37,14 @@ export const removeUserFromSignups = new SubCommand('remove')
 			);
 
 		const category = i.options.getString('category');
-		const user = i.options.getUser('user');
-		if (!category || !user)
+		const raw_user = i.options.getString('user');
+		if (!category || !raw_user)
 			throw new InteractionError(
 				'You must provide both a category and a user'
 			);
+
+		const user = await getUserByName(raw_user);
+		if (!user) throw new InteractionError('User not found');
 
 		const res = await removeUserFromCategory(
 			user.id,

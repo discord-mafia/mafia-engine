@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 
 export const users = pgTable('users', {
 	id: varchar('id', { length: 32 }).primaryKey(),
-	username: varchar('username', { length: 32 }).notNull(),
+	username: varchar('username', { length: 32 }).notNull().unique(),
 });
 
 export type User = typeof users.$inferSelect;
@@ -12,6 +12,15 @@ export type NewUser = typeof users.$inferInsert;
 
 export async function getUser(id: string): Promise<User | null> {
 	const res = await db.select().from(users).where(eq(users.id, id)).limit(1);
+	return res.shift() ?? null;
+}
+
+export async function getUserByName(name: string): Promise<User | null> {
+	const res = await db
+		.select()
+		.from(users)
+		.where(eq(users.username, name))
+		.limit(1);
 	return res.shift() ?? null;
 }
 
