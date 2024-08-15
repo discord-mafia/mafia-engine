@@ -13,12 +13,7 @@ import {
 	HydratedSignup,
 	insertSignup,
 	insertSignupCategory,
-	Signup,
-	SignupCategory,
-	SignupUser,
 } from '../db/signups';
-import { User } from '../db/users';
-import { format } from 'path';
 
 export const signup = new SlashCommand('signups')
 	.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
