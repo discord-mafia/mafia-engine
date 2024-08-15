@@ -9,7 +9,7 @@ import {
 	varchar,
 } from 'drizzle-orm/pg-core';
 import { getUser, User, users } from './users';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '../controllers/database';
 
 export const signups = pgTable(
@@ -240,8 +240,11 @@ export async function forceAddUserToCategory(
 		.from(signupCategories)
 		.where(
 			and(
-				eq(signupCategories.signupId, signupId),
-				eq(signupCategories.name, categoryName)
+				eq(
+					sql`LOWER(${signupCategories.name})`,
+					categoryName.toLowerCase()
+				),
+				eq(signupCategories.signupId, signupId)
 			)
 		)
 		.limit(1);
@@ -274,7 +277,10 @@ export async function removeUserFromCategory(
 		.where(
 			and(
 				eq(signupCategories.signupId, signupId),
-				eq(signupCategories.name, categoryName)
+				eq(
+					sql`LOWER(${signupCategories.name})`,
+					categoryName.toLowerCase()
+				)
 			)
 		)
 		.limit(1);
