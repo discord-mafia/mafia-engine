@@ -82,7 +82,7 @@ export async function registerCommands() {
 	try {
 		const commandList: SlashCommandBuilder[] = [];
 		SlashCommand.slashCommands.forEach((val) => {
-			return commandList.push(val.getBuilder());
+			return commandList.push(val);
 		});
 
 		const registeredCommands = (await clientREST.put(

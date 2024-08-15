@@ -3,9 +3,11 @@ import {
 	type ChatInputCommandInteraction,
 	type AutocompleteInteraction,
 } from 'discord.js';
-import { unknown } from 'zod';
+import { getOrInsertUser, User } from '../db/users';
 
-export type SlashCommandContext = unknown;
+export type SlashCommandContext = {
+	user: User;
+};
 
 export type SlashCommandExecute = (
 	i: ChatInputCommandInteraction,
@@ -22,30 +24,16 @@ export type SlashCommandAutocomplete = (
 	i: AutocompleteInteraction
 ) => unknown | Promise<unknown>;
 
-export class SlashCommand {
+export class SlashCommand extends SlashCommandBuilder {
 	public static slashCommands = new Map<string, SlashCommand>();
-	private builder: SlashCommandBuilder;
 	private executeFunction: SlashCommandExecute = defaultSlashCommandExecute;
-	private commandName: string;
 
 	constructor(name: string) {
+		super();
 		if (SlashCommand.slashCommands.has(name))
 			throw new Error(`Slash command ${name} already exists.`);
-		this.commandName = name;
 		SlashCommand.slashCommands.set(name, this);
-		this.builder = new SlashCommandBuilder()
-			.setName(name)
-			.setDescription('No description provided.');
-	}
-
-	public setDescription(description: string) {
-		this.builder.setDescription(description);
-		return this;
-	}
-
-	public set(setBuilder: (builder: SlashCommandBuilder) => void) {
-		setBuilder(this.builder);
-		return this;
+		this.setName(name).setDescription('No description provided.');
 	}
 
 	public onExecute(executeFunction: SlashCommandExecute) {
@@ -54,20 +42,31 @@ export class SlashCommand {
 	}
 
 	public async run(inter: ChatInputCommandInteraction) {
-		const ctx: SlashCommandContext = unknown;
+		const user = await getOrInsertUser({
+			id: inter.user.id,
+			username: inter.user.username,
+		});
+
+		if (!user) {
+			return await inter.reply({
+				content:
+					'An error occurred while executing this command. ERR_USER_NOT_FOUND',
+				ephemeral: true,
+			});
+		}
+		const ctx: SlashCommandContext = {
+			user,
+		};
 
 		try {
 			await this.executeFunction(inter, ctx);
 		} catch (err) {
 			console.log(err);
 			await inter.reply({
-				content: 'An error occurred while executing this command.',
+				content:
+					'An error occurred while executing this command. ERR_GENERIC',
 				ephemeral: true,
 			});
 		}
-	}
-
-	public getBuilder() {
-		return this.builder;
 	}
 }
