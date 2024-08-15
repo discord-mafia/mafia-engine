@@ -88,9 +88,7 @@ export async function registerCommands() {
 
 		SubCommandHandler.subcommandHandlers.forEach((val) => {
 			const tmp = val.build();
-			console.log(tmp);
 			if (tmp) return commandList.push(tmp);
-			return;
 		});
 
 		const registeredCommands = (await clientREST.put(

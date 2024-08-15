@@ -3,20 +3,18 @@ import {
 	ChannelType,
 	Colors,
 	EmbedBuilder,
-	PermissionFlagsBits,
 	RestOrArray,
 } from 'discord.js';
-import { SlashCommand } from '../builders/slashCommand';
-import { InteractionError } from '../utils/errors';
+import { SubCommand } from '../../builders/subcommand';
 import {
-	getHydratedSignup,
-	HydratedSignup,
 	insertSignup,
 	insertSignupCategory,
-} from '../db/signups';
+	getHydratedSignup,
+	HydratedSignup,
+} from '../../db/signups';
+import { InteractionError } from '../../utils/errors';
 
-export const signup = new SlashCommand('signups')
-	.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
+export const createSignup = new SubCommand('create')
 	.addStringOption((o) =>
 		o.setName('name').setDescription('Name of the signup')
 	)

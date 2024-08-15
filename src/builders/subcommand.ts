@@ -1,5 +1,4 @@
 import {
-	SlashCommandBuilder,
 	type ChatInputCommandInteraction,
 	type AutocompleteInteraction,
 	SlashCommandSubcommandBuilder,
@@ -27,9 +26,10 @@ export type SlashCommandAutocomplete = (
 
 export class SubCommand extends SlashCommandSubcommandBuilder {
 	private executeFunction: SlashCommandExecute = defaultSlashCommandExecute;
-
+	public name: string;
 	constructor(name: string) {
 		super();
+		this.name = name;
 		this.setName(name).setDescription('No description provided.');
 	}
 

@@ -16,8 +16,9 @@ export class SubCommandHandler extends SlashCommandBuilder {
 		SubCommandHandler.subcommandHandlers.set(name, this);
 	}
 
-	public addSubCommand(subcommand: SubCommand) {
-		this.subcommands.set(subcommand.name, subcommand);
+	public attachSubcommand(subcommand: SubCommand) {
+		if (!subcommand) return this;
+		this.subcommands.set(subcommand.toJSON().name, subcommand);
 		return this;
 	}
 
