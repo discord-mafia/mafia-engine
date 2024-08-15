@@ -1,19 +1,14 @@
-import type { Interaction } from 'discord.js';
+import type { ChatInputCommandInteraction, Interaction } from 'discord.js';
 import { SlashCommand } from '../builders/slashCommand';
 import { Button } from '../builders/button';
 import { parseCustomId } from '../utils/customId';
+import { SubCommandHandler } from '../builders/subcommandHandler';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function onInteraction(i: Interaction<any>) {
 	try {
 		if (i.isChatInputCommand()) {
-			const slashCommand = SlashCommand.slashCommands.get(i.commandName);
-			if (!slashCommand)
-				return i.reply({
-					content: 'This command does not exist',
-					ephemeral: true,
-				});
-			await slashCommand.run(i);
+			handleSlashCommand(i);
 		} else if (i.isButton()) {
 			const button = Button.buttons.get(i.customId);
 			if (!button)
@@ -48,4 +43,26 @@ export default async function onInteraction(i: Interaction<any>) {
 			ephemeral: true,
 		});
 	}
+}
+
+async function handleSlashCommand(i: ChatInputCommandInteraction) {
+	if (i.options.getSubcommand()) {
+		const handler = SubCommandHandler.subcommandHandlers.get(i.commandName);
+		if (!handler)
+			return i.reply({
+				content: 'This command does not exist',
+				ephemeral: true,
+			});
+
+		return await handler.run(i);
+	}
+
+	const slashCommand = SlashCommand.slashCommands.get(i.commandName);
+	if (!slashCommand)
+		return i.reply({
+			content: 'This command does not exist',
+			ephemeral: true,
+		});
+
+	return await slashCommand.run(i);
 }

@@ -14,6 +14,7 @@ import config from '../config';
 
 import OnClientReady from '../events/clientReady';
 import onInteraction from '../events/interactionCreate';
+import { SubCommandHandler } from '../builders/subcommandHandler';
 
 export const DEFAULT_INTENTS = {
 	intents: [
@@ -85,6 +86,13 @@ export async function registerCommands() {
 			return commandList.push(val);
 		});
 
+		SubCommandHandler.subcommandHandlers.forEach((val) => {
+			const tmp = val.build();
+			console.log(tmp);
+			if (tmp) return commandList.push(tmp);
+			return;
+		});
+
 		const registeredCommands = (await clientREST.put(
 			Routes.applicationCommands(config.DISCORD_CLIENT_ID),
 			{
@@ -102,7 +110,12 @@ export async function registerCommands() {
 			}
 		}
 
-		console.log('[BOT] Registered commands');
+		console.log(
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			`[BOT] Registered ${(registeredCommands as any).length}/${
+				commandList.length
+			} commands`
+		);
 	} catch (err) {
 		console.error(err);
 	}
