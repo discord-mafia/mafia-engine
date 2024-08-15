@@ -15,6 +15,13 @@
       "when": 1723711113266,
       "tag": "0001_wandering_warbound",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1723712167304,
+      "tag": "0002_misty_spectrum",
+      "breakpoints": true
     }
   ]
 }

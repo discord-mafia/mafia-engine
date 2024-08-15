@@ -34,13 +34,17 @@ export default async function onInteraction(i: Interaction<any>) {
 			}
 		}
 	} catch (err) {
+		let message = 'An error occurred while executing this command.';
+		if (err instanceof Error) {
+			message = err.message;
+		}
 		if (!i.isRepliable()) return;
 		if (i.deferred || i.replied)
 			return await i.editReply({
-				content: 'An error occurred while executing this command.',
+				content: message,
 			});
 		return await i.reply({
-			content: 'An error occurred while executing this command.',
+			content: message,
 			ephemeral: true,
 		});
 	}
@@ -70,13 +74,18 @@ async function handleSlashCommand(i: ChatInputCommandInteraction) {
 
 		return await slashCommand.run(i);
 	} catch (err) {
+		let message = 'An error occurred while executing this command.';
+		if (err instanceof Error) {
+			message = err.message;
+		}
+
 		if (!i.isRepliable()) return;
 		if (i.deferred || i.replied)
 			return await i.editReply({
-				content: 'An error occurred while executing this command.',
+				content: message,
 			});
 		return await i.reply({
-			content: 'An error occurred while executing this command.',
+			content: message,
 			ephemeral: true,
 		});
 	}

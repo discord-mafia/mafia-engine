@@ -58,10 +58,14 @@ export class SubCommand extends SlashCommandSubcommandBuilder {
 		try {
 			await this.executeFunction(inter, ctx);
 		} catch (err) {
+			let message = 'An error occurred while executing this command.';
+			if (err instanceof Error) {
+				message = err.message;
+			}
+
 			console.log(err);
 			await inter.reply({
-				content:
-					'An error occurred while executing this command. ERR_GENERIC',
+				content: message,
 				ephemeral: true,
 			});
 		}

@@ -2,6 +2,13 @@ import { ChannelType } from 'discord.js';
 import { SubCommand } from '../../builders/subcommand';
 
 import { InteractionError } from '../../utils/errors';
+import {
+	forceAddUserToCategory,
+	getHydratedSignup,
+	getSignupByChannel,
+} from '../../db/signups';
+import { formatSignupEmbed, formatSignupComponents } from '../../views/signup';
+import { getOrInsertUser } from '../../db/users';
 
 export const addUserToSignups = new SubCommand('add')
 	.setDescription('Add a user to a category')
@@ -27,8 +34,37 @@ export const addUserToSignups = new SubCommand('add')
 				'Cannot use this command outside of a text channel'
 			);
 
+		const category = i.options.getString('category');
+		const user = i.options.getUser('user');
+		if (!category || !user)
+			throw new InteractionError(
+				'You must provide both a category and a user'
+			);
+
+		const created_user = await getOrInsertUser({
+			id: user.id,
+			username: user.username,
+		});
+		if (!created_user) throw new InteractionError('Failed to create user');
+		const res = await forceAddUserToCategory(
+			created_user?.id,
+			i.channel.id,
+			category
+		);
+		if (!res) throw new InteractionError('Failed to add user to category');
+		const signup = await getSignupByChannel(i.channel.id);
+		if (!signup) throw new InteractionError('Failed to fetch signup');
+		const hydrated = await getHydratedSignup(signup.messageId);
+		if (!hydrated) throw new InteractionError('Failed to hydrate signup');
+
+		const embed = formatSignupEmbed(hydrated);
+		const components = formatSignupComponents(hydrated);
+
+		const msg = await i.channel.messages.fetch(signup.messageId);
+
+		await msg.edit({ embeds: [embed], components: [components] });
 		await i.reply({
-			content: 'This subcommand is not yet implemented',
+			content: 'Added user to category',
 			ephemeral: true,
 		});
 	});
