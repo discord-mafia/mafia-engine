@@ -295,23 +295,20 @@ export async function getCategoryNames(signupId: number) {
 	return categories.map((cat) => cat.name);
 }
 
-export async function getUserNames(signupId: number) {
-	const categories = await db
-		.select()
-		.from(signupCategories)
-		.where(eq(signupCategories.signupId, signupId));
-
-	const categoryIds = categories.map((cat) => cat.id);
-
-	const signUsers = await db
-		.select()
-		.from(signupUsers)
-		.where(inArray(signupUsers.categoryId, categoryIds));
-	const userIds = signUsers.map((usr) => usr.userId);
-
-	const usrs = await db
-		.select()
+export async function getUserNames(signupId: number): Promise<string[]> {
+	const result = await db
+		.select({
+			username: users.username,
+		})
 		.from(users)
-		.where(inArray(users.id, userIds));
-	return usrs.map((usr) => usr.username);
+		.innerJoin(signupUsers, eq(signupUsers.userId, users.id))
+		.innerJoin(
+			signupCategories,
+			eq(signupCategories.id, signupUsers.categoryId)
+		)
+		.innerJoin(signups, eq(signups.id, signupCategories.signupId))
+		.where(eq(signups.id, signupId))
+		.execute();
+
+	return result.map((row) => row.username);
 }
