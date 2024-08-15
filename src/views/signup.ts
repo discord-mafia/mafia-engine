@@ -22,15 +22,25 @@ export function formatSignupEmbed(signup: HydratedSignup) {
 	const otherFields: RestOrArray<APIEmbedField> = [];
 
 	for (const category of signup.categories) {
-		let users_str = '';
+		const users_str: string[] = [];
 		for (const user of category.users) {
-			users_str += `> ${user.username}\n`;
+			const illegal_chars = ['*', '_', '~'];
+			let does_contain = false;
+			for (const char of illegal_chars) {
+				if (user.username.includes(char)) {
+					does_contain = true;
+					break;
+				}
+			}
+
+			if (does_contain) users_str.push(`> \`${user.username}\``);
+			else users_str.push(`> ${user.username}`);
 		}
-		if (users_str == '') users_str = '> None';
+		if (users_str.length === 0) users_str.push('> None');
 
 		const field = {
 			name: category.name,
-			value: users_str,
+			value: users_str.join('\n'),
 			inline: true,
 		};
 
