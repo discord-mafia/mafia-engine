@@ -9,8 +9,6 @@ export const test = new SlashCommand('test').onExecute(async (i) => {
 		components: [btn],
 		ephemeral: true,
 	});
-
-	await i.reply({ content: 'Hello World!', ephemeral: true });
 });
 
 export const button = new Button('test')
