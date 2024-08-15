@@ -100,7 +100,6 @@ export const removeUserFromSignups = new SubCommand('remove')
 				let userNames = await getUserNames(signup.id);
 				if (userNames.length == 0) return await i.respond([]);
 
-				// remove duplicates
 				const seen = new Set();
 				userNames = userNames.filter((u) => {
 					if (seen.has(u)) return false;
