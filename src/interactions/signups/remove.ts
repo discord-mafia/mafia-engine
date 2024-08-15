@@ -79,12 +79,9 @@ export const removeUserFromSignups = new SubCommand('remove')
 		if (!i.channel || i.channel.type != ChannelType.GuildText)
 			return await i.respond([]);
 
-		const signup = await getSignupByChannel(i.channel.id);
-		if (!signup) return await i.respond([]);
-
 		switch (name) {
 			case 'category': {
-				const categoryNames = await getCategoryNames(signup.id);
+				const categoryNames = await getCategoryNames(i.channelId);
 				if (categoryNames.length == 0) return await i.respond([]);
 
 				const list = trigramSimilarity(value, categoryNames, 5);
@@ -97,7 +94,7 @@ export const removeUserFromSignups = new SubCommand('remove')
 				);
 			}
 			case 'user': {
-				let userNames = await getUserNames(signup.id);
+				let userNames = await getUserNames(i.channelId);
 				if (userNames.length == 0) return await i.respond([]);
 
 				const seen = new Set();

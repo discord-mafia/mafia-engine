@@ -25,6 +25,7 @@ export const signups = pgTable(
 	(t) => {
 		return {
 			messageIdx: index('message_id_idx').on(t.messageId),
+			channelIdx: index('channel_id_idx').on(t.channelId),
 		};
 	}
 );
@@ -287,15 +288,18 @@ export async function removeUserFromCategory(
 		.returning();
 }
 
-export async function getCategoryNames(signupId: number) {
+export async function getCategoryNames(channelId: string) {
 	const categories = await db
-		.select()
+		.select({
+			name: signupCategories.name,
+		})
 		.from(signupCategories)
-		.where(eq(signupCategories.signupId, signupId));
+		.innerJoin(signups, eq(signups.id, signupCategories.signupId))
+		.where(eq(signups.channelId, channelId));
 	return categories.map((cat) => cat.name);
 }
 
-export async function getUserNames(signupId: number): Promise<string[]> {
+export async function getUserNames(channelId: string): Promise<string[]> {
 	const result = await db
 		.select({
 			username: users.username,
@@ -307,7 +311,7 @@ export async function getUserNames(signupId: number): Promise<string[]> {
 			eq(signupCategories.id, signupUsers.categoryId)
 		)
 		.innerJoin(signups, eq(signups.id, signupCategories.signupId))
-		.where(eq(signups.id, signupId))
+		.where(eq(signups.channelId, channelId))
 		.execute();
 
 	return result.map((row) => row.username);

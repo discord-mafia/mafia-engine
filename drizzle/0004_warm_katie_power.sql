@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS "channel_id_idx" ON "signups" USING btree ("channel_id");

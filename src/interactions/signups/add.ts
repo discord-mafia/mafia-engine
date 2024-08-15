@@ -76,10 +76,7 @@ export const addUserToSignups = new SubCommand('add')
 		if (!i.channel || i.channel.type != ChannelType.GuildText)
 			return await i.respond([]);
 
-		const signup = await getSignupByChannel(i.channel.id);
-		if (!signup) return await i.respond([]);
-
-		const categoryNames = await getCategoryNames(signup.id);
+		const categoryNames = await getCategoryNames(i.channelId);
 		if (categoryNames.length == 0) return await i.respond([]);
 
 		const list = trigramSimilarity(value, categoryNames, 5);
