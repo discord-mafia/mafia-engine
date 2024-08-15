@@ -7,7 +7,7 @@ import {
 } from 'discord.js';
 import { verifyCustomId } from '../utils/customId';
 
-export type ButtonContext = unknown;
+export type ButtonContext = string | undefined;
 
 export type ButtonExecute = (
 	i: ButtonInteraction,
@@ -25,7 +25,6 @@ export class Button {
 	public static buttons = new Map<string, Button>();
 	private builder: ButtonBuilder;
 	private executeFunction: ButtonExecute = defaultButtonExecute;
-	private custom_id: string;
 
 	constructor(custom_id: string) {
 		if (Button.buttons.has(custom_id))
@@ -36,10 +35,7 @@ export class Button {
 				`Button ${custom_id} is not in the correct format.`
 			);
 
-		this.custom_id = custom_id;
-		this.builder = new ButtonBuilder()
-			.setCustomId(custom_id)
-			.setLabel('Button');
+		this.builder = new ButtonBuilder().setCustomId(custom_id);
 		Button.buttons.set(custom_id, this);
 	}
 
@@ -85,13 +81,15 @@ export class Button {
 		return this;
 	}
 
-	public build() {
-		return this.builder;
+	public build(customId?: string) {
+		const newBuilder = this.builder;
+		if (customId) newBuilder.setCustomId(customId);
+		return newBuilder;
 	}
 
-	public buildAsRow() {
+	public buildAsRow(customId?: string) {
 		return new ActionRowBuilder<ButtonBuilder>().addComponents(
-			this.builder
+			this.build(customId)
 		);
 	}
 }

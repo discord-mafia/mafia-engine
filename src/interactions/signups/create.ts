@@ -13,6 +13,7 @@ import {
 	HydratedSignup,
 } from '../../db/signups';
 import { InteractionError } from '../../utils/errors';
+import { formatSignupComponents, formatSignupEmbed } from '../../views/signup';
 
 export const createSignup = new SubCommand('create')
 	.addStringOption((o) =>
@@ -83,41 +84,7 @@ export const createSignup = new SubCommand('create')
 		if (!hydrated) throw new InteractionError('Failed to hydrate signup');
 
 		const embed = formatSignupEmbed(hydrated);
-		await i.editReply({ embeds: [embed] });
+		const components = formatSignupComponents(hydrated);
+
+		await i.editReply({ embeds: [embed], components: [components] });
 	});
-
-export function formatSignupEmbed(signup: HydratedSignup) {
-	const embed = new EmbedBuilder();
-	embed.setTitle(signup.name);
-	embed.setDescription('Click the appropriate buttons to join a category');
-	embed.setColor(Colors.Blurple);
-
-	const hoistedFields: RestOrArray<APIEmbedField> = [];
-	const otherFields: RestOrArray<APIEmbedField> = [];
-
-	for (const category of signup.categories) {
-		let users_str = '';
-		for (const user of category.users) {
-			users_str += `> ${user.username}\n`;
-		}
-		if (users_str == '') users_str = '> None';
-
-		const field = {
-			name: category.name,
-			value: users_str,
-			inline: true,
-		};
-
-		if (category.isHoisted) hoistedFields.push(field);
-		else otherFields.push(field);
-	}
-
-	embed.addFields(hoistedFields);
-	embed.addFields({
-		name: '\u200B',
-		value: '**__[ SIGNED UP ]__**',
-	});
-	embed.addFields(otherFields);
-
-	return embed;
-}

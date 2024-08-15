@@ -10,7 +10,8 @@ export default async function onInteraction(i: Interaction<any>) {
 		if (i.isChatInputCommand()) {
 			handleSlashCommand(i);
 		} else if (i.isButton()) {
-			const button = Button.buttons.get(i.customId);
+			const parsedCustomID = parseCustomId(i.customId);
+			const button = Button.buttons.get(parsedCustomID.custom_id);
 			if (!button)
 				return i.reply({
 					content: 'This button does not exist',
@@ -46,23 +47,37 @@ export default async function onInteraction(i: Interaction<any>) {
 }
 
 async function handleSlashCommand(i: ChatInputCommandInteraction) {
-	if (i.options.getSubcommand()) {
-		const handler = SubCommandHandler.subcommandHandlers.get(i.commandName);
-		if (!handler)
+	try {
+		if (i.options.getSubcommand()) {
+			const handler = SubCommandHandler.subcommandHandlers.get(
+				i.commandName
+			);
+			if (!handler)
+				return i.reply({
+					content: 'This command does not exist',
+					ephemeral: true,
+				});
+
+			return await handler.run(i);
+		}
+
+		const slashCommand = SlashCommand.slashCommands.get(i.commandName);
+		if (!slashCommand)
 			return i.reply({
 				content: 'This command does not exist',
 				ephemeral: true,
 			});
 
-		return await handler.run(i);
-	}
-
-	const slashCommand = SlashCommand.slashCommands.get(i.commandName);
-	if (!slashCommand)
-		return i.reply({
-			content: 'This command does not exist',
+		return await slashCommand.run(i);
+	} catch (err) {
+		if (!i.isRepliable()) return;
+		if (i.deferred || i.replied)
+			return await i.editReply({
+				content: 'An error occurred while executing this command.',
+			});
+		return await i.reply({
+			content: 'An error occurred while executing this command.',
 			ephemeral: true,
 		});
-
-	return await slashCommand.run(i);
+	}
 }

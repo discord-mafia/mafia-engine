@@ -8,7 +8,7 @@ import {
 	varchar,
 } from 'drizzle-orm/pg-core';
 import { getUser, User, users } from './users';
-import { eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '../controllers/database';
 
 export const signups = pgTable(
@@ -56,9 +56,7 @@ export const signupUsers = pgTable(
 	'signup_user',
 	{
 		id: serial('id').primaryKey(),
-		signupId: integer('signup_id')
-			.notNull()
-			.references(() => signups.id, { onDelete: 'cascade' }),
+
 		userId: varchar('user_id', { length: 32 })
 			.notNull()
 			.references(() => users.id, { onDelete: 'cascade' }),
@@ -139,13 +137,13 @@ export async function getHydratedSignup(
 		.from(signupCategories)
 		.where(eq(signupCategories.signupId, signup.id));
 
-	const signup_users = await db
-		.select()
-		.from(signupUsers)
-		.where(eq(signupUsers.signupId, signup.id));
-
 	const true_categories: HydratedCategory[] = [];
 	for (const category of categories) {
+		const signup_users = await db
+			.select()
+			.from(signupUsers)
+			.where(eq(signupUsers.categoryId, category.id));
+
 		const true_users: HydratedUser[] = [];
 		for (const signup_user of signup_users) {
 			const usr = await getUser(signup_user.userId);
@@ -161,4 +159,39 @@ export async function getHydratedSignup(
 	}
 
 	return { ...signup, categories: true_categories };
+}
+
+export async function addUserToCategory(query: NewSignupUser) {
+	const res = await db.insert(signupUsers).values(query).returning();
+	return res.shift() ?? null;
+}
+
+export async function leaveSignups(userId: string, messageId: string) {
+	const signupRes = await db
+		.select()
+		.from(signups)
+		.where(eq(signups.messageId, messageId))
+		.limit(1);
+	const signup = signupRes.shift();
+	if (!signup) return;
+
+	const categories = await db
+		.select()
+		.from(signupCategories)
+		.where(eq(signupCategories.signupId, signup.id));
+
+	const nonHoistedCategoryIds = categories
+		.filter((cat) => !cat.isHoisted)
+		.map((cat) => cat.id);
+
+	if (nonHoistedCategoryIds.length === 0) return;
+
+	await db
+		.delete(signupUsers)
+		.where(
+			and(
+				eq(signupUsers.userId, userId),
+				inArray(signupUsers.categoryId, nonHoistedCategoryIds)
+			)
+		);
 }
