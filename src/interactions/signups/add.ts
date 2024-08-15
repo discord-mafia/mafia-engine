@@ -80,7 +80,7 @@ export const addUserToSignups = new SubCommand('add')
 		if (!signup) return await i.respond([]);
 
 		const categoryNames = await getCategoryNames(signup.id);
-		if (categoryNames.length < 2) return await i.respond([]);
+		if (categoryNames.length == 0) return await i.respond([]);
 
 		const list = trigramSimilarity(value, categoryNames, 5);
 		if (list.length == 0) return await i.respond([]);

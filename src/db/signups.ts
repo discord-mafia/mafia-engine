@@ -294,3 +294,24 @@ export async function getCategoryNames(signupId: number) {
 		.where(eq(signupCategories.signupId, signupId));
 	return categories.map((cat) => cat.name);
 }
+
+export async function getUserNames(signupId: number) {
+	const categories = await db
+		.select()
+		.from(signupCategories)
+		.where(eq(signupCategories.signupId, signupId));
+
+	const categoryIds = categories.map((cat) => cat.id);
+
+	const signUsers = await db
+		.select()
+		.from(signupUsers)
+		.where(inArray(signupUsers.categoryId, categoryIds));
+	const userIds = signUsers.map((usr) => usr.userId);
+
+	const usrs = await db
+		.select()
+		.from(users)
+		.where(inArray(users.id, userIds));
+	return usrs.map((usr) => usr.username);
+}

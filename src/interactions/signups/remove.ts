@@ -3,12 +3,15 @@ import { SubCommand } from '../../builders/subcommand';
 
 import { InteractionError } from '../../utils/errors';
 import {
+	getCategoryNames,
 	getHydratedSignup,
 	getSignupByChannel,
+	getUserNames,
 	removeUserFromCategory,
 } from '../../db/signups';
 import { formatSignupEmbed, formatSignupComponents } from '../../views/signup';
 import { getUserByName } from '../../db/users';
+import { trigramSimilarity } from '../../utils/string';
 
 export const removeUserFromSignups = new SubCommand('remove')
 	.setDescription('Remove a user from a category')
@@ -17,6 +20,7 @@ export const removeUserFromSignups = new SubCommand('remove')
 			.setName('category')
 			.setDescription('The category to remove the user from')
 			.setRequired(true)
+			.setAutocomplete(true)
 	)
 	.addStringOption((o) =>
 		o
@@ -25,6 +29,7 @@ export const removeUserFromSignups = new SubCommand('remove')
 				'The username of the user to remove from the category'
 			)
 			.setRequired(true)
+			.setAutocomplete(true)
 	)
 	.onExecute(async (i) => {
 		if (!i.guild)
@@ -68,4 +73,44 @@ export const removeUserFromSignups = new SubCommand('remove')
 			content: 'Removed user from category',
 			ephemeral: true,
 		});
+	})
+	.onAutocomplete(async (i) => {
+		const { name, value } = i.options.getFocused(true);
+		if (!i.channel || i.channel.type != ChannelType.GuildText)
+			return await i.respond([]);
+
+		const signup = await getSignupByChannel(i.channel.id);
+		if (!signup) return await i.respond([]);
+
+		switch (name) {
+			case 'category': {
+				const categoryNames = await getCategoryNames(signup.id);
+				if (categoryNames.length == 0) return await i.respond([]);
+
+				const list = trigramSimilarity(value, categoryNames, 5);
+				if (list.length == 0) return await i.respond([]);
+
+				return await i.respond(
+					list.map((c) => {
+						return { name: c.str, value: c.str };
+					})
+				);
+			}
+			case 'user': {
+				const userNames = await getUserNames(signup.id);
+				if (userNames.length == 0) return await i.respond([]);
+
+				const list = trigramSimilarity(value, userNames, 5);
+				if (list.length == 0) return await i.respond([]);
+
+				return await i.respond(
+					list.map((c) => {
+						return { name: c.str, value: c.str };
+					})
+				);
+			}
+			default: {
+				return await i.respond([]);
+			}
+		}
 	});
