@@ -5,6 +5,7 @@ import {
 	pgTable,
 	serial,
 	timestamp,
+	unique,
 	varchar,
 } from 'drizzle-orm/pg-core';
 import { getUser, User, users } from './users';
@@ -57,7 +58,6 @@ export const signupUsers = pgTable(
 	'signup_user',
 	{
 		id: serial('id').primaryKey(),
-
 		userId: varchar('user_id', { length: 32 })
 			.notNull()
 			.references(() => users.id, { onDelete: 'cascade' }),
@@ -70,6 +70,10 @@ export const signupUsers = pgTable(
 		return {
 			userIdx: index('user_id_idx').on(t.userId),
 			categoryIdx: index('category_id_idx').on(t.categoryId),
+			userCategoryIdx: unique('user_id_category_id_idx').on(
+				t.userId,
+				t.categoryId
+			),
 		};
 	}
 );

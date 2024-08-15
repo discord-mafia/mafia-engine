@@ -1,0 +1,1 @@
+ALTER TABLE "signup_user" ADD CONSTRAINT "user_id_category_id_idx" UNIQUE("user_id","category_id");
