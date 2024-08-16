@@ -298,6 +298,52 @@ export async function removeUserFromCategory(
 		.returning();
 }
 
+export async function getCategoryByName(channelId: string, name: string) {
+	const category = await db
+		.select()
+		.from(signupCategories)
+		.innerJoin(signups, eq(signupCategories.signupId, signups.id))
+		.where(
+			and(
+				eq(signupCategories.name, name),
+				eq(signups.channelId, channelId)
+			)
+		)
+		.limit(1);
+
+	return category.shift();
+}
+
+export async function getCategoryUsersByCategoryName(
+	channelId: string,
+	categoryName: string
+) {
+	const usrs = await db
+		.select({
+			username: users.username,
+			id: users.id,
+		})
+		.from(users)
+		.innerJoin(signupUsers, eq(signupUsers.userId, users.id))
+		.innerJoin(
+			signupCategories,
+			eq(signupCategories.id, signupUsers.categoryId)
+		)
+		.innerJoin(signups, eq(signups.id, signupCategories.signupId))
+		.where(
+			and(
+				eq(signups.channelId, channelId),
+				eq(
+					sql`LOWER(${signupCategories.name})`,
+					categoryName.toLowerCase()
+				)
+			)
+		)
+		.execute();
+
+	return usrs;
+}
+
 export async function getCategoryNames(channelId: string) {
 	const categories = await db
 		.select({

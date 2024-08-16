@@ -3,7 +3,7 @@ import { Button } from '../../../builders/button';
 import { getOrInsertUser } from '../../../db/users';
 import { InteractionError } from '../../../utils/errors';
 import { addUserToCategory, leaveSignups } from '../../../db/signups';
-import { onSignupUpdate } from '../signups';
+import { onSignupUpdate } from '../signupUpdateEvent';
 
 export const categoryJoinButton = new Button('signup-join')
 	.setStyle(ButtonStyle.Secondary)

@@ -9,7 +9,7 @@ import {
 } from '../../db/signups';
 import { getOrInsertUser } from '../../db/users';
 import { trigramSimilarity } from '../../utils/string';
-import { onSignupUpdate } from './signups';
+import { onSignupUpdate } from './signupUpdateEvent';
 
 export const addUserToSignups = new SubCommand('add')
 	.setDescription('Add a user to a category')

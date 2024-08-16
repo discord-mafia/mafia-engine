@@ -4,31 +4,17 @@ import { SubCommand } from '../../builders/subcommand';
 import { InteractionError } from '../../utils/errors';
 import {
 	getCategoryNames,
-	getHydratedSignup,
-	getSignupByChannel,
+	getCategoryUsersByCategoryName,
 	getUserNames,
-	removeUserFromCategory,
 } from '../../db/signups';
-import { formatSignupEmbed, formatSignupComponents } from '../../views/signup';
-import { getUserByName } from '../../db/users';
 import { trigramSimilarity } from '../../utils/string';
-import { onSignupUpdate } from './signupUpdateEvent';
 
-export const removeUserFromSignups = new SubCommand('remove')
-	.setDescription('Remove a user from a category')
+export const getInfoFromCategory = new SubCommand('info')
+	.setDescription('View info of a category')
 	.addStringOption((o) =>
 		o
 			.setName('category')
 			.setDescription('The category to remove the user from')
-			.setRequired(true)
-			.setAutocomplete(true)
-	)
-	.addStringOption((o) =>
-		o
-			.setName('user')
-			.setDescription(
-				'The username of the user to remove from the category'
-			)
 			.setRequired(true)
 			.setAutocomplete(true)
 	)
@@ -42,34 +28,19 @@ export const removeUserFromSignups = new SubCommand('remove')
 				'Cannot use this command outside of a text channel'
 			);
 
-		const category = i.options.getString('category');
-		const raw_user = i.options.getString('user');
-		if (!category || !raw_user)
-			throw new InteractionError(
-				'You must provide both a category and a user'
-			);
+		const cat = i.options.getString('category', true);
+		const users = await getCategoryUsersByCategoryName(i.channelId, cat);
 
-		const user = await getUserByName(raw_user);
-		if (!user) throw new InteractionError('User not found');
+		let content = '```yaml\n';
 
-		const res = await removeUserFromCategory(
-			user.id,
-			i.channel.id,
-			category
-		);
-		if (!res)
-			throw new InteractionError('Failed to remove user from category');
-		const signup = await getSignupByChannel(i.channel.id);
-		if (!signup) throw new InteractionError('Failed to fetch signup');
+		for (const user of users) {
+			content += `${user.username}: <@${user.id}>\n`;
+		}
 
-		const msg = await i.channel.messages.fetch(signup.messageId);
-		await onSignupUpdate.publish({
-			messageId: msg.id,
-			message: msg,
-		});
+		content += '```';
 
 		await i.reply({
-			content: 'Removed user from category',
+			content,
 			ephemeral: true,
 		});
 	})
