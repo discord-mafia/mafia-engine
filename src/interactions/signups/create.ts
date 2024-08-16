@@ -80,4 +80,8 @@ export const createSignup = new SubCommand('create')
 		const components = formatSignupComponents(hydrated);
 
 		await i.editReply({ embeds: [embed], components: [components] });
+
+		await deferred.startThread({
+			name: 'Discussion',
+		});
 	});
