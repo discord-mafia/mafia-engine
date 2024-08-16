@@ -1,16 +1,9 @@
-import {
-	APIEmbedField,
-	ChannelType,
-	Colors,
-	EmbedBuilder,
-	RestOrArray,
-} from 'discord.js';
+import { ChannelType } from 'discord.js';
 import { SubCommand } from '../../builders/subcommand';
 import {
 	insertSignup,
 	insertSignupCategory,
 	getHydratedSignup,
-	HydratedSignup,
 } from '../../db/signups';
 import { InteractionError } from '../../utils/errors';
 import { formatSignupComponents, formatSignupEmbed } from '../../views/signup';

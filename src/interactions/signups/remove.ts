@@ -12,6 +12,7 @@ import {
 import { formatSignupEmbed, formatSignupComponents } from '../../views/signup';
 import { getUserByName } from '../../db/users';
 import { trigramSimilarity } from '../../utils/string';
+import { onSignupUpdate } from './signups';
 
 export const removeUserFromSignups = new SubCommand('remove')
 	.setDescription('Remove a user from a category')
@@ -60,15 +61,13 @@ export const removeUserFromSignups = new SubCommand('remove')
 			throw new InteractionError('Failed to remove user from category');
 		const signup = await getSignupByChannel(i.channel.id);
 		if (!signup) throw new InteractionError('Failed to fetch signup');
-		const hydrated = await getHydratedSignup(signup.messageId);
-		if (!hydrated) throw new InteractionError('Failed to hydrate signup');
-
-		const embed = formatSignupEmbed(hydrated);
-		const components = formatSignupComponents(hydrated);
 
 		const msg = await i.channel.messages.fetch(signup.messageId);
+		await onSignupUpdate.publish({
+			messageId: msg.id,
+			message: msg,
+		});
 
-		await msg.edit({ embeds: [embed], components: [components] });
 		await i.reply({
 			content: 'Removed user from category',
 			ephemeral: true,
