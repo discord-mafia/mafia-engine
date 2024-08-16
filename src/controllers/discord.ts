@@ -1,4 +1,5 @@
 import {
+	ActivityType,
 	Client,
 	Events,
 	GatewayIntentBits,
@@ -42,6 +43,11 @@ export async function startDiscordBot() {
 
 	await loadInteractions();
 	await client.login(config.DISCORD_TOKEN);
+	client.user?.setActivity({
+		name: 'Discord Mafia',
+		url: 'https://discord.gg/social-deduction',
+		type: ActivityType.Playing,
+	});
 	await registerCommands();
 }
 
