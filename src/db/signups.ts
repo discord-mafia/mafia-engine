@@ -11,6 +11,7 @@ import {
 import { getUser, User, users } from './users';
 import { and, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '../controllers/database';
+import { sign } from 'crypto';
 
 export const signups = pgTable(
 	'signups',
@@ -371,4 +372,36 @@ export async function getUserNames(channelId: string): Promise<string[]> {
 		.execute();
 
 	return result.map((row) => row.username);
+}
+
+export async function createCategoryForSignup(
+	channelId: string,
+	newCategory: NewSignupCategory
+) {
+	const signup = await getSignupByChannel(channelId);
+	if (!signup) return null;
+	const category = await db
+		.insert(signupCategories)
+		.values({ ...newCategory, signupId: signup?.id })
+		.returning();
+
+	return category.shift() ?? null;
+}
+
+export async function deleteCategoryFromSignup(
+	channelId: string,
+	categoryName: string
+) {
+	const signup = await getSignupByChannel(channelId);
+	if (!signup) return null;
+	const category = await db
+		.delete(signupCategories)
+		.where(
+			and(
+				eq(signupCategories.name, categoryName),
+				eq(signupCategories.signupId, signup.id)
+			)
+		)
+		.returning();
+	return category.shift() ?? null;
 }

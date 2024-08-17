@@ -68,7 +68,12 @@ export function formatSignupComponents(signup: HydratedSignup) {
 		const btn = new ButtonBuilder();
 		const customId = createCustomId('signup-join', category.id.toString());
 		btn.setCustomId(customId);
-		btn.setLabel(category.buttonName ?? category.name);
+
+		let label = category.buttonName ?? category.name;
+		if (!category.buttonName && label.charAt(label.length - 1) === 's')
+			label = label.substring(0, label.length - 1);
+
+		btn.setLabel(label);
 		btn.setStyle(
 			category.isFocused ? ButtonStyle.Primary : ButtonStyle.Secondary
 		);
