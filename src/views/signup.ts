@@ -8,14 +8,18 @@ import {
 	ButtonStyle,
 } from 'discord.js';
 import { HydratedSignup } from '../db/signups';
-import { categoryJoinButton } from '../interactions/signups/buttons/categoryJoin';
 import { createCustomId } from '../utils/customId';
 import { leaveCategoryBtn } from '../interactions/signups/buttons/categoryLeave';
 
 export function formatSignupEmbed(signup: HydratedSignup) {
 	const embed = new EmbedBuilder();
 	embed.setTitle(signup.name);
-	embed.setDescription('Click the appropriate buttons to join a category');
+
+	let description = 'Click the appropriate buttons to join a category';
+	if (signup.isAnonymous)
+		description += '\n **__This signup is anonymous__**';
+
+	embed.setDescription(description);
 	embed.setColor(Colors.Blurple);
 
 	const hoistedFields: RestOrArray<APIEmbedField> = [];
@@ -35,7 +39,9 @@ export function formatSignupEmbed(signup: HydratedSignup) {
 				}
 			}
 
-			if (does_contain) users_str.push(`> \`${user.username}\``);
+			if (signup.isAnonymous && !category.isHoisted)
+				users_str.push('> Anonymous User');
+			else if (does_contain) users_str.push(`> \`${user.username}\``);
 			else users_str.push(`> ${user.username}`);
 		}
 		if (users_str.length === 0) users_str.push('> None');

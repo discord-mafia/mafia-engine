@@ -11,7 +11,6 @@ import {
 import { getUser, User, users } from './users';
 import { and, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '../controllers/database';
-import { sign } from 'crypto';
 
 export const signups = pgTable(
 	'signups',
@@ -21,6 +20,7 @@ export const signups = pgTable(
 		guildId: varchar('guild_id', { length: 32 }).notNull(),
 		channelId: varchar('channel_id', { length: 32 }).notNull().unique(),
 		messageId: varchar('message_id', { length: 32 }).notNull(),
+		isAnonymous: boolean('is_anonymous').notNull().default(false),
 		createdAt: timestamp('created_at').notNull().defaultNow(),
 		updatedAt: timestamp('updated_at').notNull().defaultNow(),
 	},
@@ -343,6 +343,18 @@ export async function getCategoryUsersByCategoryName(
 		.execute();
 
 	return usrs;
+}
+
+export async function setSignupAnonymity(
+	channelId: string,
+	anonymous: boolean
+) {
+	const res = await db
+		.update(signups)
+		.set({ isAnonymous: anonymous })
+		.where(eq(signups.channelId, channelId))
+		.returning();
+	return res.shift() ?? null;
 }
 
 export async function getCategoryNames(channelId: string) {
