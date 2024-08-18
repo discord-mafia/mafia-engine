@@ -21,6 +21,8 @@ export function formatSignupEmbed(signup: HydratedSignup) {
 	const hoistedFields: RestOrArray<APIEmbedField> = [];
 	const otherFields: RestOrArray<APIEmbedField> = [];
 
+	signup.categories.sort((a, b) => a.id - b.id);
+
 	for (const category of signup.categories) {
 		const users_str: string[] = [];
 		for (const user of category.users) {
@@ -38,8 +40,12 @@ export function formatSignupEmbed(signup: HydratedSignup) {
 		}
 		if (users_str.length === 0) users_str.push('> None');
 
+		let categoryName = category.name;
+		if (category.limit)
+			categoryName += ` [${category.users.length}/${category.limit}]`;
+
 		const field = {
-			name: category.name,
+			name: categoryName,
 			value: users_str.join('\n'),
 			inline: true,
 		};

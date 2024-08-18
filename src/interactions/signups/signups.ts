@@ -7,6 +7,7 @@ import { addUserToSignups } from './add';
 
 import createNewCategory from './create_category';
 import deleteCategory from './delete_category';
+import editcategory from './editcategory';
 
 export const signups = new SubCommandHandler('signups')
 	.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
@@ -15,4 +16,5 @@ export const signups = new SubCommandHandler('signups')
 	.attachSubcommand(getInfoFromCategory)
 	.attachSubcommand(addUserToSignups)
 	.attachSubcommand(createNewCategory)
-	.attachSubcommand(deleteCategory);
+	.attachSubcommand(deleteCategory)
+	.attachSubcommand(editcategory);

@@ -388,6 +388,28 @@ export async function createCategoryForSignup(
 	return category.shift() ?? null;
 }
 
+export async function editCategoryForSignup(
+	channelId: string,
+	categoryName: string,
+	newLimit: number | null,
+	newName: string | null
+) {
+	if (!newLimit && !newName) return null;
+	const signup = await getSignupByChannel(channelId);
+	if (!signup) return null;
+	const category = await db
+		.update(signupCategories)
+		.set({ limit: newLimit || undefined, name: newName || undefined })
+		.where(
+			and(
+				eq(signupCategories.name, categoryName),
+				eq(signupCategories.signupId, signup.id)
+			)
+		)
+		.returning();
+	return category.shift() ?? null;
+}
+
 export async function deleteCategoryFromSignup(
 	channelId: string,
 	categoryName: string
