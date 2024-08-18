@@ -2,11 +2,7 @@ import { ChannelType } from 'discord.js';
 import { SubCommand } from '../../builders/subcommand';
 
 import { InteractionError } from '../../utils/errors';
-import {
-	createCategoryForSignup,
-	editCategoryForSignup,
-	getSignupByChannel,
-} from '../../db/signups';
+import { editCategoryForSignup, getSignupByChannel } from '../../db/signups';
 import { onSignupUpdate } from './signupUpdateEvent';
 
 export default new SubCommand('edit_category')
