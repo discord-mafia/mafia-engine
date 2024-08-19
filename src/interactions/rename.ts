@@ -1,13 +1,7 @@
-import { SubCommandHandler } from '../builders/subcommandHandler';
-import { SubCommand } from '../builders/subcommand';
 import { SlashCommand } from '../builders/slashCommand';
 import { ChannelType } from 'discord.js';
 import { InteractionError } from '../utils/errors';
-import { getUser, updateUser } from '../db/users';
-
-export const testSubcommand = new SubCommand('again').onExecute(async (i) => {
-	await i.reply('test');
-});
+import { updateUser } from '../db/users';
 
 export const test = new SlashCommand('rename')
 	.addUserOption((o) =>
