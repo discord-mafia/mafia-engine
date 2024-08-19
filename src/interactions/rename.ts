@@ -1,9 +1,10 @@
 import { SlashCommand } from '../builders/slashCommand';
-import { ChannelType } from 'discord.js';
+import { ChannelType, PermissionFlagsBits } from 'discord.js';
 import { InteractionError } from '../utils/errors';
 import { updateUser } from '../db/users';
 
 export const test = new SlashCommand('rename')
+	.setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
 	.addUserOption((o) =>
 		o.setName('user').setDescription('The user to rename').setRequired(true)
 	)
