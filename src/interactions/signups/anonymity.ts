@@ -35,8 +35,7 @@ export default new SubCommand('anonymity')
 			message: msg,
 		});
 
-		await i.reply({
+		await i.editReply({
 			content: `Toggled anonymity ${isAnonymous ? 'on' : 'off'}`,
-			ephemeral: true,
 		});
 	});

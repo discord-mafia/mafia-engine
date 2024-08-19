@@ -67,26 +67,19 @@ export default async function onInteraction(i: Interaction<any>) {
 
 async function handleSlashCommand(i: ChatInputCommandInteraction) {
 	try {
-		if (i.options.getSubcommand()) {
-			const handler = SubCommandHandler.subcommandHandlers.get(
+		const slashCommand = SlashCommand.slashCommands.get(i.commandName);
+		if (!slashCommand) {
+			const subcommandHandler = SubCommandHandler.subcommandHandlers.get(
 				i.commandName
 			);
-			if (!handler)
+			if (!subcommandHandler)
 				return i.reply({
 					content: 'This command does not exist',
 					ephemeral: true,
 				});
 
-			return await handler.run(i);
+			return await subcommandHandler.run(i);
 		}
-
-		const slashCommand = SlashCommand.slashCommands.get(i.commandName);
-		if (!slashCommand)
-			return i.reply({
-				content: 'This command does not exist',
-				ephemeral: true,
-			});
-
 		return await slashCommand.run(i);
 	} catch (err) {
 		let message = 'An error occurred while executing this command.';
