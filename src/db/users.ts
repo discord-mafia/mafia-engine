@@ -34,3 +34,15 @@ export async function insertUser(new_user: NewUser): Promise<User | null> {
 	const res = await db.insert(users).values(new_user).returning();
 	return res.shift() ?? null;
 }
+
+export async function updateUser(
+	id: string,
+	new_user: Partial<NewUser>
+): Promise<User | null> {
+	const res = await db
+		.update(users)
+		.set(new_user)
+		.where(eq(users.id, id))
+		.returning();
+	return res.shift() ?? null;
+}

@@ -23,6 +23,10 @@ export class SubCommandHandler extends SlashCommandBuilder {
 		return this;
 	}
 
+	public getSubCommands() {
+		return this.subcommands;
+	}
+
 	public async run(inter: ChatInputCommandInteraction) {
 		const subcommandHandle = inter.options.getSubcommand();
 		if (!subcommandHandle)
