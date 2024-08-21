@@ -11,6 +11,7 @@ import editcategory from './editcategory';
 import anonymity from './anonymity';
 
 export const signups = new SubCommandHandler('signups')
+	.setDescription('Assorted commands to create and manage signups')
 	.setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
 	.attachSubcommand(createSignup)
 	.attachSubcommand(removeUserFromSignups)

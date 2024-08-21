@@ -9,6 +9,7 @@ import { InteractionError } from '../../utils/errors';
 import { formatSignupComponents, formatSignupEmbed } from '../../views/signup';
 
 export const createSignup = new SubCommand('create')
+	.setDescription('Create a new signup in this channel')
 	.addStringOption((o) =>
 		o.setName('name').setDescription('Name of the signup')
 	)
