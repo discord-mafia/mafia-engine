@@ -12,6 +12,8 @@ export default new Button('signup-settings')
 
 		throw new InteractionError({
 			status: ErrorCode.NotPermitted,
+			message:
+				'You need to have the "Manage Channels" permission to edit the signups',
 		});
 
 		await i.reply({
