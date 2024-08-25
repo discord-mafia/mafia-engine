@@ -4,6 +4,7 @@ import {
 	SlashCommandSubcommandBuilder,
 } from 'discord.js';
 import { getOrInsertUser, User } from '../db/users';
+import { handleInteractionError } from '../utils/errors';
 
 export type SlashCommandContext = {
 	user: User;
@@ -65,16 +66,7 @@ export class SubCommand extends SlashCommandSubcommandBuilder {
 		try {
 			await this.executeFunction(inter, ctx);
 		} catch (err) {
-			let message = 'An error occurred while executing this command.';
-			if (err instanceof Error) {
-				message = err.message;
-			}
-
-			console.log(err);
-			await inter.reply({
-				content: message,
-				ephemeral: true,
-			});
+			await handleInteractionError(err, inter);
 		}
 	}
 

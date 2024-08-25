@@ -6,6 +6,7 @@ import {
 	ComponentEmojiResolvable,
 } from 'discord.js';
 import { verifyCustomId } from '../utils/customId';
+import { handleInteractionError, InteractionError } from '../utils/errors';
 
 export type ButtonContext = string | undefined;
 
@@ -48,11 +49,7 @@ export class Button {
 		try {
 			await this.executeFunction(inter, ctx);
 		} catch (err) {
-			console.log(err);
-			await inter.reply({
-				content: 'There was an error while executing this button.',
-				ephemeral: true,
-			});
+			await handleInteractionError(err, inter);
 		}
 	}
 

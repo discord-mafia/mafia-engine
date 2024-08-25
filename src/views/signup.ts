@@ -10,6 +10,7 @@ import {
 import { HydratedSignup } from '../db/signups';
 import { createCustomId } from '../utils/customId';
 import { leaveCategoryBtn } from '../interactions/signups/buttons/categoryLeave';
+import settings from '../interactions/signups/buttons/settings';
 
 export function formatSignupEmbed(signup: HydratedSignup) {
 	const embed = new EmbedBuilder();
@@ -94,5 +95,6 @@ export function formatSignupComponents(signup: HydratedSignup) {
 
 	row.setComponents(buttons);
 	row.addComponents(leaveCategoryBtn.build());
+	row.addComponents(settings.build());
 	return row;
 }
