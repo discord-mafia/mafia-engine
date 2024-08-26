@@ -31,19 +31,30 @@ export function formatSignupEmbed(signup: HydratedSignup) {
 	for (const category of signup.categories) {
 		const users_str: string[] = [];
 		for (const user of category.users) {
-			const illegal_chars = ['*', '_', '~'];
-			let does_contain = false;
-			for (const char of illegal_chars) {
-				if (user.username.includes(char)) {
-					does_contain = true;
-					break;
-				}
-			}
+			const illegal_chars = [
+				'*',
+				'_',
+				'~',
+				'`',
+				'|',
+				'>',
+				'[',
+				']',
+				'(',
+				')',
+				':',
+			];
+
+			const regex = new RegExp(
+				`([${illegal_chars.map((char) => `\\${char}`).join('')}])`,
+				'g'
+			);
+
+			const username = user.username.replace(regex, '\\$1');
 
 			if (signup.isAnonymous && !category.isHoisted)
 				users_str.push('> Anonymous User');
-			else if (does_contain) users_str.push(`> \`${user.username}\``);
-			else users_str.push(`> ${user.username}`);
+			else users_str.push(`> ${username}`);
 		}
 		if (users_str.length === 0) users_str.push('> None');
 
