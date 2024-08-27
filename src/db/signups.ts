@@ -189,6 +189,20 @@ export async function getHydratedSignup(
 }
 
 export async function addUserToCategory(query: NewSignupUser) {
+	const rawCategory = await db
+		.select()
+		.from(signupCategories)
+		.where(eq(signupCategories.id, query.categoryId))
+		.limit(1);
+	const category = rawCategory.shift();
+	if (!category) return null;
+
+	const usersCount = await db
+		.select()
+		.from(signupUsers)
+		.where(eq(signupUsers.categoryId, query.categoryId));
+	if (category.limit && usersCount.length >= category.limit) return null;
+
 	const res = await db.insert(signupUsers).values(query).returning();
 	return res.shift() ?? null;
 }
@@ -236,7 +250,7 @@ export async function forceAddUserToCategory(
 	const signupId = signup.shift()?.id;
 	if (!signupId) return null;
 
-	const category = await db
+	const categoryQuery = await db
 		.select()
 		.from(signupCategories)
 		.where(
@@ -250,12 +264,18 @@ export async function forceAddUserToCategory(
 		)
 		.limit(1);
 
-	const categoryId = category.shift()?.id;
-	if (!categoryId) return null;
+	const category = categoryQuery.shift();
+	if (!category) return null;
+
+	const userCount = await db
+		.select()
+		.from(signupUsers)
+		.where(eq(signupUsers.categoryId, category.id));
+	if (category.limit && userCount.length >= category.limit) return null;
 
 	return await db
 		.insert(signupUsers)
-		.values({ userId, categoryId })
+		.values({ userId, categoryId: category.id })
 		.returning();
 }
 
