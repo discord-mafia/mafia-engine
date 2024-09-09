@@ -58,7 +58,7 @@ export function formatSignupEmbed(signup: HydratedSignup) {
 		}
 		if (users_str.length === 0) users_str.push('> None');
 
-		let categoryName = category.name;
+		let categoryName = `${category.name} [${category.users.length}]`;
 		if (category.limit)
 			categoryName += ` [${category.users.length}/${category.limit}]`;
 
