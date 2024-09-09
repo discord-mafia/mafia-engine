@@ -4,6 +4,7 @@ import {
 	type AutocompleteInteraction,
 } from 'discord.js';
 import { getOrInsertUser, User } from '../db/users';
+import { handleInteractionError } from '../utils/errors';
 
 export type SlashCommandContext = {
 	user: User;
@@ -67,12 +68,7 @@ export class SlashCommand extends SlashCommandBuilder {
 		try {
 			await this.executeFunction(inter, ctx);
 		} catch (err) {
-			console.log(err);
-			await inter.reply({
-				content:
-					'An error occurred while executing this command. ERR_GENERIC',
-				ephemeral: true,
-			});
+			await handleInteractionError(err, inter);
 		}
 	}
 }

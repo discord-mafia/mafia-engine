@@ -10,6 +10,7 @@ import {
 import { HydratedSignup } from '../db/signups';
 import { createCustomId } from '../utils/customId';
 import { leaveCategoryBtn } from '../interactions/signups/buttons/categoryLeave';
+import settings from '../interactions/signups/buttons/settings';
 
 export function formatSignupEmbed(signup: HydratedSignup) {
 	const embed = new EmbedBuilder();
@@ -30,25 +31,37 @@ export function formatSignupEmbed(signup: HydratedSignup) {
 	for (const category of signup.categories) {
 		const users_str: string[] = [];
 		for (const user of category.users) {
-			const illegal_chars = ['*', '_', '~'];
-			let does_contain = false;
-			for (const char of illegal_chars) {
-				if (user.username.includes(char)) {
-					does_contain = true;
-					break;
-				}
-			}
+			const illegal_chars = [
+				'*',
+				'_',
+				'~',
+				'`',
+				'|',
+				'>',
+				'[',
+				']',
+				'(',
+				')',
+				':',
+			];
+
+			const regex = new RegExp(
+				`([${illegal_chars.map((char) => `\\${char}`).join('')}])`,
+				'g'
+			);
+
+			const username = user.username.replace(regex, '\\$1');
 
 			if (signup.isAnonymous && !category.isHoisted)
 				users_str.push('> Anonymous User');
-			else if (does_contain) users_str.push(`> \`${user.username}\``);
-			else users_str.push(`> ${user.username}`);
+			else users_str.push(`> ${username}`);
 		}
 		if (users_str.length === 0) users_str.push('> None');
 
-		let categoryName = `${category.name} [${category.users.length}]`;
+		let categoryName = `${category.name}`;
 		if (category.limit)
 			categoryName += ` [${category.users.length}/${category.limit}]`;
+		else categoryName += ` [${category.users.length}]`;
 
 		const field = {
 			name: categoryName,
@@ -94,5 +107,6 @@ export function formatSignupComponents(signup: HydratedSignup) {
 
 	row.setComponents(buttons);
 	row.addComponents(leaveCategoryBtn.build());
+	row.addComponents(settings.build());
 	return row;
 }
