@@ -5,8 +5,14 @@ import {
 	EmbedBuilder,
 } from 'discord.js';
 import { Button } from '../../../builders/button';
-import { HydratedSignup } from '../../../db/signups';
-import { manageCategories, miscSettings, signupSettingsHome } from './general';
+import {
+	getHydratedSignupFromChannel,
+	HydratedSignup,
+	setSignupAnonymity,
+} from '../../../db/signups';
+import { signupSettingsHome } from './general';
+import { InteractionError, ErrorCode } from '../../../utils/errors';
+import { onSignupUpdate } from '../signupUpdateEvent';
 
 export const editSignupName = new Button('signup-edit-title')
 	.setLabel('Change Name')
@@ -22,9 +28,30 @@ export const toggleAnonymity = new Button('signup-edit-anonymity')
 	.setLabel('Toggle Anonymity')
 	.setStyle(ButtonStyle.Secondary)
 	.onExecute(async (i) => {
-		await i.reply({
-			content: 'This feature is not yet implemented',
-			ephemeral: true,
+		if (!i.channel)
+			throw new InteractionError({
+				status: ErrorCode.NotPermitted,
+				message: 'This button can only be used in a channel',
+			});
+		const signup = await getHydratedSignupFromChannel(i.channelId);
+		if (!signup)
+			throw new InteractionError({
+				status: ErrorCode.NotFound,
+				message: 'Failed to find signup',
+			});
+
+		await setSignupAnonymity(i.channelId, !signup.isAnonymous);
+
+		signup.isAnonymous = !signup.isAnonymous;
+		const { embed, row } = await generalMiscEmbed(signup);
+		await i.update({ embeds: [embed], components: [row] });
+
+		const msg = await i.channel.messages.fetch(signup.messageId);
+		if (!msg) throw new InteractionError('Failed to fetch message');
+
+		await onSignupUpdate.publish({
+			message: msg,
+			messageId: signup.messageId,
 		});
 	});
 
@@ -44,7 +71,10 @@ export async function generalMiscEmbed(signup: HydratedSignup) {
 	const row = new ActionRowBuilder<ButtonBuilder>();
 	row.addComponents(signupSettingsHome.build());
 	row.addComponents(editSignupName.build());
-	row.addComponents(toggleAnonymity.build());
+
+	const toggleAnon = toggleAnonymity.build();
+	toggleAnon.setEmoji(signup.isAnonymous ? '🔳' : '⬜');
+	row.addComponents(toggleAnon);
 
 	return {
 		embed,
