@@ -1,4 +1,4 @@
-import { ButtonInteraction, Interaction, Message } from 'discord.js';
+import { Interaction, Message } from 'discord.js';
 import { getHydratedSignup } from '../../db/signups';
 import { formatSignupEmbed, formatSignupComponents } from '../../views/signup';
 import { Event } from '../../builders/event';

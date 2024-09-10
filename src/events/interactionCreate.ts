@@ -3,7 +3,6 @@ import { SlashCommand } from '../builders/slashCommand';
 import { Button } from '../builders/button';
 import { parseCustomId } from '../utils/customId';
 import { SubCommandHandler } from '../builders/subcommandHandler';
-import { handleInteractionError } from '../utils/errors';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function onInteraction(i: Interaction<any>) {

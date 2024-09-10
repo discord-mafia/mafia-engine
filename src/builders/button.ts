@@ -6,7 +6,7 @@ import {
 	ComponentEmojiResolvable,
 } from 'discord.js';
 import { verifyCustomId } from '../utils/customId';
-import { handleInteractionError, InteractionError } from '../utils/errors';
+import { handleInteractionError } from '../utils/errors';
 
 export type ButtonContext = string | undefined;
 

@@ -6,7 +6,7 @@ import {
 } from 'discord.js';
 import { Button } from '../../../builders/button';
 import { HydratedSignup } from '../../../db/signups';
-import { manageCategories, miscSettings, signupSettingsHome } from './general';
+import { signupSettingsHome } from './general';
 
 export const editCategoryButton = new Button('signup-edit-category')
 	.setLabel('Edit Category')
