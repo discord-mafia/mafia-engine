@@ -14,4 +14,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Basic database tables for discord servers and users.
 -   Project rewrite starter
 
-[Unreleased]: https://github.com/JacksonVirgo/ms-modtools
+[Unreleased]: https://github.com/JacksonVirgo/mafia-engine
