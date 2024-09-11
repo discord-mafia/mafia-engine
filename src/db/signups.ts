@@ -458,3 +458,12 @@ export async function deleteCategoryFromSignup(
 		.returning();
 	return category.shift() ?? null;
 }
+
+export async function updateSignupName(signupId: number, name: string) {
+	const res = await db
+		.update(signups)
+		.set({ name })
+		.where(eq(signups.id, signupId))
+		.returning();
+	return res.shift() ?? null;
+}

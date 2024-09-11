@@ -13,15 +13,13 @@ import {
 import { signupSettingsHome } from './general';
 import { InteractionError, ErrorCode } from '../../../utils/errors';
 import { onSignupUpdate } from '../signupUpdateEvent';
+import { changeSignupTitle } from './changeTitle';
 
 export const editSignupName = new Button('signup-edit-title')
 	.setLabel('Change Name')
 	.setStyle(ButtonStyle.Secondary)
 	.onExecute(async (i) => {
-		await i.reply({
-			content: 'This feature is not yet implemented',
-			ephemeral: true,
-		});
+		await i.showModal(changeSignupTitle);
 	});
 
 export const toggleAnonymity = new Button('signup-edit-anonymity')
