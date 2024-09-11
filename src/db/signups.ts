@@ -140,7 +140,6 @@ export async function getHydratedSignupFromChannel(channelId: string) {
 		.where(and(eq(signups.channelId, channelId)))
 		.limit(1);
 	const sign = signup.shift() ?? null;
-	console.log(sign);
 	if (!sign) return null;
 	return await getHydratedSignup(sign.messageId);
 }
