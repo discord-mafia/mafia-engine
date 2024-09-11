@@ -4,12 +4,14 @@ import type {
 	ChatInputCommandInteraction,
 	Interaction,
 	ModalSubmitInteraction,
+	StringSelectMenuInteraction,
 } from 'discord.js';
 import { SlashCommand } from '../builders/slashCommand';
 import { Button } from '../builders/button';
 import { parseCustomId } from '../utils/customId';
 import { SubCommandHandler } from '../builders/subcommandHandler';
 import { Modal } from '../builders/modal';
+import { TextSelectMenu } from '../builders/textSelectMenu';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function onInteraction(i: Interaction<any>) {
@@ -90,5 +92,19 @@ async function handleModalSubmit(i: ModalSubmitInteraction) {
 			ephemeral: true,
 		});
 	}
-	return await modal.run(i);
+	const ctx = parseCustomId(i.customId);
+	return await modal.run(i, ctx.context);
+}
+
+async function handleTextSelectMenu(i: StringSelectMenuInteraction) {
+	const selectMenu = TextSelectMenu.textSelectMenus.get(i.customId);
+	if (!selectMenu) {
+		return i.reply({
+			content: 'This select menu does not exist',
+			ephemeral: true,
+		});
+	}
+
+	const ctx = parseCustomId(i.customId);
+	await selectMenu.run(i, ctx.context);
 }
