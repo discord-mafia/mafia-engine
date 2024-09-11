@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+-   Added button menu for interacting with signup settings
 -   Anonymity feature for signups
 -   Basic signups via commands
 -   Basic database tables for discord servers and users.
