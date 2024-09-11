@@ -24,6 +24,8 @@ export default async function onInteraction(i: Interaction<any>) {
 			return await handleButton(i as ButtonInteraction);
 		case i.isModalSubmit():
 			return await handleModalSubmit(i as ModalSubmitInteraction);
+		case i.isStringSelectMenu():
+			return await handleTextSelectMenu(i as StringSelectMenuInteraction);
 		default:
 			if (i.isRepliable()) {
 				await i.reply({
