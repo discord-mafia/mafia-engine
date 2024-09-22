@@ -11,6 +11,7 @@ import { HydratedSignup } from '../db/signups';
 import { createCustomId } from '../utils/customId';
 import { leaveCategoryBtn } from '../interactions/signups/buttons/categoryLeave';
 import settings from '../interactions/signups/buttons/settings';
+import { cleanUsername } from '../utils/usernames';
 
 export function formatSignupEmbed(signup: HydratedSignup) {
 	const embed = new EmbedBuilder();
@@ -31,27 +32,7 @@ export function formatSignupEmbed(signup: HydratedSignup) {
 	for (const category of signup.categories) {
 		const users_str: string[] = [];
 		for (const user of category.users) {
-			const illegal_chars = [
-				'*',
-				'_',
-				'~',
-				'`',
-				'|',
-				'>',
-				'[',
-				']',
-				'(',
-				')',
-				':',
-			];
-
-			const regex = new RegExp(
-				`([${illegal_chars.map((char) => `\\${char}`).join('')}])`,
-				'g'
-			);
-
-			const username = user.username.replace(regex, '\\$1');
-
+			const username = cleanUsername(user.username);
 			if (signup.isAnonymous && !category.isHoisted)
 				users_str.push('> Anonymous User');
 			else users_str.push(`> ${username}`);
