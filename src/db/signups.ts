@@ -187,6 +187,38 @@ export async function getHydratedSignup(
 	return { ...signup, categories: true_categories };
 }
 
+export async function getHydratedCategory(
+	categoryId: number
+): Promise<HydratedCategory | null> {
+	const res = await db
+		.select()
+		.from(signupCategories)
+		.where(eq(signupCategories.id, categoryId))
+		.limit(1);
+
+	const category = res.shift();
+	if (!category) return null;
+
+	const signup_users = await db
+		.select()
+		.from(signupUsers)
+		.where(eq(signupUsers.categoryId, category.id));
+
+	const true_users: HydratedUser[] = [];
+	for (const signup_user of signup_users) {
+		const usr = await getUser(signup_user.userId);
+		if (!usr) continue;
+		true_users.push({ ...usr, username: usr.username });
+	}
+
+	const hydrated: HydratedCategory = {
+		...category,
+		users: true_users,
+	};
+
+	return hydrated;
+}
+
 export async function addUserToCategory(query: NewSignupUser) {
 	const rawCategory = await db
 		.select()

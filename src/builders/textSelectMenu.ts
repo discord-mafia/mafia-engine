@@ -50,4 +50,10 @@ export class TextSelectMenu extends StringSelectMenuBuilder {
 			await handleInteractionError(err, inter);
 		}
 	}
+
+	public build(customId?: string) {
+		const newBuilder = new StringSelectMenuBuilder(this.data);
+		if (customId) newBuilder.setCustomId(customId);
+		return newBuilder;
+	}
 }

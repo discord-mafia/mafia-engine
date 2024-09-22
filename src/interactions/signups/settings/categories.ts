@@ -3,18 +3,48 @@ import {
 	ButtonBuilder,
 	ButtonStyle,
 	EmbedBuilder,
+	StringSelectMenuBuilder,
 } from 'discord.js';
 import { Button } from '../../../builders/button';
-import { HydratedSignup } from '../../../db/signups';
+import {
+	getHydratedSignupFromChannel,
+	HydratedSignup,
+} from '../../../db/signups';
 import { signupSettingsHome } from './general';
+import { ErrorCode, InteractionError } from '../../../utils/errors';
+import { editCategoryMenu } from './categories/editCategory';
 
 export const editCategoryButton = new Button('signup-edit-category')
 	.setLabel('Edit Category')
 	.setStyle(ButtonStyle.Secondary)
 	.onExecute(async (i) => {
-		await i.reply({
-			content: 'This feature is not yet implemented',
-			ephemeral: true,
+		if (!i.channelId)
+			throw new InteractionError({
+				status: ErrorCode.NotPermitted,
+				message: 'This button can only be used in a channel',
+			});
+
+		const signup = await getHydratedSignupFromChannel(i.channelId);
+		if (!signup)
+			throw new InteractionError({
+				status: ErrorCode.NotFound,
+				message: 'Failed to find signup',
+			});
+
+		const editCategory = editCategoryMenu.build();
+		editCategory.addOptions([
+			...signup.categories.map((category) => ({
+				label: category.name,
+				value: category.id.toString(),
+			})),
+		]);
+
+		await i.update({
+			components: [
+				new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+					editCategory
+				),
+			],
 		});
 	});
 
