@@ -5,6 +5,7 @@ import {
 	getHydratedSignupFromChannel,
 	HydratedCategory,
 } from '../../../../db/signups';
+import { cleanUsername } from '../../../../utils/usernames';
 
 export const editCategoryMenu = new TextSelectMenu('edit-category')
 	.setMinValues(1)
@@ -40,6 +41,21 @@ export const editCategoryMenu = new TextSelectMenu('edit-category')
 export function genEditCategoryMenu(category: HydratedCategory) {
 	const embed = new EmbedBuilder();
 	embed.setTitle(`Edit Category - ${category.name}`);
+
+	const users: string[] = [];
+	for (const user of category.users) {
+		users.push(cleanUsername(user.username));
+	}
+
+	let categoryTitle: string = '';
+	if (category.limit)
+		categoryTitle = `${category.name} [${users.length}/${category.limit}]`;
+	else categoryTitle = `${category.name} [${users.length}]`;
+
+	embed.addFields({
+		name: categoryTitle,
+		value: users.length > 0 ? `${users.join('\n')}` : '> None',
+	});
 
 	return { embed };
 }
