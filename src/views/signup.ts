@@ -83,6 +83,10 @@ export function formatSignupComponents(signup: HydratedSignup) {
 		btn.setStyle(
 			category.isFocused ? ButtonStyle.Primary : ButtonStyle.Secondary
 		);
+
+		if (category.limit)
+			btn.setDisabled(category.users.length >= category.limit);
+
 		buttons.push(btn);
 	});
 
