@@ -40,9 +40,11 @@ export const editCategoryMenu = new TextSelectMenu('edit-category')
 
 		const category = signup.categories.find((c) => c.id == categoryId);
 		if (!category) throw new InteractionError('Invalid category');
-
-		const { embed, row } = genEditCategoryMenu(category);
-		await i.update({ embeds: [embed], components: [row] });
+		const { embed, rows } = genEditCategoryMenu(category);
+		await i.update({
+			embeds: [embed],
+			components: [...rows],
+		});
 	});
 
 export function genEditCategoryMenu(category: HydratedCategory) {
@@ -64,17 +66,20 @@ export function genEditCategoryMenu(category: HydratedCategory) {
 		value: users.length > 0 ? `${users.join('\n')}` : '> None',
 	});
 
-	const row = new ActionRowBuilder<ButtonBuilder>();
-
-	row.addComponents(
-		addUserButton.build(),
-		removeUserButton.build(),
-		cullUserButton.build(),
-		renameCategoryButton.build(),
-		limitChangeButton.build()
-	);
-
-	return { embed, row };
+	return {
+		embed,
+		rows: [
+			new ActionRowBuilder<ButtonBuilder>().addComponents(
+				addUserButton.build(),
+				removeUserButton.build(),
+				cullUserButton.build()
+			),
+			new ActionRowBuilder<ButtonBuilder>().addComponents(
+				renameCategoryButton.build(),
+				limitChangeButton.build()
+			),
+		],
+	};
 }
 
 export const addUserButton = new Button('add-user-to-category')
