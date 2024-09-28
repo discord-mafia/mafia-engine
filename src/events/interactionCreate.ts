@@ -8,10 +8,10 @@ import type {
 } from 'discord.js';
 import { SlashCommand } from '../builders/slashCommand';
 import { Button } from '../builders/button';
-import { parseCustomId } from '../utils/customId';
 import { SubCommandHandler } from '../builders/subcommandHandler';
 import { Modal } from '../builders/modal';
 import { TextSelectMenu } from '../builders/textSelectMenu';
+import { CustomId } from '../utils/customId';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function onInteraction(i: Interaction<any>) {
@@ -72,41 +72,39 @@ async function handleAutocomplete(i: AutocompleteInteraction) {
 }
 
 async function handleButton(i: ButtonInteraction) {
-	const parsedCustomID = parseCustomId(i.customId);
-	const button = Button.buttons.get(parsedCustomID.custom_id);
+	const customId = CustomId.parseString(i.customId);
+	const button = Button.buttons.get(customId.getId());
 	if (!button)
 		return i.reply({
 			content: 'This button does not exist',
 			ephemeral: true,
 		});
 	try {
-		const ctx = parseCustomId(i.customId);
-		await button.run(i, ctx.context);
+		await button.run(i, customId.getContext());
 	} catch (err) {
 		console.log(err);
 	}
 }
 async function handleModalSubmit(i: ModalSubmitInteraction) {
-	const modal = Modal.modals.get(i.customId);
+	const customId = CustomId.parseString(i.customId);
+	const modal = Modal.modals.get(customId.getId());
 	if (!modal) {
 		return i.reply({
 			content: 'This modal does not exist',
 			ephemeral: true,
 		});
 	}
-	const ctx = parseCustomId(i.customId);
-	return await modal.run(i, ctx.context);
+	return await modal.run(i, customId.getContext());
 }
 
 async function handleTextSelectMenu(i: StringSelectMenuInteraction) {
-	const selectMenu = TextSelectMenu.textSelectMenus.get(i.customId);
+	const customId = CustomId.parseString(i.customId);
+	const selectMenu = TextSelectMenu.textSelectMenus.get(customId.getId());
 	if (!selectMenu) {
 		return i.reply({
 			content: 'This select menu does not exist',
 			ephemeral: true,
 		});
 	}
-
-	const ctx = parseCustomId(i.customId);
-	await selectMenu.run(i, ctx.context);
+	await selectMenu.run(i, customId.getContext());
 }

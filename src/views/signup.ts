@@ -8,10 +8,11 @@ import {
 	ButtonStyle,
 } from 'discord.js';
 import { HydratedSignup } from '../db/signups';
-import { createCustomId } from '../utils/customId';
 import { leaveCategoryBtn } from '../interactions/signups/buttons/categoryLeave';
 import settings from '../interactions/signups/buttons/settings';
 import { cleanUsername } from '../utils/usernames';
+import { CustomId } from '../utils/customId';
+import { custom } from 'zod';
 
 export function formatSignupEmbed(signup: HydratedSignup) {
 	const embed = new EmbedBuilder();
@@ -72,8 +73,9 @@ export function formatSignupComponents(signup: HydratedSignup) {
 	signup.categories.forEach((category) => {
 		if (category.isHoisted) return;
 		const btn = new ButtonBuilder();
-		const customId = createCustomId('signup-join', category.id.toString());
-		btn.setCustomId(customId);
+
+		const customId = new CustomId('signup-join', category.id.toString());
+		btn.setCustomId(customId.getHydrated());
 
 		let label = category.buttonName ?? category.name;
 		if (!category.buttonName && label.charAt(label.length - 1) === 's')

@@ -1,23 +1,47 @@
 export const CUSTOM_ID_SEPERATOR = ':';
 
-export function verifyCustomId(custom_id: string) {
-	return !custom_id.includes(CUSTOM_ID_SEPERATOR);
-}
+export class CustomId {
+	private customId: string;
+	private context: string | undefined;
+	constructor(customId: string, context?: string) {
+		if (!CustomId.verifyRaw(customId))
+			throw new Error(
+				`Custom id ${customId} is not in the correct format.`
+			);
 
-export type ParsedCustomID = {
-	custom_id: string;
-	context?: string;
-};
-export function parseCustomId(custom_id: string): ParsedCustomID {
-	const split = custom_id.split(CUSTOM_ID_SEPERATOR);
-	const parsed_custom_id = split.shift() ?? custom_id;
-	return {
-		custom_id: parsed_custom_id,
-		context: split.join(CUSTOM_ID_SEPERATOR),
-	};
-}
+		this.customId = customId;
+		this.context = context;
+	}
 
-export function createCustomId(custom_id: string, context?: string) {
-	if (!context) return custom_id;
-	return `${custom_id}${CUSTOM_ID_SEPERATOR}${context}`;
+	getHydrated() {
+		if (!this.context) return this.customId;
+		return `${this.customId}${CUSTOM_ID_SEPERATOR}${this.context}`;
+	}
+
+	getId() {
+		return this.customId;
+	}
+
+	getContext() {
+		return this.context;
+	}
+
+	setCustomId(customId: string) {
+		this.customId = customId;
+	}
+
+	setContext(context: string) {
+		this.context = context;
+	}
+
+	static parseString(customId: string) {
+		const split = customId.split(CUSTOM_ID_SEPERATOR);
+		const parsed_custom_id = split.shift() ?? customId;
+
+		return new CustomId(parsed_custom_id, split.join(CUSTOM_ID_SEPERATOR));
+	}
+
+	static verifyRaw(customId: string) {
+		return !customId.includes(CUSTOM_ID_SEPERATOR);
+	}
 }

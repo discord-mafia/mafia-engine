@@ -13,6 +13,9 @@ import {
 } from '../../../../db/signups';
 import { cleanUsername } from '../../../../utils/usernames';
 import { Button } from '../../../../builders/button';
+import { signupSettingsHome } from '../general';
+import { renameCategoryModal } from './renameCategory';
+import { CustomId } from '../../../../utils/customId';
 
 export const editCategoryMenu = new TextSelectMenu('edit-category')
 	.setMinValues(1)
@@ -70,13 +73,14 @@ export function genEditCategoryMenu(category: HydratedCategory) {
 		embed,
 		rows: [
 			new ActionRowBuilder<ButtonBuilder>().addComponents(
-				addUserButton.build(),
-				removeUserButton.build(),
-				cullUserButton.build()
+				signupSettingsHome.build(),
+				renameCategoryButton.buildWithContext(String(category.id)),
+				limitChangeButton.buildWithContext(String(category.id))
 			),
 			new ActionRowBuilder<ButtonBuilder>().addComponents(
-				renameCategoryButton.build(),
-				limitChangeButton.build()
+				addUserButton.buildWithContext(String(category.id)),
+				removeUserButton.buildWithContext(String(category.id)),
+				cullUserButton.buildWithContext(String(category.id))
 			),
 		],
 	};
@@ -113,17 +117,20 @@ export const cullUserButton = new Button('cull-user-from-category')
 	});
 
 export const renameCategoryButton = new Button('rename-category')
-	.setLabel('Rename Category')
+	.setLabel('Rename')
 	.setStyle(ButtonStyle.Secondary)
-	.onExecute(async (i) => {
-		await i.reply({
-			content: 'This feature is not yet implemented',
-			ephemeral: true,
-		});
+	.onExecute(async (i, ctx) => {
+		const modal = renameCategoryModal.build(
+			new CustomId('rename-category', ctx).getHydrated()
+		);
+
+		console.log(modal.data);
+
+		await i.showModal(modal);
 	});
 
 export const limitChangeButton = new Button('change-category-limit')
-	.setLabel('Change Category Limit')
+	.setLabel('Change Limit')
 	.setStyle(ButtonStyle.Secondary)
 	.onExecute(async (i) => {
 		await i.reply({

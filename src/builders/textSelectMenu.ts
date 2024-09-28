@@ -2,8 +2,8 @@ import {
 	StringSelectMenuBuilder,
 	StringSelectMenuInteraction,
 } from 'discord.js';
-import { verifyCustomId } from '../utils/customId';
 import { handleInteractionError } from '../utils/errors';
+import { CustomId } from '../utils/customId';
 
 export type TextSelectMenuContext = string | undefined;
 
@@ -29,7 +29,7 @@ export class TextSelectMenu extends StringSelectMenuBuilder {
 		if (TextSelectMenu.textSelectMenus.has(custom_id))
 			throw new Error(`Text select menu ${custom_id} already exists.`);
 
-		if (!verifyCustomId(custom_id))
+		if (!CustomId.verifyRaw(custom_id))
 			throw new Error(
 				`Text select menu ${custom_id} is not in the correct format.`
 			);
