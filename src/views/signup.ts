@@ -12,7 +12,6 @@ import { leaveCategoryBtn } from '../interactions/signups/buttons/categoryLeave'
 import settings from '../interactions/signups/buttons/settings';
 import { cleanUsername } from '../utils/usernames';
 import { CustomId } from '../utils/customId';
-import { custom } from 'zod';
 
 export function formatSignupEmbed(signup: HydratedSignup) {
 	const embed = new EmbedBuilder();
@@ -31,6 +30,10 @@ export function formatSignupEmbed(signup: HydratedSignup) {
 	signup.categories.sort((a, b) => a.id - b.id);
 
 	for (const category of signup.categories) {
+		category.users.sort(
+			(a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+		);
+
 		const users_str: string[] = [];
 		for (const user of category.users) {
 			const username = cleanUsername(user.username);

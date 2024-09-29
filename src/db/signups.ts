@@ -131,6 +131,7 @@ export type HydratedCategory = SignupCategory & {
 
 export type HydratedUser = User & {
 	username?: string;
+	createdAt: Date;
 };
 
 export async function getHydratedSignupFromChannel(channelId: string) {
@@ -153,11 +154,13 @@ export async function getHydratedSignup(
 	const messageId = 'messageId' in query ? query.messageId : null;
 	const signupId = 'signupId' in query ? query.signupId : null;
 
+	//prettier-ignore
 	const whereClause = signupId
 		? eq(signups.id, signupId)
 		: messageId
-		? eq(signups.messageId, messageId)
-		: null;
+			? eq(signups.messageId, messageId)
+			: null;
+
 	if (!whereClause) return null;
 
 	const signup =
@@ -182,7 +185,11 @@ export async function getHydratedSignup(
 		for (const signup_user of signup_users) {
 			const usr = await getUser(signup_user.userId);
 			if (!usr) continue;
-			true_users.push({ ...usr, username: usr.username });
+			true_users.push({
+				...usr,
+				username: usr.username,
+				createdAt: signup_user.createdAt,
+			});
 		}
 
 		const cat: HydratedCategory = {
@@ -216,7 +223,11 @@ export async function getHydratedCategory(
 	for (const signup_user of signup_users) {
 		const usr = await getUser(signup_user.userId);
 		if (!usr) continue;
-		true_users.push({ ...usr, username: usr.username });
+		true_users.push({
+			...usr,
+			username: usr.username,
+			createdAt: signup_user.createdAt,
+		});
 	}
 
 	const hydrated: HydratedCategory = {
