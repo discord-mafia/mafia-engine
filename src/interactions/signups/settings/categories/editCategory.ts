@@ -16,6 +16,7 @@ import { Button } from '../../../../builders/button';
 import { signupSettingsHome } from '../general';
 import { renameCategoryModal } from './renameCategory';
 import { CustomId } from '../../../../utils/customId';
+import { changeLimitModal } from './changeLimit';
 
 export const editCategoryMenu = new TextSelectMenu('edit-category')
 	.setMinValues(1)
@@ -123,18 +124,15 @@ export const renameCategoryButton = new Button('rename-category')
 		const modal = renameCategoryModal.build(
 			new CustomId('rename-category', ctx).getHydrated()
 		);
-
-		console.log(modal.data);
-
 		await i.showModal(modal);
 	});
 
 export const limitChangeButton = new Button('change-category-limit')
 	.setLabel('Change Limit')
 	.setStyle(ButtonStyle.Secondary)
-	.onExecute(async (i) => {
-		await i.reply({
-			content: 'This feature is not yet implemented',
-			ephemeral: true,
-		});
+	.onExecute(async (i, ctx) => {
+		const modal = changeLimitModal.build(
+			new CustomId('change-category-limit', ctx).getHydrated()
+		);
+		await i.showModal(modal);
 	});
