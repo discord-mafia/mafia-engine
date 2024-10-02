@@ -4,6 +4,7 @@ import { getOrInsertUser } from '../../../db/users';
 import { InteractionError } from '../../../utils/errors';
 import { leaveSignups } from '../../../db/signups';
 import { onSignupUpdate } from '../signupUpdateEvent';
+import { logSignup, LogType } from '../../../utils/logging';
 
 export const leaveCategoryBtn = new Button('signup-leave')
 	.setStyle(ButtonStyle.Secondary)
@@ -22,5 +23,11 @@ export const leaveCategoryBtn = new Button('signup-leave')
 		onSignupUpdate.publish({
 			messageId: i.message.id,
 			i,
+		});
+
+		await logSignup({
+			user: user.username,
+			type: LogType.LEAVE,
+			channelId: i.message.channelId,
 		});
 	});

@@ -20,7 +20,9 @@ export default new Button('signup-settings')
 			});
 		}
 
-		const signup = await getHydratedSignup(i.message.id);
+		const signup = await getHydratedSignup({
+			messageId: i.message?.id,
+		});
 		if (!signup) {
 			throw new InteractionError({
 				status: ErrorCode.NotFound,

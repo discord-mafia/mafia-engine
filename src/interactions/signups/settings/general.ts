@@ -13,6 +13,15 @@ import { generalCategoriesEmbed } from './categories';
 import { InteractionError, ErrorCode } from '../../../utils/errors';
 import { generalMiscEmbed } from './misc';
 
+export const helpCategoryButton = new Button('signup-help')
+	.setStyle(ButtonStyle.Secondary)
+	.setEmoji('❔')
+	.onExecute(async (i) => {
+		const helpStr =
+			'This is a placeholder for help\nPlease contact Mel (or another member of staff) if you have any questions';
+		await i.reply({ ephemeral: true, content: `\`\`\`${helpStr}\`\`\`` });
+	});
+
 export const manageCategories = new Button('signup-manage-categories')
 	.setLabel('Categories')
 	.setStyle(ButtonStyle.Secondary)
@@ -85,6 +94,7 @@ export async function generalSettingsEmbed(signup: HydratedSignup) {
 	const row = new ActionRowBuilder<ButtonBuilder>();
 	row.addComponents(manageCategories.build());
 	row.addComponents(miscSettings.build());
+	row.addComponents(helpCategoryButton.build());
 
 	return {
 		embed,

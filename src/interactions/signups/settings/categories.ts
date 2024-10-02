@@ -3,18 +3,57 @@ import {
 	ButtonBuilder,
 	ButtonStyle,
 	EmbedBuilder,
+	StringSelectMenuBuilder,
 } from 'discord.js';
 import { Button } from '../../../builders/button';
-import { HydratedSignup } from '../../../db/signups';
+import {
+	createCategoryForSignup,
+	getHydratedCategory,
+	getHydratedSignupFromChannel,
+	getSignupByChannel,
+	HydratedSignup,
+} from '../../../db/signups';
 import { signupSettingsHome } from './general';
+import { ErrorCode, InteractionError } from '../../../utils/errors';
+import {
+	deleteCategoryMenu,
+	editCategoryMenu,
+	genEditCategoryMenu,
+} from './categories/editCategory';
+import { onSignupUpdate } from '../signupUpdateEvent';
+import { CustomId } from '../../../utils/customId';
 
 export const editCategoryButton = new Button('signup-edit-category')
 	.setLabel('Edit Category')
 	.setStyle(ButtonStyle.Secondary)
 	.onExecute(async (i) => {
-		await i.reply({
-			content: 'This feature is not yet implemented',
-			ephemeral: true,
+		if (!i.channelId)
+			throw new InteractionError({
+				status: ErrorCode.NotPermitted,
+				message: 'This button can only be used in a channel',
+			});
+
+		const signup = await getHydratedSignupFromChannel(i.channelId);
+		if (!signup)
+			throw new InteractionError({
+				status: ErrorCode.NotFound,
+				message: 'Failed to find signup',
+			});
+
+		const editCategory = editCategoryMenu.build();
+		editCategory.addOptions([
+			...signup.categories.map((category) => ({
+				label: category.name,
+				value: category.id.toString(),
+			})),
+		]);
+
+		await i.update({
+			components: [
+				new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+					editCategory
+				),
+			],
 		});
 	});
 
@@ -22,9 +61,41 @@ export const addCategoryButton = new Button('signup-add-category')
 	.setLabel('New Category')
 	.setStyle(ButtonStyle.Secondary)
 	.onExecute(async (i) => {
-		await i.reply({
-			content: 'This feature is not yet implemented',
-			ephemeral: true,
+		await i.deferUpdate();
+
+		const signup = await getSignupByChannel(i.channelId);
+		if (!signup)
+			throw new InteractionError({
+				status: ErrorCode.NotFound,
+				message: 'Failed to find signup',
+			});
+
+		const name = 'New Category';
+		const category = await createCategoryForSignup(i.channelId, {
+			name: name,
+			signupId: signup.id,
+		});
+		if (!category)
+			throw new InteractionError({
+				status: ErrorCode.Unknown,
+				message: 'Failed to create category',
+			});
+
+		const updatedCategory = await getHydratedCategory(category.id);
+		if (!updatedCategory)
+			throw new InteractionError({
+				status: ErrorCode.NotFound,
+				message: 'Category not found',
+			});
+
+		const { embed, rows } = genEditCategoryMenu(updatedCategory);
+		await i.editReply({
+			embeds: [embed],
+			components: [...rows],
+		});
+
+		await onSignupUpdate.publish({
+			signupId: category.signupId,
 		});
 	});
 
@@ -32,9 +103,38 @@ export const removeCategoryButton = new Button('signup-remove-category')
 	.setLabel('Remove Category')
 	.setStyle(ButtonStyle.Secondary)
 	.onExecute(async (i) => {
-		await i.reply({
-			content: 'This feature is not yet implemented',
-			ephemeral: true,
+		const signup = await getHydratedSignupFromChannel(i.channelId);
+		if (!signup)
+			throw new InteractionError({
+				status: ErrorCode.NotFound,
+				message: 'Failed to find signup',
+			});
+
+		const deleteCategory = deleteCategoryMenu.build(
+			deleteCategoryMenu.getCustomId()
+		);
+
+		if (signup.categories.length <= 0) {
+			throw new InteractionError({
+				status: ErrorCode.NotPermitted,
+				message: 'There must be at least one category',
+			});
+		}
+		deleteCategory.addOptions([
+			...signup.categories.map((category) => ({
+				label: category.name,
+				value: category.id.toString(),
+			})),
+		]);
+		const row =
+			new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+				deleteCategory
+			);
+
+		await i.update({ components: [row] });
+
+		await onSignupUpdate.publish({
+			signupId: signup.id,
 		});
 	});
 

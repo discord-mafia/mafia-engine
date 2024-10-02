@@ -2,8 +2,8 @@ import {
 	StringSelectMenuBuilder,
 	StringSelectMenuInteraction,
 } from 'discord.js';
-import { verifyCustomId } from '../utils/customId';
 import { handleInteractionError } from '../utils/errors';
+import { CustomId } from '../utils/customId';
 
 export type TextSelectMenuContext = string | undefined;
 
@@ -23,18 +23,20 @@ export class TextSelectMenu extends StringSelectMenuBuilder {
 	public static textSelectMenus = new Map<string, TextSelectMenu>();
 	private executeFunction: TextSelectMenuExecute =
 		defaultTextSelectMenuExecute;
+	private staticCustomId: string;
 
 	constructor(custom_id: string) {
 		super();
 		if (TextSelectMenu.textSelectMenus.has(custom_id))
 			throw new Error(`Text select menu ${custom_id} already exists.`);
 
-		if (!verifyCustomId(custom_id))
+		if (!CustomId.verifyRaw(custom_id))
 			throw new Error(
 				`Text select menu ${custom_id} is not in the correct format.`
 			);
 
 		this.setCustomId(custom_id);
+		this.staticCustomId = custom_id;
 		TextSelectMenu.textSelectMenus.set(custom_id, this);
 	}
 
@@ -49,5 +51,15 @@ export class TextSelectMenu extends StringSelectMenuBuilder {
 		} catch (err) {
 			await handleInteractionError(err, inter);
 		}
+	}
+
+	public getCustomId() {
+		return this.staticCustomId;
+	}
+
+	public build(customId?: string) {
+		const newBuilder = new StringSelectMenuBuilder(this.data);
+		if (customId) newBuilder.setCustomId(customId);
+		return newBuilder;
 	}
 }

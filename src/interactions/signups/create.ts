@@ -74,7 +74,9 @@ export const createSignup = new SubCommand('create')
 			isHoisted: true,
 		});
 
-		const hydrated = await getHydratedSignup(deferred.id);
+		const hydrated = await getHydratedSignup({
+			messageId: deferred.id,
+		});
 		if (!hydrated) throw new InteractionError('Failed to hydrate signup');
 
 		const embed = formatSignupEmbed(hydrated);

@@ -131,6 +131,7 @@ export type HydratedCategory = SignupCategory & {
 
 export type HydratedUser = User & {
 	username?: string;
+	createdAt: Date;
 };
 
 export async function getHydratedSignupFromChannel(channelId: string) {
@@ -141,20 +142,30 @@ export async function getHydratedSignupFromChannel(channelId: string) {
 		.limit(1);
 	const sign = signup.shift() ?? null;
 	if (!sign) return null;
-	return await getHydratedSignup(sign.messageId);
+	return await getHydratedSignup({
+		signupId: sign.id,
+	});
 }
 
+type HydratedSignupQuery = { messageId: string } | { signupId: number };
 export async function getHydratedSignup(
-	messageId: string
+	query: HydratedSignupQuery
 ): Promise<HydratedSignup | null> {
+	const messageId = 'messageId' in query ? query.messageId : null;
+	const signupId = 'signupId' in query ? query.signupId : null;
+
+	//prettier-ignore
+	const whereClause = signupId
+		? eq(signups.id, signupId)
+		: messageId
+			? eq(signups.messageId, messageId)
+			: null;
+
+	if (!whereClause) return null;
+
 	const signup =
-		(
-			await db
-				.select()
-				.from(signups)
-				.where(eq(signups.messageId, messageId))
-				.limit(1)
-		).shift() ?? null;
+		(await db.select().from(signups).where(whereClause).limit(1)).shift() ??
+		null;
 
 	if (!signup) return null;
 
@@ -174,7 +185,11 @@ export async function getHydratedSignup(
 		for (const signup_user of signup_users) {
 			const usr = await getUser(signup_user.userId);
 			if (!usr) continue;
-			true_users.push({ ...usr, username: usr.username });
+			true_users.push({
+				...usr,
+				username: usr.username,
+				createdAt: signup_user.createdAt,
+			});
 		}
 
 		const cat: HydratedCategory = {
@@ -185,6 +200,50 @@ export async function getHydratedSignup(
 	}
 
 	return { ...signup, categories: true_categories };
+}
+
+export async function deleteCategory(categoryId: number) {
+	const res = await db
+		.delete(signupCategories)
+		.where(eq(signupCategories.id, categoryId))
+		.returning();
+	return res.shift() ?? null;
+}
+
+export async function getHydratedCategory(
+	categoryId: number
+): Promise<HydratedCategory | null> {
+	const res = await db
+		.select()
+		.from(signupCategories)
+		.where(eq(signupCategories.id, categoryId))
+		.limit(1);
+
+	const category = res.shift();
+	if (!category) return null;
+
+	const signup_users = await db
+		.select()
+		.from(signupUsers)
+		.where(eq(signupUsers.categoryId, category.id));
+
+	const true_users: HydratedUser[] = [];
+	for (const signup_user of signup_users) {
+		const usr = await getUser(signup_user.userId);
+		if (!usr) continue;
+		true_users.push({
+			...usr,
+			username: usr.username,
+			createdAt: signup_user.createdAt,
+		});
+	}
+
+	const hydrated: HydratedCategory = {
+		...category,
+		users: true_users,
+	};
+
+	return hydrated;
 }
 
 export async function addUserToCategory(query: NewSignupUser) {
@@ -437,6 +496,18 @@ export async function editCategoryForSignup(
 				eq(signupCategories.signupId, signup.id)
 			)
 		)
+		.returning();
+	return category.shift() ?? null;
+}
+
+export async function editCategory(
+	categoryId: number,
+	changes: Partial<NewSignupCategory>
+) {
+	const category = await db
+		.update(signupCategories)
+		.set(changes)
+		.where(eq(signupCategories.id, categoryId))
 		.returning();
 	return category.shift() ?? null;
 }
