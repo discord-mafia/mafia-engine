@@ -19,7 +19,7 @@ import { renameCategoryModal } from './renameCategory';
 import { CustomId } from '../../../../utils/customId';
 import { changeLimitModal } from './changeLimit';
 import { addUserMenu } from './addUsers';
-import { UserSelectMenu } from '../../../../builders/userSelectMenu';
+import { removeUserMenu } from './removeUsers';
 
 export const editCategoryMenu = new TextSelectMenu('edit-category')
 	.setMinValues(1)
@@ -110,11 +110,18 @@ export const addUserButton = new Button('add-user-to-category')
 export const removeUserButton = new Button('remove-user-from-category')
 	.setLabel('Remove User')
 	.setStyle(ButtonStyle.Secondary)
-	.onExecute(async (i) => {
-		await i.reply({
-			content: 'This feature is not yet implemented',
-			ephemeral: true,
-		});
+	.onExecute(async (i, ctx) => {
+		if (!ctx)
+			throw new InteractionError(
+				'This button is invalid (no supplied category)'
+			);
+
+		const row = new ActionRowBuilder<UserSelectMenuBuilder>().addComponents(
+			removeUserMenu.build(
+				new CustomId(removeUserMenu.getCustomId(), ctx).getHydrated()
+			)
+		);
+		await i.update({ components: [row] });
 	});
 
 export const cullUserButton = new Button('cull-user-from-category')
