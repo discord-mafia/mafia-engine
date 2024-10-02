@@ -7,10 +7,12 @@ import {
 	UserSelectMenuBuilder,
 } from 'discord.js';
 import { TextSelectMenu } from '../../../../builders/textSelectMenu';
-import { InteractionError } from '../../../../utils/errors';
+import { ErrorCode, InteractionError } from '../../../../utils/errors';
 import {
+	getHydratedCategory,
 	getHydratedSignupFromChannel,
 	HydratedCategory,
+	removeUserFromCategory,
 } from '../../../../db/signups';
 import { cleanUsername } from '../../../../utils/usernames';
 import { Button } from '../../../../builders/button';
@@ -20,6 +22,7 @@ import { CustomId } from '../../../../utils/customId';
 import { changeLimitModal } from './changeLimit';
 import { addUserMenu } from './addUsers';
 import { removeUserMenu } from './removeUsers';
+import { onSignupUpdate } from '../../signupUpdateEvent';
 
 export const editCategoryMenu = new TextSelectMenu('edit-category')
 	.setMinValues(1)
@@ -127,10 +130,70 @@ export const removeUserButton = new Button('remove-user-from-category')
 export const cullUserButton = new Button('cull-user-from-category')
 	.setLabel('Cull Users')
 	.setStyle(ButtonStyle.Secondary)
-	.onExecute(async (i) => {
-		await i.reply({
-			content: 'This feature is not yet implemented',
-			ephemeral: true,
+	.onExecute(async (i, ctx) => {
+		if (!ctx)
+			throw new InteractionError(
+				'This button is invalid (no supplied category)'
+			);
+		if (!i.guild) {
+			throw new InteractionError(
+				'Cannot use this command outside of a server'
+			);
+		}
+		const categoryId = parseInt(ctx);
+		if (isNaN(categoryId))
+			throw new InteractionError(
+				`Invalid context, expected an integer but got ${ctx}`
+			);
+
+		const category = await getHydratedCategory(categoryId);
+		if (!category)
+			throw new InteractionError({
+				status: ErrorCode.NotFound,
+				message: 'Category not found',
+			});
+
+		await i.deferUpdate();
+
+		const deletedUsers: string[] = [];
+		for (const user of category.users) {
+			try {
+				const member = await i.guild.members.fetch(user.id);
+				if (member) continue;
+			} catch (err) {
+				/* empty */
+			}
+
+			const result = await removeUserFromCategory(
+				user.id,
+				i.channelId,
+				category.name
+			);
+			if (!result) continue;
+			deletedUsers.push(...result.map((u) => u.userId));
+		}
+
+		if (deletedUsers.length > 0) {
+			await i.followUp({
+				content: `Removed ${deletedUsers.length} users from the category`,
+				ephemeral: true,
+			});
+		}
+		const updatedCategory = await getHydratedCategory(categoryId);
+		if (!updatedCategory)
+			throw new InteractionError({
+				status: ErrorCode.NotFound,
+				message: 'Category not found',
+			});
+
+		const { embed, rows } = genEditCategoryMenu(updatedCategory);
+		await i.editReply({
+			embeds: [embed],
+			components: [...rows],
+		});
+
+		await onSignupUpdate.publish({
+			signupId: category.signupId,
 		});
 	});
 
