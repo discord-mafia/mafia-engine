@@ -8,6 +8,7 @@ import { genEditCategoryMenu } from './editCategory';
 export const addUserMenu = new UserSelectMenu('add-user-to-category')
 	.setPlaceholder('Select users to add...')
 	.setMinValues(1)
+	.setMaxValues(25)
 	.setCustomId('add-user-to-category')
 	.onExecute(async (i, ctx) => {
 		if (!i.guild) {
