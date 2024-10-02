@@ -4,12 +4,10 @@ import { SubCommand } from '../../builders/subcommand';
 import { InteractionError } from '../../utils/errors';
 import {
 	getCategoryNames,
-	getHydratedSignup,
 	getSignupByChannel,
 	getUserNames,
 	removeUserFromCategory,
 } from '../../db/signups';
-import { formatSignupEmbed, formatSignupComponents } from '../../views/signup';
 import { getUserByName } from '../../db/users';
 import { trigramSimilarity } from '../../utils/string';
 import { onSignupUpdate } from './signupUpdateEvent';

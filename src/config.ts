@@ -5,6 +5,8 @@ const envSchema = z.object({
 	DATABASE_URL: z.string(),
 	DISCORD_TOKEN: z.string(),
 	DISCORD_CLIENT_ID: z.string(),
+
+	TMP_SIGNUP_LOG_WEBHOOK: z.string().optional(),
 });
 
 export function fetchConfig() {

@@ -22,6 +22,7 @@
 		"@typescript-eslint/parser": "^6.4.1",
 		"drizzle-kit": "^0.24.0",
 		"eslint": "^8.48.0",
+		"eslint-config-prettier": "^9.1.0",
 		"ts-node": "^10.9.1"
 	},
 	"nodemonConfig": {

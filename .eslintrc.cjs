@@ -4,7 +4,11 @@ module.exports = {
 		es2021: true,
 		node: true,
 	},
-	extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
+	extends: [
+		'eslint:recommended',
+		'plugin:@typescript-eslint/recommended',
+		'prettier',
+	],
 	parser: '@typescript-eslint/parser',
 	parserOptions: {
 		ecmaVersion: 'latest',
@@ -14,7 +18,7 @@ module.exports = {
 	rules: {
 		indent: ['error', 'tab', { SwitchCase: 1 }],
 		'linebreak-style': ['error', 'unix'],
-		quotes: ['error', 'single'],
+		quotes: ['error', 'single', { avoidEscape: true }],
 		semi: ['error', 'always'],
 		'@typescript-eslint/no-unused-vars': [
 			'warn',

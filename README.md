@@ -6,6 +6,8 @@ Mafia Engine is a Discord bot written in Typescript. It is designed to be a simp
 
 This bot is currently in development and is actively getting new features and bug fixes. If you have any suggestions or find any bugs, please feel free to open an issue or pull request.
 
+You can access the projects changelog [here](CHANGELOG.md). This will cover the project starting from the rewrite.
+
 ## Bot Features
 
 -   Signup / Looking For Group functionality
@@ -23,7 +25,7 @@ This bot is currently in development and is actively getting new features and bu
 
 1. Clone the repository in a directory of your choice
 2. Run `npm install` to install all dependencies
-3. Rename `.env.example` to `.env` and fill in the appropriate values
+3. Copy `.env.example` into a new file `.env` and fill in the appropriate values
 
 **To run the bot officially**
 

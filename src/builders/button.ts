@@ -5,8 +5,8 @@ import {
 	ButtonStyle,
 	ComponentEmojiResolvable,
 } from 'discord.js';
-import { verifyCustomId } from '../utils/customId';
-import { handleInteractionError, InteractionError } from '../utils/errors';
+import { handleInteractionError } from '../utils/errors';
+import { CustomId } from '../utils/customId';
 
 export type ButtonContext = string | undefined;
 
@@ -27,15 +27,18 @@ export class Button {
 	private builder: ButtonBuilder;
 	private executeFunction: ButtonExecute = defaultButtonExecute;
 
+	private staticCustomId: string;
+
 	constructor(custom_id: string) {
 		if (Button.buttons.has(custom_id))
 			throw new Error(`Button ${custom_id} already exists.`);
 
-		if (!verifyCustomId(custom_id))
+		if (!CustomId.verifyRaw(custom_id))
 			throw new Error(
 				`Button ${custom_id} is not in the correct format.`
 			);
 
+		this.staticCustomId = custom_id;
 		this.builder = new ButtonBuilder().setCustomId(custom_id);
 		Button.buttons.set(custom_id, this);
 	}
@@ -78,10 +81,19 @@ export class Button {
 		return this;
 	}
 
+	public getCustomId() {
+		return this.staticCustomId;
+	}
+
 	public build(customId?: string) {
 		const newBuilder = this.builder;
 		if (customId) newBuilder.setCustomId(customId);
 		return newBuilder;
+	}
+
+	public buildWithContext(ctx: string) {
+		const newCustomId = new CustomId(this.getCustomId(), ctx);
+		return this.build(newCustomId.getHydrated());
 	}
 
 	public buildAsRow(customId?: string) {

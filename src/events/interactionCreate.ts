@@ -1,52 +1,45 @@
-import type { ChatInputCommandInteraction, Interaction } from 'discord.js';
+import type {
+	AutocompleteInteraction,
+	ButtonInteraction,
+	ChatInputCommandInteraction,
+	Interaction,
+	ModalSubmitInteraction,
+	StringSelectMenuInteraction,
+	UserSelectMenuInteraction,
+} from 'discord.js';
 import { SlashCommand } from '../builders/slashCommand';
 import { Button } from '../builders/button';
-import { parseCustomId } from '../utils/customId';
 import { SubCommandHandler } from '../builders/subcommandHandler';
-import { handleInteractionError } from '../utils/errors';
+import { Modal } from '../builders/modal';
+import { TextSelectMenu } from '../builders/textSelectMenu';
+import { CustomId } from '../utils/customId';
+import { UserSelectMenu } from '../builders/userSelectMenu';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function onInteraction(i: Interaction<any>) {
-	if (i.isChatInputCommand()) {
-		handleSlashCommand(i);
-	} else if (i.isAutocomplete()) {
-		if (i.options.getSubcommand()) {
-			const handler = SubCommandHandler.subcommandHandlers.get(
-				i.commandName
-			);
-			if (!handler)
-				return await i.respond([
-					{
-						name: 'Invalid Subcommand',
-						value: 'Invalid Subcommand',
-					},
-				]);
-
-			await handler.onAutocomplete(i);
-		}
-	} else if (i.isButton()) {
-		const parsedCustomID = parseCustomId(i.customId);
-		const button = Button.buttons.get(parsedCustomID.custom_id);
-		if (!button)
-			return i.reply({
-				content: 'This button does not exist',
-				ephemeral: true,
-			});
-		try {
-			const ctx = parseCustomId(i.customId);
-			await button.run(i, ctx.context);
-		} catch (err) {
-			console.log(err);
-		}
-	} else {
-		if (i.isRepliable()) {
-			await i.reply({
-				content: 'This interaction type is not supported yet.',
-				ephemeral: true,
-			});
-		} else {
-			console.log('Interaction type not supported yet.', i);
-		}
+	switch (true) {
+		case i.isChatInputCommand():
+			return await handleSlashCommand(i as ChatInputCommandInteraction);
+		case i.isAutocomplete():
+			return await handleAutocomplete(i as AutocompleteInteraction);
+		case i.isButton():
+			return await handleButton(i as ButtonInteraction);
+		case i.isModalSubmit():
+			return await handleModalSubmit(i as ModalSubmitInteraction);
+		case i.isStringSelectMenu():
+			return await handleTextSelectMenu(i as StringSelectMenuInteraction);
+		case i.isUserSelectMenu():
+			return await handleUserSelectMenu(i as UserSelectMenuInteraction);
+		default:
+			if (i.isRepliable()) {
+				await i.reply({
+					content: 'This interaction type is not supported yet.',
+					ephemeral: true,
+				});
+			} else {
+				console.log('Interaction type not supported yet.', i);
+			}
+			break;
 	}
 }
 
@@ -65,4 +58,69 @@ async function handleSlashCommand(i: ChatInputCommandInteraction) {
 		return await subcommandHandler.run(i);
 	}
 	return await slashCommand.run(i);
+}
+
+async function handleAutocomplete(i: AutocompleteInteraction) {
+	if (i.options.getSubcommand()) {
+		const handler = SubCommandHandler.subcommandHandlers.get(i.commandName);
+		if (!handler)
+			return await i.respond([
+				{
+					name: 'Invalid Subcommand',
+					value: 'Invalid Subcommand',
+				},
+			]);
+
+		await handler.onAutocomplete(i);
+	}
+}
+
+async function handleButton(i: ButtonInteraction) {
+	const customId = CustomId.parseString(i.customId);
+	const button = Button.buttons.get(customId.getId());
+	if (!button)
+		return i.reply({
+			content: 'This button does not exist',
+			ephemeral: true,
+		});
+	try {
+		await button.run(i, customId.getContext());
+	} catch (err) {
+		console.log(err);
+	}
+}
+async function handleModalSubmit(i: ModalSubmitInteraction) {
+	const customId = CustomId.parseString(i.customId);
+	const modal = Modal.modals.get(customId.getId());
+	if (!modal) {
+		return i.reply({
+			content: 'This modal does not exist',
+			ephemeral: true,
+		});
+	}
+	return await modal.run(i, customId.getContext());
+}
+
+async function handleTextSelectMenu(i: StringSelectMenuInteraction) {
+	const customId = CustomId.parseString(i.customId);
+	const selectMenu = TextSelectMenu.textSelectMenus.get(customId.getId());
+	if (!selectMenu) {
+		return i.reply({
+			content: 'This select menu does not exist',
+			ephemeral: true,
+		});
+	}
+	await selectMenu.run(i, customId.getContext());
+}
+
+async function handleUserSelectMenu(i: UserSelectMenuInteraction) {
+	const customId = CustomId.parseString(i.customId);
+	const selectMenu = UserSelectMenu.selectMenus.get(customId.getId());
+	if (!selectMenu) {
+		return i.reply({
+			content: 'This select menu does not exist',
+			ephemeral: true,
+		});
+	}
+	await selectMenu.run(i, customId.getContext());
 }

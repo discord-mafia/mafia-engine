@@ -6,6 +6,8 @@ export enum ErrorCode {
 	Unknown = 'UNKNOWN',
 	NotPermitted = 'NOT_PERMITTED',
 	NotImplemented = 'NOT_IMPLEMENTED',
+	NotFound = 'NOT_FOUND',
+	BadRequest = 'BAD_REQUEST',
 }
 
 export type StatusMessage = {
@@ -19,6 +21,8 @@ export const defaultStatusMessages: Record<ErrorCode, string> = {
 	[ErrorCode.NotPermitted]:
 		'You do not have the required permissions to do this',
 	[ErrorCode.NotImplemented]: 'This feature has not been implemented yet',
+	[ErrorCode.NotFound]: 'The requested resource was not found',
+	[ErrorCode.BadRequest]: 'The request was invalid',
 };
 
 const embedErrorJokeNames: string[] = [

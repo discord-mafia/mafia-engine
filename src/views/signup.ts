@@ -8,9 +8,10 @@ import {
 	ButtonStyle,
 } from 'discord.js';
 import { HydratedSignup } from '../db/signups';
-import { createCustomId } from '../utils/customId';
 import { leaveCategoryBtn } from '../interactions/signups/buttons/categoryLeave';
 import settings from '../interactions/signups/buttons/settings';
+import { cleanUsername } from '../utils/usernames';
+import { CustomId } from '../utils/customId';
 
 export function formatSignupEmbed(signup: HydratedSignup) {
 	const embed = new EmbedBuilder();
@@ -29,29 +30,13 @@ export function formatSignupEmbed(signup: HydratedSignup) {
 	signup.categories.sort((a, b) => a.id - b.id);
 
 	for (const category of signup.categories) {
+		category.users.sort(
+			(a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+		);
+
 		const users_str: string[] = [];
 		for (const user of category.users) {
-			const illegal_chars = [
-				'*',
-				'_',
-				'~',
-				'`',
-				'|',
-				'>',
-				'[',
-				']',
-				'(',
-				')',
-				':',
-			];
-
-			const regex = new RegExp(
-				`([${illegal_chars.map((char) => `\\${char}`).join('')}])`,
-				'g'
-			);
-
-			const username = user.username.replace(regex, '\\$1');
-
+			const username = cleanUsername(user.username);
 			if (signup.isAnonymous && !category.isHoisted)
 				users_str.push('> Anonymous User');
 			else users_str.push(`> ${username}`);
@@ -91,8 +76,9 @@ export function formatSignupComponents(signup: HydratedSignup) {
 	signup.categories.forEach((category) => {
 		if (category.isHoisted) return;
 		const btn = new ButtonBuilder();
-		const customId = createCustomId('signup-join', category.id.toString());
-		btn.setCustomId(customId);
+
+		const customId = new CustomId('signup-join', category.id.toString());
+		btn.setCustomId(customId.getHydrated());
 
 		let label = category.buttonName ?? category.name;
 		if (!category.buttonName && label.charAt(label.length - 1) === 's')
@@ -102,6 +88,10 @@ export function formatSignupComponents(signup: HydratedSignup) {
 		btn.setStyle(
 			category.isFocused ? ButtonStyle.Primary : ButtonStyle.Secondary
 		);
+
+		if (category.limit)
+			btn.setDisabled(category.users.length >= category.limit);
+
 		buttons.push(btn);
 	});
 
