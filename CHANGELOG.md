@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+-   Manage signups (for hosts) via buttons and interactions
+    -   Creating categories
+    -   Deleting categories
+    -   Updating categories
+        -   Rename
+        -   Change limit
+        -   Add users
+        -   Remove users
+        -   Cull users that left the server (as they cannot be fetched via a user select menu)
+    -   Toggle anonymity
+    -   Change name of signups
+-   Signup logging using webhooks
+
+## [0.1.0]
+
 ### Added
 
 -   Added button menu for interacting with signup settings
@@ -16,3 +31,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -   Project rewrite starter
 
 [Unreleased]: https://github.com/JacksonVirgo/mafia-engine
+[0.1.0]: https://github.com/discord-mafia/mafia-engine/releases/tag/0.1.0
