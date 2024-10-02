@@ -20,7 +20,7 @@ export class UserSelectMenu extends UserSelectMenuBuilder {
 	public static selectMenus = new Map<string, UserSelectMenu>();
 	private executeFunction: UserSelectMenuExecute =
 		defaultTextSelectMenuExecute;
-
+	private staticCustomId: string;
 	constructor(custom_id: string) {
 		super();
 		if (UserSelectMenu.selectMenus.has(custom_id))
@@ -32,6 +32,7 @@ export class UserSelectMenu extends UserSelectMenuBuilder {
 			);
 
 		this.setCustomId(custom_id);
+		this.staticCustomId = custom_id;
 		UserSelectMenu.selectMenus.set(custom_id, this);
 	}
 
@@ -46,6 +47,10 @@ export class UserSelectMenu extends UserSelectMenuBuilder {
 		} catch (err) {
 			await handleInteractionError(err, inter);
 		}
+	}
+
+	public getCustomId() {
+		return this.staticCustomId;
 	}
 
 	public build(customId?: string) {

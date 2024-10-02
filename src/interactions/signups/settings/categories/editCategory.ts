@@ -4,6 +4,7 @@ import {
 	ButtonStyle,
 	ChannelType,
 	EmbedBuilder,
+	UserSelectMenuBuilder,
 } from 'discord.js';
 import { TextSelectMenu } from '../../../../builders/textSelectMenu';
 import { InteractionError } from '../../../../utils/errors';
@@ -17,6 +18,8 @@ import { signupSettingsHome } from '../general';
 import { renameCategoryModal } from './renameCategory';
 import { CustomId } from '../../../../utils/customId';
 import { changeLimitModal } from './changeLimit';
+import { addUserMenu } from './addUsers';
+import { UserSelectMenu } from '../../../../builders/userSelectMenu';
 
 export const editCategoryMenu = new TextSelectMenu('edit-category')
 	.setMinValues(1)
@@ -90,11 +93,18 @@ export function genEditCategoryMenu(category: HydratedCategory) {
 export const addUserButton = new Button('add-user-to-category')
 	.setLabel('Add Users')
 	.setStyle(ButtonStyle.Secondary)
-	.onExecute(async (i) => {
-		await i.reply({
-			content: 'This feature is not yet implemented',
-			ephemeral: true,
-		});
+	.onExecute(async (i, ctx) => {
+		if (!ctx)
+			throw new InteractionError(
+				'This button is invalid (no supplied category)'
+			);
+		const row = new ActionRowBuilder<UserSelectMenuBuilder>().addComponents(
+			addUserMenu.build(
+				new CustomId(addUserMenu.getCustomId(), ctx).getHydrated()
+			)
+		);
+
+		await i.update({ components: [row] });
 	});
 
 export const removeUserButton = new Button('remove-user-from-category')
@@ -131,6 +141,10 @@ export const limitChangeButton = new Button('change-category-limit')
 	.setLabel('Change Limit')
 	.setStyle(ButtonStyle.Secondary)
 	.onExecute(async (i, ctx) => {
+		if (!ctx)
+			throw new InteractionError(
+				'This button is invalid (no supplied category)'
+			);
 		const modal = changeLimitModal.build(
 			new CustomId('change-category-limit', ctx).getHydrated()
 		);

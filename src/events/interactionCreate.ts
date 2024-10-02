@@ -122,4 +122,5 @@ async function handleUserSelectMenu(i: UserSelectMenuInteraction) {
 			ephemeral: true,
 		});
 	}
+	await selectMenu.run(i, customId.getContext());
 }
