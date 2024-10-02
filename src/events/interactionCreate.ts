@@ -5,6 +5,7 @@ import type {
 	Interaction,
 	ModalSubmitInteraction,
 	StringSelectMenuInteraction,
+	UserSelectMenuInteraction,
 } from 'discord.js';
 import { SlashCommand } from '../builders/slashCommand';
 import { Button } from '../builders/button';
@@ -12,6 +13,7 @@ import { SubCommandHandler } from '../builders/subcommandHandler';
 import { Modal } from '../builders/modal';
 import { TextSelectMenu } from '../builders/textSelectMenu';
 import { CustomId } from '../utils/customId';
+import { UserSelectMenu } from '../builders/userSelectMenu';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function onInteraction(i: Interaction<any>) {
@@ -26,6 +28,8 @@ export default async function onInteraction(i: Interaction<any>) {
 			return await handleModalSubmit(i as ModalSubmitInteraction);
 		case i.isStringSelectMenu():
 			return await handleTextSelectMenu(i as StringSelectMenuInteraction);
+		case i.isUserSelectMenu():
+			return await handleUserSelectMenu(i as UserSelectMenuInteraction);
 		default:
 			if (i.isRepliable()) {
 				await i.reply({
@@ -107,4 +111,15 @@ async function handleTextSelectMenu(i: StringSelectMenuInteraction) {
 		});
 	}
 	await selectMenu.run(i, customId.getContext());
+}
+
+async function handleUserSelectMenu(i: UserSelectMenuInteraction) {
+	const customId = CustomId.parseString(i.customId);
+	const selectMenu = UserSelectMenu.selectMenus.get(customId.getId());
+	if (!selectMenu) {
+		return i.reply({
+			content: 'This select menu does not exist',
+			ephemeral: true,
+		});
+	}
 }
