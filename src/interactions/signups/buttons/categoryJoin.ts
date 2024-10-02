@@ -1,9 +1,14 @@
 import { ButtonStyle } from 'discord.js';
 import { Button } from '../../../builders/button';
 import { getOrInsertUser } from '../../../db/users';
-import { InteractionError } from '../../../utils/errors';
-import { addUserToCategory, leaveSignups } from '../../../db/signups';
+import { ErrorCode, InteractionError } from '../../../utils/errors';
+import {
+	addUserToCategory,
+	getHydratedCategory,
+	leaveSignups,
+} from '../../../db/signups';
 import { onSignupUpdate } from '../signupUpdateEvent';
+import { logSignup, LogType } from '../../../utils/logging';
 
 export const categoryJoinButton = new Button('signup-join')
 	.setStyle(ButtonStyle.Secondary)
@@ -23,14 +28,28 @@ export const categoryJoinButton = new Button('signup-join')
 				`Invalid context, expected an integer but got ${ctx}`
 			);
 
+		const category = await getHydratedCategory(categoryId);
+		if (!category)
+			throw new InteractionError({
+				status: ErrorCode.NotFound,
+				message: 'Category not found',
+			});
+
 		await leaveSignups(user.id, i.message.id);
 		await addUserToCategory({
 			categoryId,
 			userId: user.id,
 		});
 
-		onSignupUpdate.publish({
+		await onSignupUpdate.publish({
 			messageId: i.message.id,
 			i,
+		});
+
+		await logSignup({
+			categoryName: category.name,
+			user: user.username,
+			type: LogType.JOIN,
+			channelId: i.message.channelId,
 		});
 	});
