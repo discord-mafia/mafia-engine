@@ -7,12 +7,19 @@ import {
 } from 'discord.js';
 import { Button } from '../../../builders/button';
 import {
+	createCategoryForSignup,
+	getHydratedCategory,
 	getHydratedSignupFromChannel,
+	getSignupByChannel,
 	HydratedSignup,
 } from '../../../db/signups';
 import { signupSettingsHome } from './general';
 import { ErrorCode, InteractionError } from '../../../utils/errors';
-import { editCategoryMenu } from './categories/editCategory';
+import {
+	editCategoryMenu,
+	genEditCategoryMenu,
+} from './categories/editCategory';
+import { onSignupUpdate } from '../signupUpdateEvent';
 
 export const editCategoryButton = new Button('signup-edit-category')
 	.setLabel('Edit Category')
@@ -52,9 +59,41 @@ export const addCategoryButton = new Button('signup-add-category')
 	.setLabel('New Category')
 	.setStyle(ButtonStyle.Secondary)
 	.onExecute(async (i) => {
-		await i.reply({
-			content: 'This feature is not yet implemented',
-			ephemeral: true,
+		await i.deferUpdate();
+
+		const signup = await getSignupByChannel(i.channelId);
+		if (!signup)
+			throw new InteractionError({
+				status: ErrorCode.NotFound,
+				message: 'Failed to find signup',
+			});
+
+		const name = 'New Category';
+		const category = await createCategoryForSignup(i.channelId, {
+			name: name,
+			signupId: signup.id,
+		});
+		if (!category)
+			throw new InteractionError({
+				status: ErrorCode.Unknown,
+				message: 'Failed to create category',
+			});
+
+		const updatedCategory = await getHydratedCategory(category.id);
+		if (!updatedCategory)
+			throw new InteractionError({
+				status: ErrorCode.NotFound,
+				message: 'Category not found',
+			});
+
+		const { embed, rows } = genEditCategoryMenu(updatedCategory);
+		await i.editReply({
+			embeds: [embed],
+			components: [...rows],
+		});
+
+		await onSignupUpdate.publish({
+			signupId: category.signupId,
 		});
 	});
 
