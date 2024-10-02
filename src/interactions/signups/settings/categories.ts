@@ -21,7 +21,6 @@ import {
 	genEditCategoryMenu,
 } from './categories/editCategory';
 import { onSignupUpdate } from '../signupUpdateEvent';
-import { CustomId } from '../../../utils/customId';
 
 export const editCategoryButton = new Button('signup-edit-category')
 	.setLabel('Edit Category')
