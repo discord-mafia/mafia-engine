@@ -202,6 +202,14 @@ export async function getHydratedSignup(
 	return { ...signup, categories: true_categories };
 }
 
+export async function deleteCategory(categoryId: number) {
+	const res = await db
+		.delete(signupCategories)
+		.where(eq(signupCategories.id, categoryId))
+		.returning();
+	return res.shift() ?? null;
+}
+
 export async function getHydratedCategory(
 	categoryId: number
 ): Promise<HydratedCategory | null> {

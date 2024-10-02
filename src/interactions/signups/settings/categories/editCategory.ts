@@ -9,6 +9,7 @@ import {
 import { TextSelectMenu } from '../../../../builders/textSelectMenu';
 import { ErrorCode, InteractionError } from '../../../../utils/errors';
 import {
+	deleteCategory,
 	getHydratedCategory,
 	getHydratedSignupFromChannel,
 	HydratedCategory,
@@ -219,4 +220,42 @@ export const limitChangeButton = new Button('change-category-limit')
 			new CustomId('change-category-limit', ctx).getHydrated()
 		);
 		await i.showModal(modal);
+	});
+
+export const deleteCategoryMenu = new TextSelectMenu('delete-category')
+	.setMinValues(1)
+	.setMaxValues(1)
+	.onExecute(async (i) => {
+		if (!i.guild)
+			throw new InteractionError(
+				'Cannot use this command outside of a server'
+			);
+		if (!i.channel || i.channel.type != ChannelType.GuildText)
+			throw new InteractionError(
+				'Cannot use this command outside of a text channel'
+			);
+
+		const rawRequestedCategoryId = i.values.shift();
+		if (!rawRequestedCategoryId)
+			throw new InteractionError('Invalid category');
+
+		const categoryId = parseInt(rawRequestedCategoryId);
+		if (isNaN(categoryId))
+			throw new InteractionError(
+				`Invalid context, expected an integer but got ${i.values[0]}`
+			);
+
+		const signup = await getHydratedSignupFromChannel(i.channelId);
+		if (!signup) throw new InteractionError('Failed to fetch signup');
+
+		const category = signup.categories.find((c) => c.id == categoryId);
+		if (!category) throw new InteractionError('Invalid category');
+
+		const result = await deleteCategory(categoryId);
+		if (!result) throw new InteractionError('Failed to delete category');
+
+		await i.update({
+			content: `Deleted category ${category.name}`,
+			components: [],
+		});
 	});

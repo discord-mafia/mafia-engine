@@ -16,10 +16,12 @@ import {
 import { signupSettingsHome } from './general';
 import { ErrorCode, InteractionError } from '../../../utils/errors';
 import {
+	deleteCategoryMenu,
 	editCategoryMenu,
 	genEditCategoryMenu,
 } from './categories/editCategory';
 import { onSignupUpdate } from '../signupUpdateEvent';
+import { CustomId } from '../../../utils/customId';
 
 export const editCategoryButton = new Button('signup-edit-category')
 	.setLabel('Edit Category')
@@ -101,9 +103,38 @@ export const removeCategoryButton = new Button('signup-remove-category')
 	.setLabel('Remove Category')
 	.setStyle(ButtonStyle.Secondary)
 	.onExecute(async (i) => {
-		await i.reply({
-			content: 'This feature is not yet implemented',
-			ephemeral: true,
+		const signup = await getHydratedSignupFromChannel(i.channelId);
+		if (!signup)
+			throw new InteractionError({
+				status: ErrorCode.NotFound,
+				message: 'Failed to find signup',
+			});
+
+		const deleteCategory = deleteCategoryMenu.build(
+			deleteCategoryMenu.getCustomId()
+		);
+
+		if (signup.categories.length <= 0) {
+			throw new InteractionError({
+				status: ErrorCode.NotPermitted,
+				message: 'There must be at least one category',
+			});
+		}
+		deleteCategory.addOptions([
+			...signup.categories.map((category) => ({
+				label: category.name,
+				value: category.id.toString(),
+			})),
+		]);
+		const row =
+			new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+				deleteCategory
+			);
+
+		await i.update({ components: [row] });
+
+		await onSignupUpdate.publish({
+			signupId: signup.id,
 		});
 	});
 

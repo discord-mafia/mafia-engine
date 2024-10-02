@@ -23,6 +23,7 @@ export class TextSelectMenu extends StringSelectMenuBuilder {
 	public static textSelectMenus = new Map<string, TextSelectMenu>();
 	private executeFunction: TextSelectMenuExecute =
 		defaultTextSelectMenuExecute;
+	private staticCustomId: string;
 
 	constructor(custom_id: string) {
 		super();
@@ -35,6 +36,7 @@ export class TextSelectMenu extends StringSelectMenuBuilder {
 			);
 
 		this.setCustomId(custom_id);
+		this.staticCustomId = custom_id;
 		TextSelectMenu.textSelectMenus.set(custom_id, this);
 	}
 
@@ -49,6 +51,10 @@ export class TextSelectMenu extends StringSelectMenuBuilder {
 		} catch (err) {
 			await handleInteractionError(err, inter);
 		}
+	}
+
+	public getCustomId() {
+		return this.staticCustomId;
 	}
 
 	public build(customId?: string) {
