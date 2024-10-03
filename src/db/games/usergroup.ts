@@ -9,6 +9,7 @@ import {
 import { games } from './games';
 import { eq } from 'drizzle-orm';
 import { db } from '../../controllers/database';
+import { Participant, participants } from './participants';
 
 export const participantType = pgEnum('participant_type', [
 	'player',
@@ -42,6 +43,20 @@ export class Usergroup {
 		return this.usergroup;
 	}
 
+	public async fetchParticipants() {
+		const res = await db
+			.select()
+			.from(participants)
+			.where(eq(participants.usergroupId, this.usergroup.id));
+
+		const users: Participant[] = [];
+		for (const participant of res) {
+			users.push(new Participant(participant));
+		}
+
+		return users;
+	}
+
 	public async update(changes: Partial<DbUsergroup>) {
 		const res = await db
 			.update(usergroups)
@@ -70,19 +85,5 @@ export class Usergroup {
 		const usergroup = res.shift();
 		if (!usergroup) return null;
 		return new Usergroup(usergroup);
-	}
-
-	static async allFromGameId(gameId: number) {
-		const res = await db
-			.select()
-			.from(usergroups)
-			.where(eq(usergroups.gameId, gameId));
-
-		const groups: Usergroup[] = [];
-		for (const usergroup of res) {
-			groups.push(new Usergroup(usergroup));
-		}
-
-		return groups;
 	}
 }

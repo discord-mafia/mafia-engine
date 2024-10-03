@@ -9,6 +9,7 @@ import {
 import { eq } from 'drizzle-orm';
 
 import { db } from '../../controllers/database';
+import { Usergroup, usergroups } from './usergroup';
 
 export const gameQueues = pgEnum('game_queue', [
 	'newcomer',
@@ -38,6 +39,20 @@ export class Game {
 
 	public getData() {
 		return this.game;
+	}
+
+	public async fetchUsergroups() {
+		const res = await db
+			.select()
+			.from(usergroups)
+			.where(eq(usergroups.gameId, this.game.id));
+
+		const groups: Usergroup[] = [];
+		for (const usergroup of res) {
+			groups.push(new Usergroup(usergroup));
+		}
+
+		return groups;
 	}
 
 	public async update(changes: Partial<DbGame>) {
