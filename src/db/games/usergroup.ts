@@ -42,26 +42,6 @@ export class Usergroup {
 		return this.usergroup;
 	}
 
-	public getId() {
-		return this.usergroup.id;
-	}
-
-	public getName() {
-		return this.usergroup.name;
-	}
-
-	public getGameId() {
-		return this.usergroup.gameId;
-	}
-
-	public getType() {
-		return this.usergroup.type;
-	}
-
-	public getCreatedAt() {
-		return this.usergroup.createdAt;
-	}
-
 	public async update(changes: Partial<DbUsergroup>) {
 		const res = await db
 			.update(usergroups)

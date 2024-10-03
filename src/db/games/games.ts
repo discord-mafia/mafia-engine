@@ -40,26 +40,6 @@ export class Game {
 		return this.game;
 	}
 
-	public getId() {
-		return this.game.id;
-	}
-
-	public getName() {
-		return this.game.name;
-	}
-
-	public getQueue() {
-		return this.game.queue;
-	}
-
-	public getQueueIndex() {
-		return this.game.queueIndex;
-	}
-
-	public getCreatedAt() {
-		return this.game.createdAt;
-	}
-
 	public async update(changes: Partial<DbGame>) {
 		const res = await db
 			.update(games)

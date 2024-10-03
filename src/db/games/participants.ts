@@ -42,22 +42,6 @@ export class Participant {
 		return this.participant;
 	}
 
-	public getId() {
-		return this.participant.id;
-	}
-
-	public getName() {
-		return this.participant.name;
-	}
-
-	public getUserIds() {
-		return this.participant.userIds;
-	}
-
-	public getMentorIds() {
-		return this.participant.mentorIds;
-	}
-
 	public async update(changes: Partial<DbParticipant>) {
 		const res = await db
 			.update(participants)
