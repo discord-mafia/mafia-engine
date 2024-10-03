@@ -7,15 +7,7 @@ import {
 	varchar,
 } from 'drizzle-orm/pg-core';
 import { users } from './users';
-
-export const gameQueues = pgEnum('game_queue', [
-	'newcomer',
-	'main',
-	'special',
-	'community',
-	'arcade',
-	'unknown',
-]);
+import { games } from './games/games';
 
 export const participantType = pgEnum('participant_type', [
 	'player',
@@ -23,14 +15,6 @@ export const participantType = pgEnum('participant_type', [
 	'host',
 	'unknown',
 ]);
-
-export const games = pgTable('games', {
-	id: serial('id').primaryKey(),
-	name: varchar('name', { length: 256 }).notNull(),
-	queue: gameQueues('queue').notNull(),
-	queueIndex: integer('queue_index').notNull(),
-	createdAt: timestamp('created_at').notNull().defaultNow(),
-});
 
 export const usergroups = pgTable('usergroups', {
 	id: serial('id').primaryKey(),
