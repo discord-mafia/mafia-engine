@@ -59,5 +59,9 @@ export async function genManageGameEmbed(game: Game) {
 		embed.addFields({ name: usergroupName, value });
 	}
 
+	if (usergroups.length == 0) {
+		embed.addFields({ name: 'Usergroups', value: '> None' });
+	}
+
 	return { embed };
 }
