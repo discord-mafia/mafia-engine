@@ -1,6 +1,7 @@
 /* eslint-disable quotes */
 
 import { EmbedBuilder, Interaction } from 'discord.js';
+import { isError } from 'util';
 
 export enum ErrorCode {
 	Unknown = 'UNKNOWN',
@@ -14,6 +15,18 @@ export enum ErrorCode {
 	// Specifics
 	OUT_OF_SERVER = 'OUT_OF_SERVER',
 	OUT_OF_TEXT_CHANNEL = 'OUT_OF_TEXT_CHANNEL',
+}
+
+export function isErrorCode(value: string): value is ErrorCode {
+	return (
+		ErrorCode.Unknown === value ||
+		ErrorCode.NotPermitted === value ||
+		ErrorCode.NotImplemented === value ||
+		ErrorCode.NotFound === value ||
+		ErrorCode.BadRequest === value ||
+		ErrorCode.Conflict === value ||
+		ErrorCode.Internal === value
+	);
 }
 
 export type StatusMessage = {
@@ -105,9 +118,11 @@ export function getErrorEmbedTitle() {
 
 export class InteractionError extends Error {
 	public readonly errorCode: ErrorCode = ErrorCode.Unknown;
-	constructor(message: string | StatusMessage) {
+	constructor(message: string | ErrorCode | StatusMessage) {
 		if (typeof message === 'string') {
-			super(message);
+			super(
+				isErrorCode(message) ? defaultStatusMessages[message] : message
+			);
 			this.errorCode = ErrorCode.Unknown;
 		} else {
 			super(message.message ?? defaultStatusMessages[message.status]);
