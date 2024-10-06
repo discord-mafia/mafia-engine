@@ -15,6 +15,7 @@ export enum ErrorCode {
 	OutOfServer = 'OUT_OF_SERVER',
 	OutOfTextChannel = 'OUT_OF_TEXT_CHANNEL',
 	MissingContext = 'MISSING_CONTEXT',
+	InvalidContext = 'INVALID_CONTEXT',
 }
 
 export function isErrorCode(value: string): value is ErrorCode {
@@ -28,7 +29,8 @@ export function isErrorCode(value: string): value is ErrorCode {
 		ErrorCode.Internal === value ||
 		ErrorCode.OutOfServer === value ||
 		ErrorCode.OutOfTextChannel === value ||
-		ErrorCode.MissingContext === value
+		ErrorCode.MissingContext === value ||
+		ErrorCode.InvalidContext === value
 	);
 }
 
@@ -54,6 +56,8 @@ export const defaultStatusMessages: Record<ErrorCode, string> = {
 		'This action must be done within a text channel',
 	[ErrorCode.MissingContext]:
 		'This action requires internal context that it is unable to find',
+	[ErrorCode.InvalidContext]:
+		'This action has internal context that is invalid',
 };
 
 const embedErrorJokeNames: string[] = [
