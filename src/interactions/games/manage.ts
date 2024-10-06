@@ -42,10 +42,14 @@ export const manageGame = new SubCommand('manage')
 	});
 
 export async function genManageGameEmbed(game: Game) {
-	const { name } = game.getData();
+	const { name, queue, queueIndex } = game.getData();
+
+	// Get first 2 chars in queue
+	const queueShorthand = queue.slice(0, 2).toUpperCase();
+	const fullTitle = `${queueShorthand}${queueIndex + 1}: ${name}`;
 
 	const embed = new EmbedBuilder();
-	embed.setTitle(name);
+	embed.setTitle(fullTitle);
 
 	const usergroups = await game.fetchUsergroups();
 	for (const usergroup of usergroups) {
