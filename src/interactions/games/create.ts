@@ -1,4 +1,4 @@
-import { ChannelType, messageLink } from 'discord.js';
+import { ChannelType } from 'discord.js';
 import { SubCommand } from '../../builders/subcommand';
 import { ErrorCode, InteractionError } from '../../utils/errors';
 import { Game, gameQueues, isValidGameQueue } from '../../db/games/games';
