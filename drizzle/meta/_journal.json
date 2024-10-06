@@ -50,6 +50,13 @@
       "when": 1723974020941,
       "tag": "0006_early_storm",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1728191131933,
+      "tag": "0007_material_titanium_man",
+      "breakpoints": true
     }
   ]
 }

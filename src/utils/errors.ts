@@ -8,6 +8,12 @@ export enum ErrorCode {
 	NotImplemented = 'NOT_IMPLEMENTED',
 	NotFound = 'NOT_FOUND',
 	BadRequest = 'BAD_REQUEST',
+	Conflict = 'CONFLICT',
+	Internal = 'INTERNAL',
+
+	// Specifics
+	OUT_OF_SERVER = 'OUT_OF_SERVER',
+	OUT_OF_TEXT_CHANNEL = 'OUT_OF_TEXT_CHANNEL',
 }
 
 export type StatusMessage = {
@@ -23,6 +29,13 @@ export const defaultStatusMessages: Record<ErrorCode, string> = {
 	[ErrorCode.NotImplemented]: 'This feature has not been implemented yet',
 	[ErrorCode.NotFound]: 'The requested resource was not found',
 	[ErrorCode.BadRequest]: 'The request was invalid',
+	[ErrorCode.Conflict]: 'The resource already exists or cannot be overridden',
+	[ErrorCode.Internal]: 'An internal server error occurred',
+
+	// Specifics
+	[ErrorCode.OUT_OF_SERVER]: 'This action must be done within a server',
+	[ErrorCode.OUT_OF_TEXT_CHANNEL]:
+		'This action must be done within a text channel',
 };
 
 const embedErrorJokeNames: string[] = [

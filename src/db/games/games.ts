@@ -6,7 +6,7 @@ import {
 	timestamp,
 	varchar,
 } from 'drizzle-orm/pg-core';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 import { db } from '../../controllers/database';
 import { Usergroup, usergroups } from './usergroup';
@@ -19,6 +19,12 @@ export const gameQueues = pgEnum('game_queue', [
 	'arcade',
 	'unknown',
 ]);
+
+export type GameQueueValue = (typeof gameQueues.enumValues)[number];
+
+export function isValidGameQueue(value: string): value is GameQueueValue {
+	return (gameQueues.enumValues as string[]).includes(value);
+}
 
 export const games = pgTable('games', {
 	id: serial('id').primaryKey(),
@@ -72,6 +78,17 @@ export class Game {
 			.select()
 			.from(games)
 			.where(eq(games.id, id))
+			.limit(1);
+		const game = res.shift();
+		if (!game) return null;
+		return new Game(game);
+	}
+
+	static async fromQueueIndex(queue: GameQueueValue, index: number) {
+		const res = await db
+			.select()
+			.from(games)
+			.where(and(eq(games.queue, queue), eq(games.queueIndex, index)))
 			.limit(1);
 		const game = res.shift();
 		if (!game) return null;

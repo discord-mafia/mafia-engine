@@ -1,5 +1,5 @@
 import { integer, pgTable, serial, varchar } from 'drizzle-orm/pg-core';
-import { users } from '../users';
+import { getUser, users } from '../users';
 import { usergroups } from './usergroup';
 import { db } from '../../controllers/database';
 import { eq } from 'drizzle-orm';
@@ -12,17 +12,7 @@ export const participants = pgTable('participants', {
 			onDelete: 'cascade',
 		}),
 	name: varchar('name', { length: 32 }),
-	userIds: varchar('user_ids', { length: 32 })
-		.array()
-		.default([])
-		.notNull()
-		.references(() => users.id, {
-			onDelete: 'cascade',
-		}),
-
-	mentorIds: varchar('mentor_ids', { length: 32 })
-		.array()
-		.default([])
+	userId: varchar('user_id', { length: 32 })
 		.notNull()
 		.references(() => users.id, {
 			onDelete: 'cascade',
@@ -40,6 +30,14 @@ export class Participant {
 
 	public getData() {
 		return this.participant;
+	}
+
+	public async generateUsername() {
+		if (this.participant.name) return this.participant.name;
+		const id = this.participant.userId;
+		const user = await getUser(id);
+		if (user) return user.username;
+		return 'Unknown Slot';
 	}
 
 	public async update(changes: Partial<DbParticipant>) {
