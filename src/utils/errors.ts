@@ -12,8 +12,8 @@ export enum ErrorCode {
 	Internal = 'INTERNAL',
 
 	// Specifics
-	OUT_OF_SERVER = 'OUT_OF_SERVER',
-	OUT_OF_TEXT_CHANNEL = 'OUT_OF_TEXT_CHANNEL',
+	OutOfServer = 'OUT_OF_SERVER',
+	OutOfTextChannel = 'OUT_OF_TEXT_CHANNEL',
 }
 
 export function isErrorCode(value: string): value is ErrorCode {
@@ -45,8 +45,8 @@ export const defaultStatusMessages: Record<ErrorCode, string> = {
 	[ErrorCode.Internal]: 'An internal server error occurred',
 
 	// Specifics
-	[ErrorCode.OUT_OF_SERVER]: 'This action must be done within a server',
-	[ErrorCode.OUT_OF_TEXT_CHANNEL]:
+	[ErrorCode.OutOfServer]: 'This action must be done within a server',
+	[ErrorCode.OutOfTextChannel]:
 		'This action must be done within a text channel',
 };
 

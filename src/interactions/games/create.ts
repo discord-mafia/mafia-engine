@@ -19,9 +19,9 @@ export const createGame = new SubCommand('create')
 		o.setName('index').setDescription('Queue index').setRequired(true)
 	)
 	.onExecute(async (i) => {
-		if (!i.guild) throw new InteractionError(ErrorCode.OUT_OF_SERVER);
+		if (!i.guild) throw new InteractionError(ErrorCode.OutOfServer);
 		if (!i.channel || i.channel.type != ChannelType.GuildText)
-			throw new InteractionError(ErrorCode.OUT_OF_TEXT_CHANNEL);
+			throw new InteractionError(ErrorCode.OutOfTextChannel);
 
 		const queue = i.options.getString('queue', true);
 		if (!isValidGameQueue(queue))
