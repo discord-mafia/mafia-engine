@@ -1,7 +1,6 @@
 /* eslint-disable quotes */
 
 import { EmbedBuilder, Interaction } from 'discord.js';
-import { isError } from 'util';
 
 export enum ErrorCode {
 	Unknown = 'UNKNOWN',
