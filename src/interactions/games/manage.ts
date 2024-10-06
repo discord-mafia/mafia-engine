@@ -1,5 +1,39 @@
-import { EmbedBuilder } from 'discord.js';
-import { Game } from '../../db/games/games';
+import { ChannelType, EmbedBuilder } from 'discord.js';
+import { Game, gameQueues, isValidGameQueue } from '../../db/games/games';
+import { SubCommand } from '../../builders/subcommand';
+import { InteractionError, ErrorCode } from '../../utils/errors';
+
+export const manageGame = new SubCommand('manage')
+	.setDescription('Manage a game')
+	.addStringOption((o) =>
+		o
+			.setName('queue')
+			.setDescription('Name of the game')
+			.setChoices(
+				...gameQueues.enumValues.map((q) => ({ name: q, value: q }))
+			)
+			.setRequired(true)
+	)
+	.addIntegerOption((o) =>
+		o.setName('index').setDescription('Queue index').setRequired(true)
+	)
+	.onExecute(async (i) => {
+		if (!i.guild) throw new InteractionError(ErrorCode.OUT_OF_SERVER);
+		if (!i.channel || i.channel.type != ChannelType.GuildText)
+			throw new InteractionError(ErrorCode.OUT_OF_TEXT_CHANNEL);
+
+		const queue = i.options.getString('queue', true);
+		if (!isValidGameQueue(queue))
+			throw new InteractionError(ErrorCode.BadRequest);
+
+		const index = i.options.getInteger('index', true);
+
+		const game = await Game.fromQueueIndex(queue, index);
+		if (!game) throw new InteractionError(ErrorCode.NotFound);
+
+		const { embed } = await genManageGameEmbed(game);
+		await i.reply({ embeds: [embed] });
+	});
 
 export async function genManageGameEmbed(game: Game) {
 	const { name } = game.getData();
