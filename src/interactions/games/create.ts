@@ -46,9 +46,10 @@ export const createGame = new SubCommand('create')
 			});
 
 		const manageEmbed = await genManageGameEmbed(game);
-		const { embed } = manageEmbed;
+		const { embed, components } = manageEmbed;
 
 		return await i.editReply({
 			embeds: [embed],
+			components,
 		});
 	});

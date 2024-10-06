@@ -1,7 +1,13 @@
-import { ChannelType, EmbedBuilder } from 'discord.js';
+import {
+	ActionRowBuilder,
+	ButtonBuilder,
+	ChannelType,
+	EmbedBuilder,
+} from 'discord.js';
 import { Game, gameQueues, isValidGameQueue } from '../../db/games/games';
 import { SubCommand } from '../../builders/subcommand';
 import { InteractionError, ErrorCode } from '../../utils/errors';
+import { renameGameBtn } from './manage/renameGame';
 
 export const manageGame = new SubCommand('manage')
 	.setDescription('Manage a game')
@@ -31,8 +37,8 @@ export const manageGame = new SubCommand('manage')
 		const game = await Game.fromQueueIndex(queue, index);
 		if (!game) throw new InteractionError(ErrorCode.NotFound);
 
-		const { embed } = await genManageGameEmbed(game);
-		await i.reply({ embeds: [embed], ephemeral: true });
+		const { embed, components } = await genManageGameEmbed(game);
+		await i.reply({ embeds: [embed], components, ephemeral: true });
 	});
 
 export async function genManageGameEmbed(game: Game) {
@@ -63,5 +69,8 @@ export async function genManageGameEmbed(game: Game) {
 		embed.addFields({ name: 'Usergroups', value: '> None' });
 	}
 
-	return { embed };
+	const row = new ActionRowBuilder<ButtonBuilder>();
+	row.addComponents(renameGameBtn.buildWithContext('' + game.getData().id));
+
+	return { embed, components: [row] };
 }
