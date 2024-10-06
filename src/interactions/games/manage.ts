@@ -44,7 +44,6 @@ export const manageGame = new SubCommand('manage')
 export async function genManageGameEmbed(game: Game) {
 	const { name, queue, queueIndex } = game.getData();
 
-	// Get first 2 chars in queue
 	const queueShorthand = queue.slice(0, 2).toUpperCase();
 	const fullTitle = `${queueShorthand}${queueIndex + 1}: ${name}`;
 
