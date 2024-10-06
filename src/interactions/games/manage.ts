@@ -32,7 +32,7 @@ export const manageGame = new SubCommand('manage')
 		if (!game) throw new InteractionError(ErrorCode.NotFound);
 
 		const { embed } = await genManageGameEmbed(game);
-		await i.reply({ embeds: [embed] });
+		await i.reply({ embeds: [embed], ephemeral: true });
 	});
 
 export async function genManageGameEmbed(game: Game) {
