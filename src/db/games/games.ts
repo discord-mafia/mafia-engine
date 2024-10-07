@@ -10,6 +10,7 @@ import { and, eq } from 'drizzle-orm';
 
 import { db } from '../../controllers/database';
 import { Usergroup, usergroups } from './usergroup';
+import { users } from '../users';
 
 export const gameQueues = pgEnum('game_queue', [
 	'newcomer',
@@ -32,6 +33,19 @@ export const games = pgTable('games', {
 	queue: gameQueues('queue').notNull(),
 	queueIndex: integer('queue_index').notNull(),
 	createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+export const gameHosts = pgTable('game_hosts', {
+	gameId: integer('game_id')
+		.notNull()
+		.references(() => games.id, {
+			onDelete: 'cascade',
+		}),
+	userId: varchar('user_id', { length: 32 })
+		.notNull()
+		.references(() => users.id, {
+			onDelete: 'cascade',
+		}),
 });
 
 export type DbGame = typeof games.$inferSelect;

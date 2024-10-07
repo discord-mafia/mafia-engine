@@ -57,6 +57,13 @@
       "when": 1728191131933,
       "tag": "0007_material_titanium_man",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1728276966893,
+      "tag": "0008_medical_tyger_tiger",
+      "breakpoints": true
     }
   ]
 }
