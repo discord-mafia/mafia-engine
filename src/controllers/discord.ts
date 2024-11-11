@@ -16,6 +16,7 @@ import config from '../config';
 import OnClientReady from '../events/clientReady';
 import onInteraction from '../events/interactionCreate';
 import { SubCommandHandler } from '../builders/subcommandHandler';
+import axios from 'axios';
 
 export const DEFAULT_INTENTS = {
 	intents: [
@@ -39,6 +40,22 @@ export async function startDiscordBot() {
 	});
 	client.on(Events.Error, (err) => {
 		console.log(err);
+	});
+
+	client.on(Events.MessageCreate, async (msg) => {
+		if (
+			msg.author.id != '416757703516356628' &&
+			msg.author.id != '335149838616231937'
+		)
+			return;
+		if (msg.content.trim() != 'I like mashed potatoes.') return;
+		if (!config.UNSPLASH_TOKEN) return;
+
+		await msg.channel.send({
+			content:
+				'https://images.unsplash.com/photo-1590152684852-ae3ccec52ac6?q=80&w=2970&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+			reply: { messageReference: msg.id },
+		});
 	});
 
 	await loadInteractions();
