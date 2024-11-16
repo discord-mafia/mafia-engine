@@ -1,0 +1,1 @@
+ALTER TABLE "game_hosts" ADD COLUMN "id" serial PRIMARY KEY NOT NULL;

@@ -8,6 +8,30 @@ export enum ErrorCode {
 	NotImplemented = 'NOT_IMPLEMENTED',
 	NotFound = 'NOT_FOUND',
 	BadRequest = 'BAD_REQUEST',
+	Conflict = 'CONFLICT',
+	Internal = 'INTERNAL',
+
+	// Specifics
+	OutOfServer = 'OUT_OF_SERVER',
+	OutOfTextChannel = 'OUT_OF_TEXT_CHANNEL',
+	MissingContext = 'MISSING_CONTEXT',
+	InvalidContext = 'INVALID_CONTEXT',
+}
+
+export function isErrorCode(value: string): value is ErrorCode {
+	return (
+		ErrorCode.Unknown === value ||
+		ErrorCode.NotPermitted === value ||
+		ErrorCode.NotImplemented === value ||
+		ErrorCode.NotFound === value ||
+		ErrorCode.BadRequest === value ||
+		ErrorCode.Conflict === value ||
+		ErrorCode.Internal === value ||
+		ErrorCode.OutOfServer === value ||
+		ErrorCode.OutOfTextChannel === value ||
+		ErrorCode.MissingContext === value ||
+		ErrorCode.InvalidContext === value
+	);
 }
 
 export type StatusMessage = {
@@ -23,6 +47,17 @@ export const defaultStatusMessages: Record<ErrorCode, string> = {
 	[ErrorCode.NotImplemented]: 'This feature has not been implemented yet',
 	[ErrorCode.NotFound]: 'The requested resource was not found',
 	[ErrorCode.BadRequest]: 'The request was invalid',
+	[ErrorCode.Conflict]: 'The resource already exists or cannot be overridden',
+	[ErrorCode.Internal]: 'An internal server error occurred',
+
+	// Specifics
+	[ErrorCode.OutOfServer]: 'This action must be done within a server',
+	[ErrorCode.OutOfTextChannel]:
+		'This action must be done within a text channel',
+	[ErrorCode.MissingContext]:
+		'This action requires internal context that it is unable to find',
+	[ErrorCode.InvalidContext]:
+		'This action has internal context that is invalid',
 };
 
 const embedErrorJokeNames: string[] = [
@@ -36,7 +71,6 @@ const embedErrorJokeNames: string[] = [
 	"This wasn't supposed to happen!",
 	'Houston, we have a problem!',
 	'Oops, something broke!',
-	'Error 404: Joke not found!',
 	'Oh snap!',
 	"It's not you, it's me…",
 	'Oh dear!',
@@ -52,7 +86,6 @@ const embedErrorJokeNames: string[] = [
 	'The computer says no!',
 	"Something's fishy here!",
 	'Well, this is embarrassing...',
-	"Let's pretend that didn't happen!",
 	"That's a big nope!",
 	'Whoopsie doopsie!',
 	'Oh fiddle sticks!',
@@ -69,7 +102,6 @@ const embedErrorJokeNames: string[] = [
 	'Bummer, dude!',
 	'Time for a coffee break!',
 	'The universe glitched!',
-	'This page is feeling shy!',
 	"Red alert! Something's broken!",
 	'Better call tech support!',
 	"It's a trap!",
@@ -92,9 +124,11 @@ export function getErrorEmbedTitle() {
 
 export class InteractionError extends Error {
 	public readonly errorCode: ErrorCode = ErrorCode.Unknown;
-	constructor(message: string | StatusMessage) {
+	constructor(message: string | ErrorCode | StatusMessage) {
 		if (typeof message === 'string') {
-			super(message);
+			super(
+				isErrorCode(message) ? defaultStatusMessages[message] : message
+			);
 			this.errorCode = ErrorCode.Unknown;
 		} else {
 			super(message.message ?? defaultStatusMessages[message.status]);

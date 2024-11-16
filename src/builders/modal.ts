@@ -41,6 +41,10 @@ export class Modal extends ModalBuilder {
 		return this;
 	}
 
+	public getCustomId() {
+		return this.customId;
+	}
+
 	public set(...inputs: TextInputBuilder[]) {
 		this.addComponents(
 			new ActionRowBuilder<TextInputBuilder>().addComponents(...inputs)
