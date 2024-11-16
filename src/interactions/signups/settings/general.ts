@@ -162,6 +162,9 @@ const createPlayerChatButton = new Button('signup-create-pc')
 							PermissionFlagsBits.ViewChannel,
 							PermissionFlagsBits.ManageChannels,
 							PermissionFlagsBits.ManageWebhooks,
+							PermissionFlagsBits.ManageRoles,
+							PermissionFlagsBits.MentionEveryone,
+							PermissionFlagsBits.ManageMessages,
 						],
 					};
 				}),
