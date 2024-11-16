@@ -3,6 +3,8 @@ import {
 	ActionRowBuilder,
 	ButtonBuilder,
 	ButtonStyle,
+	ChannelType,
+	PermissionFlagsBits,
 } from 'discord.js';
 import {
 	getHydratedSignupFromChannel,
@@ -94,6 +96,7 @@ export async function generalSettingsEmbed(signup: HydratedSignup) {
 	const row = new ActionRowBuilder<ButtonBuilder>();
 	row.addComponents(manageCategories.build());
 	row.addComponents(miscSettings.build());
+	row.addComponents(createPlayerChatButton.build());
 	row.addComponents(helpCategoryButton.build());
 
 	return {
@@ -101,3 +104,77 @@ export async function generalSettingsEmbed(signup: HydratedSignup) {
 		row,
 	};
 }
+
+const createPlayerChatButton = new Button('signup-create-pc')
+	.setStyle(ButtonStyle.Secondary)
+	.setEmoji('👤')
+	.onExecute(async (i) => {
+		if (!i.user) throw new InteractionError('Failed to fetch user');
+		if (!i.guild) throw new InteractionError('Failed to fetch guild');
+
+		const member = await i.guild.members.fetch(i.user.id);
+		if (!member) throw new InteractionError('Failed to fetch member');
+
+		if (!member.permissions.has(PermissionFlagsBits.Administrator))
+			throw new InteractionError(
+				'You must be an admin to use this button'
+			);
+
+		const client = i.client;
+		if (!client) throw new InteractionError('Failed to fetch client');
+
+		await i.deferReply({ ephemeral: true });
+
+		await client.guilds.fetch();
+		const playerChatServer = client.guilds.cache.get('753231987589906483');
+		if (!playerChatServer)
+			throw new InteractionError('Failed to fetch player chat server');
+
+		const signup = await getHydratedSignupFromChannel(i.channelId);
+		if (!signup)
+			throw new InteractionError({
+				status: ErrorCode.NotFound,
+				message: 'Failed to find signup',
+			});
+
+		const hostIds: string[] = [];
+
+		for (const category of signup.categories) {
+			if (category.name == 'Hosts' || category.name == 'Moderators') {
+				for (const user of category.users) {
+					hostIds.push(user.id);
+				}
+			}
+		}
+
+		const category = await playerChatServer.channels.create({
+			name: signup.name,
+			type: ChannelType.GuildCategory,
+			permissionOverwrites: [
+				{
+					id: playerChatServer.roles.everyone.id,
+					deny: [PermissionFlagsBits.ViewChannel],
+				},
+				...hostIds.map((id) => {
+					return {
+						id,
+						allow: [
+							PermissionFlagsBits.ViewChannel,
+							PermissionFlagsBits.ManageChannels,
+							PermissionFlagsBits.ManageWebhooks,
+						],
+					};
+				}),
+			],
+		});
+
+		const hostPanelChannel = await playerChatServer.channels.create({
+			name: 'host-panel',
+			type: ChannelType.GuildText,
+			parent: category.id,
+		});
+
+		await i.editReply({
+			content: `Channel ID: <#${hostPanelChannel.id}>`,
+		});
+	});
