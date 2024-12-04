@@ -45,15 +45,22 @@ export async function startDiscordBot() {
 	client.on(Events.MessageCreate, async (msg) => {
 		if (
 			msg.author.id != '416757703516356628' &&
-			msg.author.id != '335149838616231937'
+			msg.author.id != '335149838616231937' &&
+			msg.author.id != '689590113684291627'
 		)
 			return;
 		if (msg.content.trim() != 'I like mashed potatoes.') return;
 		if (!config.UNSPLASH_TOKEN) return;
 
+		let url =
+			'https://images.unsplash.com/photo-1590152684852-ae3ccec52ac6?q=80&w=2970&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+		if (msg.author.id == '689590113684291627') {
+			url =
+				'https://media1.tenor.com/m/GJ2PsnsAmCMAAAAd/elmo-burning.gif';
+		}
+
 		await msg.channel.send({
-			content:
-				'https://images.unsplash.com/photo-1590152684852-ae3ccec52ac6?q=80&w=2970&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+			content: url,
 			reply: { messageReference: msg.id },
 		});
 	});
