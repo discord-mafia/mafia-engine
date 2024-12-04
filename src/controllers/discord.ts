@@ -46,7 +46,8 @@ export async function startDiscordBot() {
 		if (
 			msg.author.id != '416757703516356628' &&
 			msg.author.id != '335149838616231937' &&
-			msg.author.id != '689590113684291627'
+			msg.author.id != '689590113684291627' &&
+			msg.author.id != '412634999020453891'
 		)
 			return;
 		if (msg.content.trim() != 'I like mashed potatoes.') return;
@@ -57,6 +58,9 @@ export async function startDiscordBot() {
 		if (msg.author.id == '689590113684291627') {
 			url =
 				'https://media1.tenor.com/m/GJ2PsnsAmCMAAAAd/elmo-burning.gif';
+		} else if (msg.author.id == '412634999020453891') {
+			url =
+				'https://media1.tenor.com/m/saPUlEkMM9YAAAAd/noah-sebastian-bad-omens.gif';
 		}
 
 		await msg.channel.send({
