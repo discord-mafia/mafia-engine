@@ -43,15 +43,6 @@ export async function startDiscordBot() {
 	});
 
 	client.on(Events.MessageCreate, async (msg) => {
-		if (msg.content.toLowerCase().includes('rule 6')) {
-			await msg.channel.send({
-				content: 'https://i.imgur.com/bwZXsnx.png',
-				reply: {
-					messageReference: msg.id,
-				},
-			});
-		}
-
 		if (
 			msg.author.id != '416757703516356628' &&
 			msg.author.id != '335149838616231937' &&
