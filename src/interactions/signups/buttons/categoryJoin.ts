@@ -5,6 +5,7 @@ import { ErrorCode, InteractionError } from '../../../utils/errors';
 import {
 	addUserToCategory,
 	getHydratedCategory,
+	getHydratedSignup,
 	leaveSignups,
 } from '../../../db/signups';
 import { onSignupUpdate } from '../signupUpdateEvent';
@@ -46,10 +47,13 @@ export const categoryJoinButton = new Button('signup-join')
 			i,
 		});
 
-		await logSignup({
-			categoryName: category.name,
-			user: user.username,
-			type: LogType.JOIN,
-			channelId: i.message.channelId,
-		});
+		const signup = await getSignup(category.signupId);
+		if (signup && !signup.isAnonymous) {
+			await logSignup({
+				categoryName: category.name,
+				user: user.username,
+				type: LogType.JOIN,
+				channelId: i.message.channelId,
+			});
+		}
 	});

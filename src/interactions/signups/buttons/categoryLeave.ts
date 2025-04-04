@@ -25,9 +25,12 @@ export const leaveCategoryBtn = new Button('signup-leave')
 			i,
 		});
 
-		await logSignup({
-			user: user.username,
-			type: LogType.LEAVE,
-			channelId: i.message.channelId,
-		});
+		const signup = await getSignup(category.signupId);
+		if (signup && !signup.isAnonymous) {
+			await logSignup({
+				user: user.username,
+				type: LogType.LEAVE,
+				channelId: i.message.channelId,
+			});
+		}
 	});
