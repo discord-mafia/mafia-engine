@@ -5,7 +5,7 @@ import { ErrorCode, InteractionError } from '../../../utils/errors';
 import {
 	addUserToCategory,
 	getHydratedCategory,
-	getHydratedSignup,
+	getSignup,
 	leaveSignups,
 } from '../../../db/signups';
 import { onSignupUpdate } from '../signupUpdateEvent';

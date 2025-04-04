@@ -2,7 +2,7 @@ import { ButtonStyle } from 'discord.js';
 import { Button } from '../../../builders/button';
 import { getOrInsertUser } from '../../../db/users';
 import { InteractionError } from '../../../utils/errors';
-import { leaveSignups } from '../../../db/signups';
+import { leaveSignups, getSignupByChannel } from '../../../db/signups';
 import { onSignupUpdate } from '../signupUpdateEvent';
 import { logSignup, LogType } from '../../../utils/logging';
 
@@ -15,6 +15,8 @@ export const leaveCategoryBtn = new Button('signup-leave')
 			username: i.user.username,
 		});
 
+		if (!i.channelId) throw new InteractionError('Invalid channel');
+
 		if (!user)
 			throw new InteractionError('Unable to fetch your user account');
 
@@ -25,7 +27,7 @@ export const leaveCategoryBtn = new Button('signup-leave')
 			i,
 		});
 
-		const signup = await getSignup(category.signupId);
+		const signup = await getSignupByChannel(i.channelId);
 		if (signup && !signup.isAnonymous) {
 			await logSignup({
 				user: user.username,
