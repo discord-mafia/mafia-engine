@@ -21,7 +21,7 @@ export const onSignupUpdate = new Event<SignupUpdateEvent>().subscribe(
 
             if ('i' in data) {
                 if (data.i.isButton())
-                    return await data.i.update({
+                    return await data.i.editReply({
                         embeds: [embed],
                         components: [components],
                     });

@@ -15,7 +15,6 @@ export const categoryJoinButton = new Button('signup-join')
     .setStyle(ButtonStyle.Secondary)
     .onExecute(async (i, ctx) => {
         if (!ctx) throw new InteractionError('Invalid context');
-        await i.deferUpdate();
         const user = await getOrInsertUser({
             id: i.user.id,
             username: i.user.username,
@@ -36,6 +35,9 @@ export const categoryJoinButton = new Button('signup-join')
                 status: ErrorCode.NotFound,
                 message: 'Category not found',
             });
+
+        await i.deferUpdate();
+
 
         await leaveSignups(user.id, i.message.id);
         await addUserToCategory({
