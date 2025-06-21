@@ -7,32 +7,34 @@ import { onSignupUpdate } from '../signupUpdateEvent';
 import { logSignup, LogType } from '../../../utils/logging';
 
 export const leaveCategoryBtn = new Button('signup-leave')
-	.setStyle(ButtonStyle.Secondary)
-	.setEmoji('❌')
-	.onExecute(async (i, _) => {
-		const user = await getOrInsertUser({
-			id: i.user.id,
-			username: i.user.username,
-		});
+    .setStyle(ButtonStyle.Secondary)
+    .setEmoji('❌')
+    .onExecute(async (i, _) => {
+        const user = await getOrInsertUser({
+            id: i.user.id,
+            username: i.user.username,
+        });
 
-		if (!i.channelId) throw new InteractionError('Invalid channel');
+        if (!i.channelId) throw new InteractionError('Invalid channel');
 
-		if (!user)
-			throw new InteractionError('Unable to fetch your user account');
+        if (!user)
+            throw new InteractionError('Unable to fetch your user account');
 
-		await leaveSignups(user.id, i.message.id);
+        await i.deferUpdate();
 
-		onSignupUpdate.publish({
-			messageId: i.message.id,
-			i,
-		});
+        await leaveSignups(user.id, i.message.id);
 
-		const signup = await getSignupByChannel(i.channelId);
-		if (signup && !signup.isAnonymous) {
-			await logSignup({
-				user: user.username,
-				type: LogType.LEAVE,
-				channelId: i.message.channelId,
-			});
-		}
-	});
+        onSignupUpdate.publish({
+            messageId: i.message.id,
+            i,
+        });
+
+        const signup = await getSignupByChannel(i.channelId);
+        if (signup && !signup.isAnonymous) {
+            await logSignup({
+                user: user.username,
+                type: LogType.LEAVE,
+                channelId: i.message.channelId,
+            });
+        }
+    });
