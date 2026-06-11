@@ -139,14 +139,7 @@ export function calculateVoteCount(vc: FullVoteCount) {
 	}
 
 	for (const vote of vc.votes) {
-		if (vc.majorityAfter) {
-			const now = new Date();
-			const after = new Date(vc.majorityAfter);
-
-			if (now > after) canMajorityBeReached = true;
-
-			console.log(now.getTime(), after.getTime(), now.getTime() - after.getTime(), canMajorityBeReached);
-		}
+		if (vc.majorityAfter && vote.createdAt > vc.majorityAfter) canMajorityBeReached = true;
 
 		if (canMajorityBeReached && checkMajorityReached()) continue;
 
